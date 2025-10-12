@@ -14,7 +14,7 @@ services:
     networks:
       - GLOBAL_NETWORK
 
-  web-celery:
+  celery:
     build: ./
     container_name: django_celery_tasks
     command: poetry run celery -A PANEL worker --beat -l INFO
@@ -23,7 +23,7 @@ services:
     depends_on:
       - web
 
-  web-beat:
+  beat:
     build: ./
     container_name: django_beat
     command: poetry run celery -A PANEL beat -S django_celery_beat.schedulers:DatabaseScheduler --loglevel=info
