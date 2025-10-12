@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     'app.abstractions',
+    'app.sockets',
     'app.users',
     'app.frontend',
 ]

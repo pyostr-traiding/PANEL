@@ -29,6 +29,7 @@ django-json-widget = "^2.0.4"
 pyotp = "^2.9.0"
 qrcode = "^8.2"
 twisted = "^25.5.0"
+daphne = "^4.2.1"
 
 
 [build-system]
