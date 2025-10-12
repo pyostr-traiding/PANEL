@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Подтверждение 2FA</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background: white;
+            padding: 30px 40px;
+            border: 1px solid #ccc;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.13);
+            border-radius: 5px;
+            width: 320px;
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 400;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #40a9ff;
+            outline: none;
+            box-shadow: 0 0 5px #40a9ff;
+        }
+        .error {
+            color: #d93025;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        button {
+            width: 100%;
+            background-color: #0c7cd5;
+            border: none;
+            color: white;
+            padding: 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #095a9d;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Введите код из Google Authenticator</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                <label for="id_token">Код 2FA:</label>
+                {{ form.token }}
+                {% if form.token.errors %}
+                    <div class="error">{{ form.token.errors }}</div>
+                {% endif %}
+            </div>
+            <button type="submit">Подтвердить</button>
+        </form>
+    </div>
+</body>
+</html>
