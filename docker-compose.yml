@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
 
-  web-django:
+  panel:
     build: ./
     container_name: admin-panel
     command: poetry run daphne -b 0.0.0.0 -p 8000 PANEL.asgi:application
@@ -16,21 +16,21 @@ services:
 
   celery:
     build: ./
-    container_name: django_celery_tasks
+    container_name: panel-celery-tasks
     command: poetry run celery -A PANEL worker --beat -l INFO
     env_file: ./.env
     restart: always
     depends_on:
-      - web
+      - panel
 
   beat:
     build: ./
-    container_name: django_beat
+    container_name: panel-beat
     command: poetry run celery -A PANEL beat -S django_celery_beat.schedulers:DatabaseScheduler --loglevel=info
     env_file: ./.env
     restart: always
     depends_on:
-      - web
+      - panel
 #
 #  redis_subscriber:
 #    build: ./
