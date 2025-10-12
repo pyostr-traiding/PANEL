@@ -22,7 +22,8 @@ services:
     restart: always
     depends_on:
       - panel
-
+    networks:
+      - GLOBAL_NETWORK
   beat:
     build: ./
     container_name: panel-beat
@@ -31,6 +32,9 @@ services:
     restart: always
     depends_on:
       - panel
+    networks:
+      - GLOBAL_NETWORK
+
 #
 #  redis_subscriber:
 #    build: ./
