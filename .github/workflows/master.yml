@@ -54,15 +54,15 @@ jobs:
               echo "Ошибка при клонировании репозитория"
               exit 1
             fi
-#
-#            # Установка .env файла
-#            if ! echo "${{ secrets.ENV_FILE }}" > .env; then
-#              echo "Ошибка при установке .env файла"
-#              exit 1
-#            fi
-#
-#            # Попытка запуска docker-compose
-#            if ! docker compose up --build -d; then
-#              echo "Ошибка при запуске docker-compose"
-#              exit 1
-#            fi
+
+            # Установка .env файла
+            if ! echo "${{ secrets.ENV_FILE }}" > .env; then
+              echo "Ошибка при установке .env файла"
+              exit 1
+            fi
+
+            # Попытка запуска docker-compose
+            if ! docker compose up --build -d; then
+              echo "Ошибка при запуске docker-compose"
+              exit 1
+            fi
