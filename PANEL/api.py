@@ -3,8 +3,12 @@
 from ninja_extra import NinjaExtraAPI
 
 # Импорт роутеров из других модулей
-from app.users.api import router as users_router
-from app.P2P.fake_check.api import router as fake_p2p_router
+from app.users.api import router as router_users
+from app.P2P.fake_check.api import router as router_fake_p2p
+
+#####
+# Позиции
+from app.position.routes.position import router as router_position
 
 # Создание API с уникальным namespace
 api_route = NinjaExtraAPI(
@@ -18,5 +22,6 @@ api_route = NinjaExtraAPI(
 )
 
 # Подключение роутеров
-api_route.add_router('/users/', users_router)
-api_route.add_router('/receipt/', fake_p2p_router)
+api_route.add_router('/users/', router_users)
+api_route.add_router('/receipt/', router_fake_p2p)
+api_route.add_router('/position/', router_position)

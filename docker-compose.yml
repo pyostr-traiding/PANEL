@@ -6,7 +6,7 @@ services:
   panel:
     build: ./
     container_name: admin-panel
-    command: poetry run daphne -b 0.0.0.0 -p 8000 PANEL.asgi:application
+    command: poetry run daphne -b 0.0.0.0 -p 8000 PANEL.asgi:application --verbosity 0
     env_file: ./.env
     restart: always
     ports:

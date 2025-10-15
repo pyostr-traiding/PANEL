@@ -11,6 +11,7 @@ urlpatterns = [
     path('setup-2fa/', setup_2fa, name='setup_2fa'),
     path('login/', login_view, name='login'),
     path('2fa/', two_factor_view, name='two_factor'),
+    path('grappelli/', include('grappelli.urls')),
     path('', admin.site.urls),
 
 ]

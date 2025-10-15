@@ -23,14 +23,14 @@ class AbstractModel(models.Model):
         abstract = True
     objects = GetOrNoneManager()
 
-    create_on = models.DateTimeField(
+    created_at = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания',
     )
-    update_on = models.DateTimeField(
+    updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата обновления',
     )
 
     def __str__(self):
-        return str(self.create_on)
+        return str(self.created_at)

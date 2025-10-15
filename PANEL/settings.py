@@ -1,12 +1,17 @@
 # using Django 5.2.7.
 import ast
 import os
-from pathlib import Path
 
 import boto3
 import pika
+import redis
+
+from pathlib import Path
+
 from dotenv import load_dotenv
 from telebot import TeleBot
+
+from PANEL.redis_conf import RedisServer
 
 load_dotenv()
 
@@ -21,9 +26,8 @@ DEBUG = ast.literal_eval(os.getenv('DEBUG', False))
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', []).split(',')
 
 
-
-
 INSTALLED_APPS = [
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,6 +41,9 @@ INSTALLED_APPS = [
     'app.sockets',
     'app.users',
     'app.frontend',
+
+    'app.setting',
+    'app.position',
 ]
 
 CHANNEL_LAYERS = {
@@ -152,6 +159,13 @@ SESSION_COOKIE_SECURE = False
 
 ####
 # S3 bucket
+s3_client = boto3.resource(
+    service_name='s3',
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    endpoint_url='https://s3.timeweb.com',
+
+)
 
 STORAGES = {
     'default': {
@@ -190,25 +204,19 @@ tg_client = TeleBot(
     token=os.getenv('BOT_TOKEN'),
     parse_mode='HTML'
 )
-s3_client = boto3.resource(
-    service_name='s3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-    endpoint_url='https://s3.timeweb.com',
 
-)
 
 #####################
 # RabbitMQ
 
-# Параметры подключения
 credentials = pika.PlainCredentials(
     username=os.getenv('RABBITMQ_USERNAME'),
     password=os.getenv('RABBITMQ_PASSWORD')
 )
+
 connection_params = pika.ConnectionParameters(
     host=os.getenv('RABBITMQ_HOST'),
-    port=os.getenv('RABBITMQ_PORT'),
+    port=int(os.getenv('RABBITMQ_PORT')),
     virtual_host=os.getenv('RABBITMQ_VIRTUAL_HOST'),
     credentials=credentials
 )
@@ -221,3 +229,9 @@ CELERY_BROKER_URL = f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_H
 CELERY_RESULT_BACKEND = f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}/44"
 CELERY_RESULT_EXTENDED = True
 CELERY_BEAT_MAX_LOOP_INTERVAL = 1  # в секундах
+
+
+#####
+# Redis
+
+redis_server = RedisServer()

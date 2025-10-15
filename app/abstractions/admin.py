@@ -126,6 +126,68 @@ class AbstractAdmin(admin.ModelAdmin):
 
         return formfield
 
+
+#####################################################################
+from django.contrib import admin
+from django_celery_beat.models import PeriodicTask, CrontabSchedule, IntervalSchedule, SolarSchedule
+
+# Свертываем PeriodicTask
+class PeriodicTaskAdmin(admin.ModelAdmin):
+    list_display = ('name', 'task', 'enabled', 'last_run_at')
+    fieldsets = (
+        ('Основное', {
+            'fields': ('name', 'task', 'enabled'),
+        }),
+        ('Дополнительно', {
+            'classes': ('collapse',),  # <-- свернуть блок
+            'fields': (
+                'interval', 'crontab', 'solar', 'args', 'kwargs', 'queue',
+                'exchange', 'routing_key', 'expires', 'one_off', 'start_time', 'priority',
+            ),
+        }),
+    )
+
+# Свертываем расписания
+class CrontabScheduleAdmin(admin.ModelAdmin):
+    list_display = ('minute', 'hour', 'day_of_week', 'day_of_month', 'month_of_year')
+    fieldsets = (
+        (None, {
+            'fields': ('minute', 'hour', 'day_of_week', 'day_of_month', 'month_of_year'),
+            'classes': ('collapse',),
+        }),
+    )
+
+class IntervalScheduleAdmin(admin.ModelAdmin):
+    list_display = ('every', 'period')
+    fieldsets = (
+        (None, {
+            'fields': ('every', 'period'),
+            'classes': ('collapse',),
+        }),
+    )
+
+class SolarScheduleAdmin(admin.ModelAdmin):
+    list_display = ('event', 'latitude', 'longitude')
+    fieldsets = (
+        (None, {
+            'fields': ('event', 'latitude', 'longitude'),
+            'classes': ('collapse',),
+        }),
+    )
+
+# Сначала снимаем стандартную регистрацию
+admin.site.unregister(PeriodicTask)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(SolarSchedule)
+
+# Регистрируем с нашими Admin-классами
+admin.site.register(PeriodicTask, PeriodicTaskAdmin)
+admin.site.register(CrontabSchedule, CrontabScheduleAdmin)
+admin.site.register(IntervalSchedule, IntervalScheduleAdmin)
+admin.site.register(SolarSchedule, SolarScheduleAdmin)
+
+
 def app_resort(func):
     def inner(*args, **kwargs):
         app_list = func(*args, **kwargs)
@@ -171,3 +233,5 @@ def app_resort(func):
 
 
 admin.site.get_app_list = app_resort(admin.site.get_app_list)
+
+
