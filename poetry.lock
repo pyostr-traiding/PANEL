@@ -757,6 +757,17 @@ django = ">=3.0"
 django-fsm = "*"
 
 [[package]]
+name = "django-grappelli"
+version = "4.0.2"
+description = "A jazzy skin for the Django Admin-Interface."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-grappelli-4.0.2.tar.gz", hash = "sha256:cf753ba830b5597a5a453bedcf6358c1538368c916d2ed1ae7b4cee1a660fe09"},
+    {file = "django_grappelli-4.0.2-py2.py3-none-any.whl", hash = "sha256:ed0a87a3cf025ad359fffb995b5d37d0bae5b4fd32eb0f06428c8a7a47702594"},
+]
+
+[[package]]
 name = "django-json-widget"
 version = "2.0.4"
 description = "Django json widget is an alternative widget that makes it easy to edit the jsonfield field of django."
@@ -2109,4 +2120,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.14"
-content-hash = "06489252c88f2a74733184e9a2090bfb9f96e1040cec8cc9820f1c6f0ec50c9d"
+content-hash = "5b63990d9b7d4dabb0ff503458197abbc45d8d59bfb61c1ae9cdcc3ef8305b8d"
