@@ -1,9 +1,16 @@
 # app/position/service/status.py
 
 from app.position.models import PositionModel
+from app.position.schemas.base import PositionSchema
+from app.position.service.status_handlers import STATUS_HANDLERS
 from app.utils import response
 
-from app.position.service.status_handlers import STATUS_HANDLERS
+# Импортируем обработчики для регистрации в STATUS_HANDLERS
+from app.position.service.handlers import (  # noqa: F401
+    accept_monitoring,
+    cancel,
+    completed,
+)
 
 from django_fsm import TransitionNotAllowed
 
@@ -28,7 +35,14 @@ def change_status_position(data):
     handler_func = handler_data["handler"]
 
     try:
-        return handler_func(position, data)
+        result = handler_func(position, data)
+        if isinstance(result, response.BaseResponse):
+            return result
+
+        if isinstance(result, PositionModel):
+            return PositionSchema(**result.__dict__)
+
+        return result
     except TransitionNotAllowed as e:
         return response.OtherErrorResponse(msg=str(e))
     except Exception as e:

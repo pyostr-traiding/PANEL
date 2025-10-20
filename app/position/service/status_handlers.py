@@ -1,6 +1,6 @@
 from functools import wraps
-from app.position.models import PositionStatus, PositionModel
-from app.utils import response
+
+from app.position.models import PositionStatus
 
 # Глобальный реестр обработчиков
 STATUS_HANDLERS = {}

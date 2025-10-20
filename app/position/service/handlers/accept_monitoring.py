@@ -1,6 +1,5 @@
-from position.models import PositionStatus, PositionModel
-from position.service.status_handlers import status_handler
-from app.utils import response
+from app.position.models import PositionModel, PositionStatus
+from app.position.service.status_handlers import status_handler
 
 
 @status_handler(
@@ -12,5 +11,5 @@ def handle_accept_monitoring(
         data,
 ):
     position.set_status_position_accept_monitoring_service()
-    # тут можно добавить логику отправки в RabbitMQ и т.д.
-    print("✅ Переведено в мониторинг")
+    position.refresh_from_db(fields=['status', 'updated_at'])
+    return position

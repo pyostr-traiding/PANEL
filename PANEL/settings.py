@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'app.setting',
     'app.position',
+    'app.order',
 ]
 
 CHANNEL_LAYERS = {

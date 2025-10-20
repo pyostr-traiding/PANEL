@@ -82,8 +82,8 @@ class PositionModel(AbstractModel):
         Установить статус мониторинга
         """
         self.status = PositionStatus.ACCEPT_MONITORING
-        self.save()
-        return True
+        self.save(update_fields=['status', 'updated_at'])
+        return self
 
     @transition(
         field=status,
@@ -94,15 +94,23 @@ class PositionModel(AbstractModel):
         """
         Установить статус ордера
         """
-        print(f"Позиция завершена!")
+        self.status = PositionStatus.COMPLETED
+        self.save(update_fields=['status', 'updated_at'])
+        return self
 
     @transition(
         field=status,
-        source=[PositionStatus.ACCEPT_MONITORING, PositionStatus.CREATED],
+        source=[
+            PositionStatus.CREATED,
+            PositionStatus.ACCEPT_MONITORING,
+            PositionStatus.COMPLETED,
+        ],
         target=PositionStatus.CANCEL,
     )
     def set_status_cancel(self):
         """
-        Установить статус ордера
+        Установить статус отмены
         """
-        print(f"Позиция завершена!")
+        self.status = PositionStatus.CANCEL
+        self.save(update_fields=['status', 'updated_at'])
+        return self
