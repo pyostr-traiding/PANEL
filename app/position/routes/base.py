@@ -7,7 +7,7 @@ from ninja import Router
 from app.position.schemas.base import CreatePositionSchema
 from app.position.service.base import create_position, get_position
 from app.utils import response
-from utils.rabbit import send_to_rabbitmq
+from app.utils.rabbit import send_to_rabbitmq
 
 router = Router(
     tags=['Позиции'],
