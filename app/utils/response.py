@@ -40,6 +40,7 @@ class ConflictResponse(BaseResponse):
     """
     status: bool = False
 
+
 class OtherErrorResponse(BaseResponse):
     """
     Странная/другая ошибка

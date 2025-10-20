@@ -1,5 +1,3 @@
-from symtable import Symbol
-
 from django.db import models
 from django_fsm import FSMField, transition
 
@@ -8,10 +6,13 @@ from django.core.exceptions import ValidationError
 from app.abstractions.models import AbstractModel
 
 
-class StatusPosition(models.TextChoices):
+class PositionStatus(models.TextChoices):
     CREATED = 'created', 'Создано'
     ACCEPT_MONITORING = 'monitoring', 'Мониторинг'
-    CLOSED = 'closed', 'Завершено'
+
+    COMPLETED = 'completed', 'Исполнено'
+
+    CANCEL = 'cancel', 'Отменено'
 
 
 def validate_category(value: str):
@@ -27,6 +28,7 @@ def validate_side(value: str):
         raise ValidationError(
             f'Недопустимое значение категории "{value}". Разрешено только: {", ".join(allowed)}.'
         )
+
 
 class PositionModel(AbstractModel):
     class Meta:
@@ -63,21 +65,44 @@ class PositionModel(AbstractModel):
     )
     status = FSMField(
         verbose_name='Статус',
-        choices=StatusPosition.choices,
-        default=StatusPosition.CREATED,
+        choices=PositionStatus.choices,
+        default=PositionStatus.CREATED,
     )
     is_test = models.BooleanField(
         verbose_name='Тест-позиция',
     )
 
-    @transition(field=status, source=StatusPosition.CREATED, target=StatusPosition.ACCEPT_MONITORING)
+    @transition(
+        field=status,
+        source=[PositionStatus.CREATED],
+        target=PositionStatus.ACCEPT_MONITORING,
+    )
     def set_status_position_accept_monitoring_service(self):
-        pass
-
-    @transition(field=status, source=[StatusPosition.ACCEPT_MONITORING], target=StatusPosition.CLOSED)
-    def close(self):
         """
-        Завершение позиции
+        Установить статус мониторинга
+        """
+        self.status = PositionStatus.ACCEPT_MONITORING
+        self.save()
+        return True
+
+    @transition(
+        field=status,
+        source=[PositionStatus.ACCEPT_MONITORING],
+        target=PositionStatus.COMPLETED,
+    )
+    def set_status_completed(self):
+        """
+        Установить статус ордера
         """
         print(f"Позиция завершена!")
 
+    @transition(
+        field=status,
+        source=[PositionStatus.ACCEPT_MONITORING, PositionStatus.CREATED],
+        target=PositionStatus.CANCEL,
+    )
+    def set_status_cancel(self):
+        """
+        Установить статус ордера
+        """
+        print(f"Позиция завершена!")

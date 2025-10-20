@@ -8,7 +8,8 @@ from app.P2P.fake_check.api import router as router_fake_p2p
 
 #####
 # Позиции
-from app.position.routes.position import router as router_position
+from app.position.routes.base import router as router_position_base
+from app.position.routes.status import router as router_position_status
 
 # Создание API с уникальным namespace
 api_route = NinjaExtraAPI(
@@ -24,4 +25,6 @@ api_route = NinjaExtraAPI(
 # Подключение роутеров
 api_route.add_router('/users/', router_users)
 api_route.add_router('/receipt/', router_fake_p2p)
-api_route.add_router('/position/', router_position)
+
+api_route.add_router('/position/', router_position_base)
+api_route.add_router('/position/', router_position_status)

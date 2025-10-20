@@ -37,8 +37,11 @@ class CreatePositionSchema(BaseModel):
 class PositionSchema(BaseModel):
 
     id: int
+
     symbol_name: str = 'BTCUSDT'
-    uuid: str
+    status: str
+
+    uuid: uuid.UUID
     category: Literal['spot', 'option']
     side: Literal['buy', 'sell']
     qty_tokens: str
@@ -46,3 +49,4 @@ class PositionSchema(BaseModel):
     is_test: bool
 
     created_at: Any
+
