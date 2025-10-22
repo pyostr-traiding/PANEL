@@ -17,14 +17,14 @@ class PositionStatus(models.TextChoices):
 
 def validate_category(value: str):
     allowed = ['spot', 'option']
-    if value.capitalize() not in allowed:
+    if value.lower() not in allowed:
         raise ValidationError(
             f'Недопустимое значение категории "{value}". Разрешено только: {", ".join(allowed)}.'
         )
 
 def validate_side(value: str):
     allowed = ['sell', 'buy']
-    if value.capitalize() not in allowed:
+    if value.lower() not in allowed:
         raise ValidationError(
             f'Недопустимое значение категории "{value}". Разрешено только: {", ".join(allowed)}.'
         )
@@ -71,19 +71,6 @@ class PositionModel(AbstractModel):
     is_test = models.BooleanField(
         verbose_name='Тест-позиция',
     )
-
-    @transition(
-        field=status,
-        source=[PositionStatus.CREATED],
-        target=PositionStatus.ACCEPT_MONITORING,
-    )
-    def set_status_position_accept_monitoring_service(self):
-        """
-        Установить статус мониторинга
-        """
-        self.status = PositionStatus.ACCEPT_MONITORING
-        self.save()
-        return True
 
     @transition(
         field=status,

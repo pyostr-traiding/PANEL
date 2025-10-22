@@ -1,5 +1,5 @@
-from position.models import PositionStatus, PositionModel
-from position.service.status_handlers import status_handler
+from app.position.models import PositionStatus, PositionModel
+from app.position.service.status_handlers import status_handler
 from app.utils import response
 
 
@@ -8,5 +8,5 @@ from app.utils import response
     source=[PositionStatus.ACCEPT_MONITORING],
 )
 def handle_completed(position: PositionModel, data):
-    position.set_status_completed()
+    # position.set_status_completed()
     print("✅ Позиция завершена")

@@ -1,6 +1,5 @@
 version: '3.8'
 
-
 services:
 
   panel:
@@ -11,6 +10,8 @@ services:
     restart: always
     ports:
       - '8091:8000'
+    volumes:
+      - /root/logs/:/root/logs/   # ✅ добавили
     networks:
       - GLOBAL_NETWORK
 
@@ -22,8 +23,11 @@ services:
     restart: always
     depends_on:
       - panel
+    volumes:
+      - /root/logs/:/root/logs/  # ✅ та же папка
     networks:
       - GLOBAL_NETWORK
+
   beat:
     build: ./
     container_name: panel-beat
@@ -32,20 +36,10 @@ services:
     restart: always
     depends_on:
       - panel
+    volumes:
+      - /root/logs/:/root/logs/   # ✅ та же папка
     networks:
       - GLOBAL_NETWORK
-
-#
-#  redis_subscriber:
-#    build: ./
-#    container_name: redis_subscriber
-#    command: poetry run python redis_subscriber.py
-#    env_file: ./.env
-#    restart: always
-#    depends_on:
-#      - web
-#    networks:
-#      - TRADE_NET
 
 
 networks:

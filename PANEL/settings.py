@@ -232,3 +232,87 @@ CELERY_BEAT_MAX_LOOP_INTERVAL = 1  # в секундах
 # Redis
 
 redis_server = RedisServer()
+
+
+#####
+# Logger
+
+import logging
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name}:{lineno} — {message}',
+            'style': '{',
+            'datefmt': '%d-%m-%Y %H:%M:%S',
+        },
+        'colored': {
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s[%(asctime)s] %(levelname)s %(name)s: %(message)s',
+        },
+    },
+
+    'filters': {
+        'require_debug_true': {'()': 'django.utils.log.RequireDebugTrue'},
+        'require_debug_false': {'()': 'django.utils.log.RequireDebugFalse'},
+    },
+
+    'handlers': {
+        # Показывает всё в консоль только если DEBUG=True
+        'console_debug': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'colored',
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+        },
+        # Показывает только ошибки в консоли при DEBUG=False
+        'console_production': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+        },
+
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': str(BASE_DIR / 'logs' / 'panel.log'),
+            'formatter': 'verbose',
+            'level': 'INFO',
+        },
+        'rotating': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(BASE_DIR / 'logs' / 'panel_rotating.log'),
+            'maxBytes': 10 * 1024 * 1024,
+            'backupCount': 3,
+            'formatter': 'verbose',
+        },
+        'mail_admins': {
+            'class': 'django.utils.log.AdminEmailHandler',
+            'level': 'ERROR',
+        },
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['console_debug', 'console_production'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'app': {
+            'handlers': ['console_debug', 'console_production', 'rotating'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+
+    'root': {
+        'handlers': ['console_debug', 'console_production'],
+        'level': 'WARNING',
+    },
+}

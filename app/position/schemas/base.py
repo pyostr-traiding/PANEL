@@ -35,6 +35,8 @@ class CreatePositionSchema(BaseModel):
 
 
 class PositionSchema(BaseModel):
+    class Config:
+        from_attributes = True  # <— ключевая строка!
 
     id: int
 
