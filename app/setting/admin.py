@@ -17,6 +17,7 @@ class BanSymbolModelAdminTabularInline(TabularInline):
     )
     fields = ('key', 'value', 'redis_value')  # порядок отображения
 
+    @admin.display(description='Значение в Redis')
     def redis_value(self, obj):
         """
         Возвращает значение из Redis для данной блокировки
@@ -27,7 +28,6 @@ class BanSymbolModelAdminTabularInline(TabularInline):
         value = redis_server.get(redis_key, db=RedisDB.settings)
         return value
 
-    redis_value.short_description = "Значение в Redis"
     def has_add_permission(self, request, obj):
         return False
 

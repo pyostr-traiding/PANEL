@@ -1,23 +1,20 @@
 from functools import wraps
-from pprint import pprint
 
-from app.position.models import PositionStatus, PositionModel
-from app.utils import response
+from app.order.models import OrderStatus
 
 # Глобальный реестр обработчиков
-STATUS_HANDLERS = {}
+STATUS_ORDER_HANDLERS = {}
 
 
-def status_handler(status: PositionStatus, source: list[PositionStatus]):
+def status_order_handler(status: OrderStatus, source: list[OrderStatus]):
     """
     Декоратор для регистрации функции как обработчика смены статуса
     """
     def decorator(func):
-        STATUS_HANDLERS[status] = {
+        STATUS_ORDER_HANDLERS[status] = {
             "handler": func,
             "source": source,
         }
-        pprint(STATUS_HANDLERS)
 
         @wraps(func)
         def wrapper(*args, **kwargs):

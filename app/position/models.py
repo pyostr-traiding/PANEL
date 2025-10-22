@@ -1,5 +1,5 @@
 from django.db import models
-from django_fsm import FSMField, transition
+from django_fsm import FSMField
 
 from django.core.exceptions import ValidationError
 
@@ -14,6 +14,15 @@ class PositionStatus(models.TextChoices):
 
     CANCEL = 'cancel', 'Отменено'
 
+    @classmethod
+    def get_open_status_list(cls):
+        """
+        Получить список статусов в которых позиция считается активной
+        """
+        return [
+            cls.CREATED,
+            cls.ACCEPT_MONITORING,
+        ]
 
 def validate_category(value: str):
     allowed = ['spot', 'option']
@@ -72,24 +81,3 @@ class PositionModel(AbstractModel):
         verbose_name='Тест-позиция',
     )
 
-    @transition(
-        field=status,
-        source=[PositionStatus.ACCEPT_MONITORING],
-        target=PositionStatus.COMPLETED,
-    )
-    def set_status_completed(self):
-        """
-        Установить статус ордера
-        """
-        print(f"Позиция завершена!")
-
-    @transition(
-        field=status,
-        source=[PositionStatus.ACCEPT_MONITORING, PositionStatus.CREATED],
-        target=PositionStatus.CANCEL,
-    )
-    def set_status_cancel(self):
-        """
-        Установить статус ордера
-        """
-        print(f"Позиция завершена!")

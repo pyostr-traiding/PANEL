@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'app.setting',
     'app.position',
+    'app.order',
 ]
 
 CHANNEL_LAYERS = {
@@ -236,11 +237,6 @@ redis_server = RedisServer()
 
 #####
 # Logger
-
-import logging
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 LOGGING = {
     'version': 1,

@@ -4,11 +4,11 @@ from decimal import Decimal
 import django
 import pika
 
-from typing import Union
+from typing import Union, List
 
 from django.db import transaction
 
-from app.position.models import PositionModel
+from app.position.models import PositionModel, PositionStatus
 from app.position.schemas.base import CreatePositionSchema, PositionSchema
 from app.setting.models import SymbolModel
 from app.utils import response
@@ -72,4 +72,16 @@ def get_position(
     )
     if not position_model:
         return response.NotFoundResponse(msg='Позиция не найдена')
-    return PositionSchema(**position_model.__dict__)
+    return PositionSchema.model_validate(position_model)
+
+
+def get_list_open_position() -> Union[List[PositionSchema], response.BaseResponse]:
+    """
+    Получить все открытые позиции
+    """
+    positions_models = PositionModel.objects.filter(
+        status__in=PositionStatus.get_open_status_list(),
+    )
+    if not positions_models:
+        return response.NotFoundResponse(msg='Позиций не найдено не найдена')
+    return [PositionSchema.model_validate(i) for i in positions_models]
