@@ -10,7 +10,7 @@ services:
     ports:
       - '8091:8000'
     volumes:
-      - /root/logs/:/code/logs/   # ✅ добавили
+      - /root/logs/PANEL/panel:/code/logs/
     networks:
       - GLOBAL_NETWORK
 
@@ -23,7 +23,7 @@ services:
     depends_on:
       - panel
     volumes:
-      - /root/logs/:/code/logs/  # ✅ та же папка
+      - /root/logs/PANEL/celery:/code/logs/
     networks:
       - GLOBAL_NETWORK
 
@@ -36,7 +36,7 @@ services:
     depends_on:
       - panel
     volumes:
-      - /root/logs/:/code/logs/   # ✅ та же папка
+      - /root/logs/PANEL/beat:/code/logs/
     networks:
       - GLOBAL_NETWORK
 
