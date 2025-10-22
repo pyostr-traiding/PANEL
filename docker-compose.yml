@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   panel:
     build: ./
     container_name: admin-panel
@@ -11,7 +10,7 @@ services:
     ports:
       - '8091:8000'
     volumes:
-      - /root/logs/:/root/logs/   # ✅ добавили
+      - /root/logs/:/code/logs/   # ✅ добавили
     networks:
       - GLOBAL_NETWORK
 
@@ -24,7 +23,7 @@ services:
     depends_on:
       - panel
     volumes:
-      - /root/logs/:/root/logs/  # ✅ та же папка
+      - /root/logs/:/code/logs/  # ✅ та же папка
     networks:
       - GLOBAL_NETWORK
 
@@ -37,7 +36,7 @@ services:
     depends_on:
       - panel
     volumes:
-      - /root/logs/:/root/logs/   # ✅ та же папка
+      - /root/logs/:/code/logs/   # ✅ та же папка
     networks:
       - GLOBAL_NETWORK
 

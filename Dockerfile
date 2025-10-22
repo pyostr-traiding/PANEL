@@ -8,6 +8,7 @@ RUN pip install poetry
 
 # Создание рабочей директории
 RUN mkdir /code
+RUN mkdir /code/logs
 WORKDIR /code
 
 # Копирование файлов проекта
