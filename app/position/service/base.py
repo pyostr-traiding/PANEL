@@ -83,5 +83,5 @@ def get_list_open_position() -> Union[List[PositionSchema], response.BaseRespons
         status__in=PositionStatus.get_open_status_list(),
     )
     if not positions_models:
-        return response.NotFoundResponse(msg='Позиций не найдено не найдена')
+        return response.NotFoundResponse(msg='Позиций не найдено')
     return [PositionSchema.model_validate(i) for i in positions_models]

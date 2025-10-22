@@ -1,6 +1,6 @@
 import logging
 import uuid
-from typing import Union
+from typing import Union, List
 
 import django
 from django.db import transaction
@@ -95,3 +95,15 @@ def get_order(
     if not order_model:
         return response.NotFoundResponse(msg='Ордер не найден')
     return OrderSchema.model_validate(order_model)
+
+
+def get_list_open_orders() -> Union[List[OrderSchema], response.BaseResponse]:
+    """
+    Получить все открытые позиции
+    """
+    orders_models = OrderModel.objects.filter(
+        status__in=OrderStatus.get_open_status_list(),
+    )
+    if not orders_models:
+        return response.NotFoundResponse(msg='Ордеров не найдено')
+    return [OrderSchema.model_validate(i) for i in orders_models]

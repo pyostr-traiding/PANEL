@@ -19,6 +19,12 @@ class OrderStatus(models.TextChoices):
 
     CANCEL = 'cancel', 'Отменено'
 
+    @classmethod
+    def get_open_status_list(cls):
+        return [
+            cls.CREATED,
+            cls.ACCEPT_MONITORING,
+        ]
 
 class OrderModel(AbstractModel):
     class Meta:
