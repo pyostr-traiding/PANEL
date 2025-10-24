@@ -2,10 +2,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from app.abstractions.models import AbstractModel
+
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-
-from app.abstractions.models import AbstractModel
 
 
 class SymbolModel(AbstractModel):
@@ -18,13 +18,16 @@ class SymbolModel(AbstractModel):
         help_text='Пример: BTCUSDT',
         max_length=40,
     )
+
     is_active = models.BooleanField(
         verbose_name='Активно',
         help_text='Разрешено открытие новых позиций',
     )
+
     qty_USDT_for_order = models.IntegerField(
         verbose_name='Сумма USDT для позиции',
     )
+
     class Meta:
         verbose_name = 'Символ'
         verbose_name_plural = 'Символы'
@@ -41,9 +44,11 @@ class BanSymbolModel(AbstractModel):
         verbose_name='Блокировка',
         max_length=40,
     )
+
     value = models.IntegerField(
         verbose_name='Значение',
     )
+
     symbol = models.ForeignKey(
         SymbolModel,
         on_delete=models.CASCADE,

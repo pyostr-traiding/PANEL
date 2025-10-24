@@ -5,7 +5,7 @@ class RedisDB:
     stream: int = 0
     settings: int = 1
     cache: int = 2
-    orders: int = 3
+    extremums: int = 3
 
 class RedisServer:
     def __init__(self):
@@ -30,7 +30,6 @@ class RedisServer:
         conn = self._get_connection(db)
         return conn.mget(keys)
 
-
     def set(self, key: str, value, db: int = 0):
         conn = self._get_connection(db)
         return conn.set(key, value)
@@ -38,6 +37,3 @@ class RedisServer:
     def delete(self, key: str, db: int = 0):
         conn = self._get_connection(db)
         return conn.delete(key)
-
-
-

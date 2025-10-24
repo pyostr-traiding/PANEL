@@ -72,7 +72,7 @@ class OrderModel(AbstractModel):
             f"extremum:{self.uuid}:min",
         ]
 
-        values = redis_server.mget(keys, db=RedisDB.orders)
+        values = redis_server.mget(keys, db=RedisDB.extremums)
 
         result = []
         for k, v in zip(keys, values):

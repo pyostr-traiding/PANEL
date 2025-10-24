@@ -24,6 +24,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = ast.literal_eval(os.getenv('DEBUG', False))
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', []).split(',')
+ALLOWED_HOSTS.append('admin-panel')
 
 
 INSTALLED_APPS = [
