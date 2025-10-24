@@ -50,9 +50,10 @@ class PositionModel(AbstractModel):
         to='setting.SymbolModel',
         on_delete=models.PROTECT,
     )
-    uuid = models.UUIDField(
+    uuid = models.CharField(
         verbose_name='UUID',
         unique=True,
+        max_length=40,
     )
     category = models.CharField(
         verbose_name='Рынок',

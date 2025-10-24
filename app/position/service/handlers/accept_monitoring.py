@@ -31,15 +31,15 @@ def handle_accept_monitoring(
 
         # Формируем сообщение
         schema = PositionSchema.model_validate(position)
-        message = schema.model_json_schema()
+        # message = schema.model_json_schema()
 
         # Отправляем в RabbitMQ
-        if not send_to_rabbitmq(queue="queue_monitoring_position", message=message):
-            # Если не удалось — откатываем статус
-            position.status = prev_status
-            position.save(update_fields=["status"])
-            logger.error(f"Не удалось отправить позицию {position.uuid} в RabbitMQ")
-            return response.OtherErrorResponse(msg="Не удалось отправить позицию в мониторинг")
+        # if not send_to_rabbitmq(queue="queue_monitoring_position", message=message):
+        #     Если не удалось — откатываем статус
+            # position.status = prev_status
+            # position.save(update_fields=["status"])
+            # logger.error(f"Не удалось отправить позицию {position.uuid} в RabbitMQ")
+            # return response.OtherErrorResponse(msg="Не удалось отправить позицию в мониторинг")
 
         logger.info(f"Позиция {position.uuid} переведена в мониторинг")
         return schema

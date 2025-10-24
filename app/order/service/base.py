@@ -75,7 +75,7 @@ def create_order(
         return order_model
 
     message = OrderSchema.model_validate(order_model).model_json_schema()
-    if not send_to_rabbitmq(queue='queue_new_order', message=message):
+    if not send_to_rabbitmq(queue='queue_monitoring_order', message=message):
         # Очередь не приняла, но запись уже в базе — можно пометить как failed или удалить
         order_model.delete()
         return response.ConflictResponse(msg='Ошибка отправки в RabbitMQ')

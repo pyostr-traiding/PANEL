@@ -43,7 +43,7 @@ class PositionSchema(BaseModel):
     symbol_name: str = 'BTCUSDT'
     status: str
 
-    uuid: uuid.UUID
+    uuid: str
     category: Literal['spot', 'option']
     side: Literal['buy', 'sell']
     qty_tokens: str
