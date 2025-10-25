@@ -50,9 +50,8 @@ def create_position(
                 msg='Уже создана запись с таким ID'
             )
         raise e
-
     # Здесь транзакция уже коммитнулась, запись точно в базе
-    message = PositionSchema.model_validate(result_create).model_json_schema()
+    message = PositionSchema.model_validate(result_create).model_dump_json()
     if not send_to_rabbitmq(queue='queue_monitoring_position', message=message):
         # Очередь не приняла, но запись уже в базе — можно пометить как failed или удалить
         result_create.delete()
