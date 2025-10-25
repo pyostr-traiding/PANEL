@@ -53,7 +53,7 @@ def create_position(
 
     # Здесь транзакция уже коммитнулась, запись точно в базе
     message = PositionSchema.model_validate(result_create).model_json_schema()
-    if not send_to_rabbitmq(queue='queue_new_position', message=message):
+    if not send_to_rabbitmq(queue='queue_monitoring_position', message=message):
         # Очередь не приняла, но запись уже в базе — можно пометить как failed или удалить
         result_create.delete()
         return response.ConflictResponse(msg='Ошибка отправки в RabbitMQ')
