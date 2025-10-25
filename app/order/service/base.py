@@ -74,7 +74,7 @@ def create_order(
     if isinstance(order_model, response.BaseResponse):
         return order_model
 
-    message = OrderSchema.model_validate(order_model).model_json_schema()
+    message = OrderSchema.model_validate(order_model).model_dump_json()
     if not send_to_rabbitmq(queue='queue_monitoring_order', message=message):
         # Очередь не приняла, но запись уже в базе — можно пометить как failed или удалить
         order_model.delete()
