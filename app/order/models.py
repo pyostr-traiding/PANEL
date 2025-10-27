@@ -4,6 +4,7 @@ from typing import List
 from django_fsm import FSMField
 
 from django.db import models
+from pydantic import ValidationError
 
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
@@ -37,30 +38,49 @@ class OrderModel(AbstractModel):
         on_delete=models.CASCADE,
         related_name='order',
     )
-    uuid = models.UUIDField(
+
+    uuid = models.CharField(
         verbose_name='UUID',
+        max_length=255,
         unique=True,
+        default='string'
     )
+
     category = models.CharField(
         verbose_name='Рынок',
         max_length=20,
+        default='option',
     )
+
     side = models.CharField(
         verbose_name='Сторона',
         max_length=6,
+        default='sell'
     )
+
     price = models.CharField(
         verbose_name='Цена',
         max_length=255,
+        default='100000',
     )
+
     qty_tokens = models.CharField(
         verbose_name='Кол-во токенов',
         max_length=255,
+        default='0.00123'
     )
+
     status = FSMField(
         verbose_name='Статус',
         choices=OrderStatus.choices,
         default=OrderStatus.CREATED,
+    )
+
+    accumulated_funding = models.DecimalField(
+        verbose_name='Накопленный фандинг',
+        decimal_places=18,
+        max_digits=40,
+        default=0
     )
 
     def get_extremum(self) -> List[OrderExtremumSchema]:
@@ -94,6 +114,69 @@ class OrderModel(AbstractModel):
 
         return result
 
-    # def set_extremum(self):
-    #     redis_server.set(f'extremum:{self.uuid}:max', json.dumps({'value': '1000', 'dt': '12-12-12 10:10'}), db=RedisDB.orders)
-    #     redis_server.set(f'extremum:{self.uuid}:min', json.dumps({'value': '1000', 'dt': '12-12-12 10:10'}), db=RedisDB.orders)
+
+
+class OrderHistoryModel(AbstractModel):
+    class Meta:
+        verbose_name = 'История ордера'
+        verbose_name_plural = 'История ордера'
+
+    order = models.ForeignKey(
+        verbose_name='Ордер',
+        to='order.OrderModel',
+        on_delete=models.CASCADE,
+        related_name='history',
+    )
+
+    action_name = models.CharField(
+        verbose_name='Действие',
+        max_length=255,
+    )
+
+    update_data = models.JSONField(
+        verbose_name='Данные обновления'
+    )
+
+    comment = models.TextField(
+        verbose_name='Описание'
+    )
+
+class OrderCreditingType(models.TextChoices):
+    FEE = 'fee', 'Комиссия'
+    FUNDING = 'funding', 'Фандинг'
+
+def validate_type(value):
+    allowed = ['fee', 'funding']
+    if value not in allowed:
+        raise ValidationError(f"Недопустимый тип: {value}. Допустимые значения: {', '.join(allowed)}")
+
+
+class OrderCreditingModel(AbstractModel):
+    class Meta:
+        verbose_name = 'Зачисления'
+        verbose_name_plural = 'Зачисления'
+
+    order = models.ForeignKey(
+        verbose_name='Ордер',
+        to='order.OrderModel',
+        on_delete=models.CASCADE,
+        related_name='crediting',
+    )
+
+    type = models.CharField(
+        verbose_name='Тип',
+        max_length=20,
+        choices=OrderCreditingType.choices,
+        validators=[validate_type],
+
+    )
+
+    count = models.DecimalField(
+        verbose_name='Кол-во',
+        decimal_places=18,
+        max_digits=40,
+    )
+
+    comment = models.TextField(
+        verbose_name='Описание'
+    )

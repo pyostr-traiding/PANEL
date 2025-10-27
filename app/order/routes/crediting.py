@@ -1,3 +1,6 @@
+"""
+Методы для управления позицией
+"""
 from django.http import HttpRequest
 from ninja import Router
 
@@ -11,14 +14,14 @@ router = Router(
 
 
 @router.post(
-    path='/crediting',
+    path='/changeStatus',
 )
-def api_add_crediting(
+def api_change_status_order(
         request: HttpRequest,
         data: ChangeOrderStatusSchema,
 ):
     """
-    Добавить начисление
+    Смена статуса ордера
 
     Статусы:
     * 200 - Записано

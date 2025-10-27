@@ -1,6 +1,3 @@
-"""
-Базовые методы GET/POST
-"""
 from typing import Union
 
 from django.http import HttpRequest

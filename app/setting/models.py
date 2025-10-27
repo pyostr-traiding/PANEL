@@ -1,11 +1,7 @@
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from app.abstractions.models import AbstractModel
 
-from PANEL.redis_conf import RedisDB
-from PANEL.settings import redis_server
 
 
 class SymbolModel(AbstractModel):
@@ -61,22 +57,27 @@ class BanSymbolModel(AbstractModel):
         verbose_name_plural = 'Блокировки символа'
 
 
-# Сигнал для автоматического создания блокировок при создании символа
-@receiver(post_save, sender=SymbolModel)
-def create_bans_for_symbol(sender, instance, created, **kwargs):
-    if created:
-        # словарь ключ:значение для каждой блокировки
-        bans_data = {
-            'short': 0,
-            'long': 0,
-            'sleep': 30,
-        }
-        for key, value in bans_data.items():
-            BanSymbolModel.objects.create(symbol=instance, key=key, value=value)
+class ExchangeModel(AbstractModel):
+    class Meta:
+        verbose_name = 'Биржа'
+        verbose_name_plural = 'Биржи'
 
+    name = models.CharField(
+        verbose_name='Биржа',
+        max_length=40,
+    )
 
-# Сигнал для автоматической записи в Redis
-@receiver(post_save, sender=BanSymbolModel)
-def update_redis_for_ban(sender, instance, **kwargs):
-    redis_key = f"settings:{instance.symbol.name}:{instance.key}"
-    redis_server.set(redis_key, instance.value, db=RedisDB.settings)
+    base_url = models.URLField(
+        verbose_name='Базовый URL',
+    )
+
+    maker_fee = models.FloatField(
+        verbose_name='Комиссия мейкера',
+    )
+
+    taker_fee = models.FloatField(
+        verbose_name='Комиссия тейкера',
+    )
+
+    def __str__(self):
+        return self.name

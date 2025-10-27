@@ -265,7 +265,7 @@ LOGGING = {
         'console_debug': {
             'class': 'logging.StreamHandler',
             'formatter': 'colored',
-            'level': 'DEBUG',
+            'level': 'INFO',
             'filters': ['require_debug_true'],
         },
         # Показывает только ошибки в консоли при DEBUG=False
@@ -297,8 +297,9 @@ LOGGING = {
 
     'loggers': {
         'django': {
-            'handlers': ['console_debug', 'console_production'],
-            'level': 'WARNING',
+            # 'handlers': ['console_debug', 'console_production'],
+            'handlers': ['console_debug'],
+            'level': 'INFO',
             'propagate': True,
         },
         'app': {

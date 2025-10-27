@@ -4,7 +4,7 @@ from django.contrib.admin import TabularInline
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
 from app.abstractions.admin import AbstractAdmin
-from app.setting.models import BanSymbolModel, SymbolModel
+from app.setting.models import BanSymbolModel, SymbolModel, ExchangeModel
 
 
 class BanSymbolModelAdminTabularInline(TabularInline):
@@ -46,4 +46,14 @@ class SymbolModelAdmin(AbstractAdmin):
     )
     list_filter = (
         'is_active',
+    )
+
+@admin.register(ExchangeModel)
+class ExchangeModelAdmin(AbstractAdmin):
+    list_display = (
+        'name',
+        'maker_fee',
+        'taker_fee',
+        'base_url',
+        'id',
     )

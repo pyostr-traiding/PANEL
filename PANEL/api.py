@@ -12,9 +12,10 @@ from app.position.routes.base import router as router_position_base
 from app.position.routes.status import router as router_position_status
 
 #####
-# Позиции
+# Ордера
 from app.order.routes.base import router as router_order_base
 from app.order.routes.status import router as router_order_status
+from app.order.routes.crediting import router as router_order_crediting
 
 
 # Создание API с уникальным namespace
@@ -38,6 +39,7 @@ api_route.add_router('/position/', router_position_base)
 api_route.add_router('/position/', router_position_status)
 
 #####
-# Позиции
+# Ордера
 api_route.add_router('/order/', router_order_base)
 api_route.add_router('/order/', router_order_status)
+api_route.add_router('/order/', router_order_crediting)
