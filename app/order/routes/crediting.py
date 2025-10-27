@@ -4,6 +4,7 @@
 from django.http import HttpRequest
 from ninja import Router
 
+from app.order.service.funding import accumulate_funding
 from app.utils import response
 from app.order.schemas.status import ChangeOrderStatusSchema
 from app.order.service.status import change_status_order
@@ -30,6 +31,23 @@ def api_change_status_order(
     result = change_status_order(
         data=data,
     )
+    if isinstance(result, response.BaseResponse):
+        return response.return_response(result)
+
+    return result
+
+
+@router.post(
+    path='/accumulateFunding',
+)
+def api_accumulate_funding(
+        request: HttpRequest,
+):
+    """
+    Начислить фандинг на все открытые ордера
+    """
+
+    result = accumulate_funding()
     if isinstance(result, response.BaseResponse):
         return response.return_response(result)
 

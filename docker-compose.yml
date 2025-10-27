@@ -1,5 +1,10 @@
 version: '3.8'
 
+networks:
+  GLOBAL_NETWORK:
+    external: true
+
+
 services:
   panel:
     build: ./
@@ -39,8 +44,3 @@ services:
       - /root/logs/PANEL/beat:/code/logs/
     networks:
       - GLOBAL_NETWORK
-
-
-networks:
-  GLOBAL_NETWORK:
-    external: true

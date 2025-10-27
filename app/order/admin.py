@@ -56,24 +56,68 @@ class OrderCreditingModelAdmin(admin.TabularInline):
             full_value,
             short_value
         )
+
+
 @admin.register(OrderModel)
 class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
-
     list_filter = (
         'status',
     )
-
     list_display = (
         'status',
-        'side',
-        'price',
+        'position_info',
+        'accumulated_funding',
         'redis_value',
     )
-
     inlines = [
         OrderCreditingModelAdmin,
         OrderHistoryModelAdmin,
     ]
+
+
+    @admin.display(description='Инфо')
+    def position_info(self, obj):
+        if not obj.pk:
+            return "-"
+
+        price = Decimal(obj.price)
+        qty = Decimal(obj.qty_tokens)
+        value = price * qty
+        rounded_usdt = value.quantize(Decimal('0.01'))
+
+        return mark_safe(
+            f'Вход: {price} </br>'
+            f'Сторона: {obj.side} </br>'
+            f'Кол-во: {qty} </br>'
+            f'USDT: {rounded_usdt} </br>'
+        )
+
+    @admin.display(description='Объем позиции (USDT)')
+    def position_value_usdt(self, obj):
+        if not obj.pk:
+            return "-"
+        try:
+            price = Decimal(obj.price)
+            qty = Decimal(obj.qty_tokens)
+            value = price * qty
+            rounded = value.quantize(Decimal('0.001'))
+            return format_html(
+                '<span title="Полное значение: {}">{}</span>',
+                value,
+                rounded
+            )
+        except Exception:
+            return "-"
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Показываем поле 'position_value_usdt' только после создания ордера.
+        """
+        ro_fields = super().get_readonly_fields(request, obj)
+        if obj:  # если объект уже существует
+            # возвращаем новый tuple, не дублируя поле
+            return (*ro_fields, 'position_value_usdt')
+        return ro_fields
 
     @admin.display(description='Макс/Мин экстремумы')
     def redis_value(self, obj):
