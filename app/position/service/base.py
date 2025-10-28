@@ -8,6 +8,7 @@ from typing import Union, List
 
 from django.db import transaction
 
+from app.order.models import OrderModel, OrderStatus
 from app.position.models import PositionModel, PositionStatus
 from app.position.schemas.base import CreatePositionSchema, PositionSchema
 from app.setting.models import SymbolModel
@@ -31,6 +32,13 @@ def create_position(
     """
     Создать новую позицию
     """
+    check_open_order = OrderModel.objects.filter(
+        status__in=[OrderStatus.CREATED, OrderStatus.ACCEPT_MONITORING]
+    )
+    if check_open_order.exists():
+        return response.OtherErrorResponse(
+            msg='Нельзя иметь более 1 ордера'
+        )
     try:
         with transaction.atomic():
             symbol = SymbolModel.objects.get(name=position_data.symbol_name)
