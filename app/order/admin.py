@@ -66,6 +66,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
             'js/admin_order_init.js',
             'js/admin_order_extremum.js',
             'js/admin_order_live_info.js',
+            'js/admin_order_lifetime.js',
         )
         css = {
             'all': ('css/admin_order.css',)
@@ -103,12 +104,17 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         value = price * qty
         rounded_usdt = value.quantize(Decimal('0.01'))
         side = 'ЛОНГ' if obj.side == 'buy' else 'ШОРТ'
+        created_at = obj.created_at.isoformat()
         html = f"""
         <table style="border-collapse: collapse; width: 100%; border: none;">
             <tr><td style="text-align: left; padding-right: 10px;">Вход:</td><td>{price}</td></tr>
             <tr><td style="text-align: left; padding-right: 10px;">Сторона:</td><td>{side}</td></tr>
             <tr><td style="text-align: left; padding-right: 10px;">Кол-во:</td><td>{qty}</td></tr>
             <tr><td style="text-align: left; padding-right: 10px;">USDT:</td><td>{rounded_usdt}</td></tr>
+              <tr>
+                <td style="text-align: left; padding-right: 10px;">Времени от создания:</td>
+                <td class="js-lifetime" data-created-at="{created_at}">—</td>
+            </tr>
         </table>
         """
         return mark_safe(html)
@@ -195,6 +201,8 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
             <div style="position:absolute; top:0; right:0; font-size:10px; color:gray;">
                 <span class="js-ext-counter">5</span>с
             </div>
+         
+
             <table style="border-collapse: collapse; width: 100%; border: none;">
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">МАКС:</td>
@@ -206,6 +214,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                     <td class="js-ext-min">—</td>
                     <td class="js-ext-min-dt">—</td>
                 </tr>
+  
             </table>
         </div>
         """
