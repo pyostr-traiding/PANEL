@@ -105,18 +105,51 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         rounded_usdt = value.quantize(Decimal('0.01'))
         side = 'ЛОНГ' if obj.side == 'buy' else 'ШОРТ'
 
+        # форматирование даты
+        def fmt(dt):
+            return dt.strftime("%d.%m.%Y %H:%M:%S") if dt else "—"
+
         created_at = obj.created_at.isoformat()
-        updated_at = obj.updated_at.isoformat() if obj.updated_at else ''
+        close_at = obj.close_at.isoformat() if obj.close_at else ''
+        created_display = fmt(obj.created_at)
+        closed_display = fmt(obj.close_at)
+
+        # строка "Создано" + подпись "Закрыт"
+        created_html = f"""
+            <td>
+                {created_display}
+                {f'<div style="font-size:11px;">Закрыт: {closed_display}</div>' if obj.status == OrderStatus.COMPLETED and obj.close_at else ''}
+            </td>
+        """
 
         html = f"""
         <table style="border-collapse: collapse; width: 100%; border: none;">
-            <tr><td style="text-align: left; padding-right: 10px;">Вход:</td><td>{price}</td></tr>
-            <tr><td style="text-align: left; padding-right: 10px;">Сторона:</td><td>{side}</td></tr>
-            <tr><td style="text-align: left; padding-right: 10px;">Кол-во:</td><td>{qty}</td></tr>
-            <tr><td style="text-align: left; padding-right: 10px;">USDT:</td><td>{rounded_usdt}</td></tr>
-              <tr>
-                <td style="text-align: left; padding-right: 10px;">Время жизни:</td>
-                <td class="js-lifetime" data-created-at="{created_at}" data-updated-at="{updated_at}">—</td>
+            <tr>
+                <td style="text-align:left; padding-right:10px;">Вход:</td>
+                <td>{price}</td>
+            </tr>
+            <tr>
+                <td style="text-align:left; padding-right:10px;">Сторона:</td>
+                <td>{side}</td>
+            </tr>
+            <tr>
+                <td style="text-align:left; padding-right:10px;">Кол-во:</td>
+                <td>{qty}</td>
+            </tr>
+            <tr>
+                <td style="text-align:left; padding-right:10px;">USDT:</td>
+                <td>{rounded_usdt}</td>
+            </tr>
+            <tr>
+                <td style="text-align:left; padding-right:10px;">Создано:</td>
+                {created_html}
+            </tr>
+            <tr>
+                <td style="text-align:left; padding-right:10px;">Время жизни:</td>
+                <td class="js-lifetime"
+                    data-created-at="{created_at}"
+                    data-closed-at="{close_at}"
+                    data-status="{obj.status}">—</td>
             </tr>
         </table>
         """
