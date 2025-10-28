@@ -25,6 +25,7 @@ class OrderSchema(BaseModel):
     price: str
     status_title: Optional[str] = None
     accumulated_funding: Decimal
+    target_rate: Decimal
     created_at: Any
 
 class OrderExtremumValueSchema(BaseModel):

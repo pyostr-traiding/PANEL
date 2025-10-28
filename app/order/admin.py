@@ -156,8 +156,8 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                     <td class="js-funding">{funding.quantize(Decimal('0.001'))}</td>
                 </tr>
                 <tr>
-                    <td style="text-align: left; padding-right: 10px;">Цель для {percent_profit}%:</td>
-                    <td>{obj.target_price_for_profit(1).quantize(Decimal('0.001'))}</td>
+                    <td style="text-align: left; padding-right: 10px;">Цель для 1$:</td>
+                    <td>{obj.target_rate}</td>
                 </tr>
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">Статус:</td>

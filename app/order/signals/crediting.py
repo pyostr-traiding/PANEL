@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -31,13 +32,12 @@ def create_order_crediting(sender, instance: OrderModel, created, **kwargs):
     taker_commission = position_value * Decimal(exchange.taker_fee)
     total_commission = maker_commission + taker_commission
 
-    # 💥 Всё делаем атомарно
     with transaction.atomic():
-        # 1️⃣ Обновляем поле accumulated_funding
+        # Добавляем поле accumulated_funding
         instance.accumulated_funding += total_commission
         instance.save(update_fields=["accumulated_funding"])
 
-        # 2️⃣ Создаем зачисления (мейкер и тейкер)
+        # Создаем зачисления (мейкер и тейкер)
         OrderCreditingModel.objects.bulk_create([
             OrderCreditingModel(
                 order=instance,

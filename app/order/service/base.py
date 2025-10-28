@@ -14,6 +14,7 @@ from app.utils.rabbit import send_to_rabbitmq
 
 logger = logging.getLogger(__name__)
 
+
 def __create_order(
         position: PositionModel,
 ):
@@ -28,6 +29,7 @@ def __create_order_test(
                 return response.OtherErrorResponse(
                     msg=f'Позиция уже в статусе {position.status}'
                 )
+
             position.status = PositionStatus.COMPLETED
             position.save(update_fields=['status'])
 
