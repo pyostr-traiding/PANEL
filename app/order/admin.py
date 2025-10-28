@@ -9,7 +9,7 @@ from fsm_admin2.admin import FSMTransitionMixin
 
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-from app.order.models import OrderModel, OrderHistoryModel, OrderCreditingModel
+from app.order.models import OrderModel, OrderHistoryModel, OrderCreditingModel, OrderStatus
 
 
 class OrderHistoryModelAdmin(TabularInline):
@@ -104,7 +104,10 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         value = price * qty
         rounded_usdt = value.quantize(Decimal('0.01'))
         side = 'ЛОНГ' if obj.side == 'buy' else 'ШОРТ'
+
         created_at = obj.created_at.isoformat()
+        updated_at = obj.updated_at.isoformat() if obj.updated_at else ''
+
         html = f"""
         <table style="border-collapse: collapse; width: 100%; border: none;">
             <tr><td style="text-align: left; padding-right: 10px;">Вход:</td><td>{price}</td></tr>
@@ -112,78 +115,96 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
             <tr><td style="text-align: left; padding-right: 10px;">Кол-во:</td><td>{qty}</td></tr>
             <tr><td style="text-align: left; padding-right: 10px;">USDT:</td><td>{rounded_usdt}</td></tr>
               <tr>
-                <td style="text-align: left; padding-right: 10px;">Времени от создания:</td>
-                <td class="js-lifetime" data-created-at="{created_at}">—</td>
+                <td style="text-align: left; padding-right: 10px;">Время жизни:</td>
+                <td class="js-lifetime" data-created-at="{created_at}" data-updated-at="{updated_at}">—</td>
             </tr>
         </table>
         """
         return mark_safe(html)
 
-    @admin.display(description='Актуальные данные')
+    @admin.display(description='Актуальные данные / Курс закрытия')
     def position_live_data(self, obj: OrderModel):
         if not obj.pk:
             return "-"
 
-        percent_profit = 0.1
+        side = obj.side.lower()
         entry_price = Decimal(obj.price)
         qty = Decimal(obj.qty_tokens)
         funding = Decimal(obj.accumulated_funding)
-        side = obj.side.lower()
+        target_rate = obj.target_rate
         symbol = obj.position.symbol.name
+        url = f"/api/order/?uuid={obj.uuid}"
 
+        # Проверяем, исполнен ли ордер
+        if obj.status == OrderStatus.COMPLETED:
+            close_rate = obj.close_rate or Decimal('0')
+            pnl = (close_rate - entry_price) * qty - funding if side == 'buy' else (
+                                                                                   entry_price - close_rate) * qty - funding
+            pnl = pnl.quantize(Decimal('0.001'))
+
+            html = f"""
+               <table style="border-collapse: collapse; width: 100%; border: none;">
+                   <tr>
+                       <td style="text-align: left; padding-right: 10px;">Сборы USDT:</td>
+                       <td>{funding.quantize(Decimal('0.001'))}</td>
+                   </tr>
+                   <tr>
+                       <td style="text-align: left; padding-right: 10px;">Цель для 1$:</td>
+                       <td>{target_rate or '—'}</td>
+                   </tr>
+                   <tr>
+                       <td style="text-align: left; padding-right: 10px;">Статус:</td>
+                       <td class="js-status"
+                            data-symbol="{symbol}"
+                            data-entry-price="{entry_price}"
+                            data-qty="{qty}"
+                            data-funding="{funding}"
+                            data-side="{side}"
+                            data-target-rate="{target_rate or '—'}"
+                            data-close-rate="{obj.close_rate or ''}">{obj.get_status_display().upper()}</td>
+                   </tr>
+                   <tr>
+                       <td style="text-align: left; padding-right: 10px;">Курс закрытия:</td>
+                       <td>{close_rate}</td>
+                   </tr>
+                   <tr>
+                       <td style="text-align: left; padding-right: 10px;">P&L:</td>
+                       <td><span style="color:{'green' if pnl > 0 else 'red' if pnl < 0 else 'gray'};">{pnl}</span></td>
+                   </tr>
+               </table>
+               """
+            return mark_safe(html)
+
+        # --- иначе обычная динамика ---
+        funding = funding.quantize(Decimal('0.001'))
         price_span_id = f'curprice-{obj.pk}'
         pnl_span_id = f'pnl-{obj.pk}'
-        indicator_id = f'socket-indicator-{obj.pk}'
-        url = f"/api/order/?uuid={obj.uuid}"
+        data_closed_attr = ' data-closed="true"' if obj.status == OrderStatus.COMPLETED else ''
 
         html = f"""
         <div style="position: relative;"
              class="js-live-block"
              data-url="{url}"
-             data-symbol="{symbol}"
+             data-symbol="{symbol}"{data_closed_attr}
              id="live-block-{obj.uuid}">
-
-
-            <!-- Обратный отсчёт -->
-            <div class="js-refresh-counter"
-                 style="position:absolute; top:2px; right:4px; font-size:10px; color:gray;">
-                5с
-            </div>
-
-            <table style="border-collapse: collapse; width: 100%; border: none;">
-                <tr>
-                    <td style="text-align: left; padding-right: 10px;">Сборы USDT:</td>
-                    <td class="js-funding">{funding.quantize(Decimal('0.001'))}</td>
-                </tr>
-                <tr>
-                    <td style="text-align: left; padding-right: 10px;">Цель для 1$:</td>
-                    <td>{obj.target_rate}</td>
-                </tr>
-                <tr>
-                    <td style="text-align: left; padding-right: 10px;">Статус:</td>
-                    <td class="js-status">{obj.get_status_display().upper()}</td>
-                </tr>
-                <tr>
-                    <td style="text-align: left; padding-right: 10px;">Курс:</td>
-                    <td><span id="{price_span_id}" class="js-current-price" data-symbol="{symbol}">—</span></td>
-                </tr>
-                <tr>
-                    <td style="text-align: left; padding-right: 10px;">P&L:</td>
-                    <td>
-                        <span
-                            id="{pnl_span_id}"
-                            class="js-pnl"
-                            data-entry-price="{entry_price}"
-                            data-qty="{qty}"
-                            data-funding="{funding}"
-                            data-side="{side}"
-                            data-symbol="{symbol}"
-                        >—</span>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        """
+               <div class="js-refresh-counter"
+                    style="position:absolute; top:2px; right:4px; font-size:10px; color:gray;">
+                   5с
+               </div>
+               <table style="border-collapse: collapse; width: 100%; border: none;">
+                   <tr><td>Сборы USDT:</td><td class="js-funding">{funding}</td></tr>
+                   <tr><td>Цель для 1$:</td><td>{target_rate or '—'}</td></tr>
+                   <tr><td>Статус:</td><td class="js-status">{obj.get_status_display().upper()}</td></tr>
+                   <tr><td>Курс:</td><td><span id="{price_span_id}" class="js-current-price" data-symbol="{symbol}">—</span></td></tr>
+                   <tr><td>P&L:</td><td><span id="{pnl_span_id}" class="js-pnl"
+                       data-entry-price="{entry_price}"
+                       data-qty="{qty}"
+                       data-funding="{funding}"
+                       data-side="{side}"
+                       data-symbol="{symbol}">—</span></td></tr>
+               </table>
+           </div>
+           """
         return mark_safe(html)
 
     @admin.display(description='Макс/Мин экстремумы')

@@ -46,8 +46,20 @@
 
   // ==== DOM ====
   function collectNodes() {
-    priceNodes = Array.from(document.querySelectorAll(".js-current-price"));
-    pnlNodes = Array.from(document.querySelectorAll(".js-pnl"));
+    const allPrice = Array.from(document.querySelectorAll(".js-current-price"));
+    const allPnl = Array.from(document.querySelectorAll(".js-pnl"));
+
+    priceNodes = allPrice.filter((el) => {
+      const block = el.closest(".js-live-block");
+      const isClosed = block?.dataset.closed === "true"; // <-- ключевое
+      return !isClosed;
+    });
+
+    pnlNodes = allPnl.filter((el) => {
+      const block = el.closest(".js-live-block");
+      const isClosed = block?.dataset.closed === "true";
+      return !isClosed;
+    });
   }
 
   // ==== WebSocket ====

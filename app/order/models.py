@@ -111,6 +111,11 @@ class OrderModel(AbstractModel):
         null=True,
         blank=True,
     )
+    close_at = models.DateTimeField(
+        verbose_name='Время закрытия',
+        null=True,
+        blank=True,
+    )
 
     def get_extremum(self) -> List[OrderExtremumSchema]:
         """

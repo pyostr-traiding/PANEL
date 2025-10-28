@@ -1,5 +1,6 @@
 import logging
 import uuid
+from datetime import datetime
 from typing import Union, List
 
 import django
@@ -133,6 +134,7 @@ def close_order(
         )
     order_model.status = OrderStatus.COMPLETED
     order_model.close_rate = data.rate
-    order_model.save(update_fields=['status', 'close_rate'])
+    order_model.close_at = datetime.now()
+    order_model.save(update_fields=['status', 'close_rate', 'close_at'])
 
     return OrderSchema.model_validate(order_model)
