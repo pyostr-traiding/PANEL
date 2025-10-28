@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal, getcontext, InvalidOperation
 from typing import List
 
 from django_fsm import FSMField
@@ -26,6 +27,18 @@ class OrderStatus(models.TextChoices):
             cls.CREATED,
             cls.ACCEPT_MONITORING,
         ]
+
+
+def _to_decimal(value: str, name: str) -> Decimal:
+    if isinstance(value, Decimal):
+        return value
+    try:
+        # чистим пробелы, заменяем запятую на точку на всякий случай
+        s = str(value).strip().replace(',', '.')
+        return Decimal(s)
+    except (InvalidOperation, ValueError):
+        raise ValueError(f"{name} должно быть числом, получено: {value!r}")
+
 
 class OrderModel(AbstractModel):
     class Meta:
@@ -114,8 +127,29 @@ class OrderModel(AbstractModel):
 
         return result
 
+    def target_price_for_profit(self, profit_percent: float | str | Decimal) -> Decimal:
+        """
+        Возвращает цену, при которой ЧИСТАЯ прибыль составит profit_percent %
+        от стоимости позиции (в долларах), с учётом accumulated_funding (тоже в $).
+        """
+        price = _to_decimal(self.price, "price")
+        qty = _to_decimal(self.qty_tokens, "qty_tokens")
+        fees_usd = _to_decimal(self.accumulated_funding, "accumulated_funding")
+        p = _to_decimal(profit_percent, "profit_percent")
 
+        # Текущая стоимость позиции в долларах
+        position_value_usd = price * qty
 
+        # Желаемая прибыль в долларах
+        desired_profit_usd = position_value_usd * (p / Decimal(100))
+
+        # Целевая цена (лонг или шорт)
+        if self.side.lower() == "sell":
+            target_price = price - (desired_profit_usd + fees_usd) / qty
+        else:
+            target_price = price + (desired_profit_usd + fees_usd) / qty
+
+        return target_price
 class OrderHistoryModel(AbstractModel):
     class Meta:
         verbose_name = 'История ордера'

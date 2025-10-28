@@ -78,7 +78,6 @@ def accumulate_funding():
         funding_rate = get_current_funding_rate(order.position.symbol.name)
         funding_fee = calculate_funding_fee(position_size, mark_price, funding_rate, side)
 
-        # 💥 теперь делаем всё атомарно — начисление + лог + зачисление
         with transaction.atomic():
             old_funding = order.accumulated_funding
             new_funding = old_funding + funding_fee
@@ -94,4 +93,3 @@ def accumulate_funding():
             )
 
             print(f"[{order.id}] funding начислен | rate={funding_rate:.6f} | fee={funding_fee:.6f}")
-

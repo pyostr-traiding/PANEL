@@ -60,13 +60,24 @@ class OrderCreditingModelAdmin(admin.TabularInline):
 
 @admin.register(OrderModel)
 class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
+    class Media:
+        js = (
+            'js/admin_order_ws.js',
+            'js/admin_order_extremum.js',
+        )
+        css = {
+            'all': ('css/admin_order.css',)
+        }
+    search_fields = (
+        'uuid',
+    )
     list_filter = (
         'status',
     )
     list_display = (
-        'status',
+        'open_block',
         'position_info',
-        'accumulated_funding',
+        'position_live_data',
         'redis_value',
     )
     inlines = [
@@ -74,9 +85,12 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         OrderHistoryModelAdmin,
     ]
 
+    @admin.display(description='')
+    def open_block(self, obj):
+        return 'Открыть'
 
     @admin.display(description='Инфо')
-    def position_info(self, obj):
+    def position_info(self, obj: OrderModel):
         if not obj.pk:
             return "-"
 
@@ -84,60 +98,107 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         qty = Decimal(obj.qty_tokens)
         value = price * qty
         rounded_usdt = value.quantize(Decimal('0.01'))
+        side = 'ЛОНГ' if obj.side == 'buy' else 'ШОРТ'
+        html = f"""
+        <table style="border-collapse: collapse; width: 100%; border: none;">
+            <tr><td style="text-align: left; padding-right: 10px;">Вход:</td><td>{price}</td></tr>
+            <tr><td style="text-align: left; padding-right: 10px;">Сторона:</td><td>{side}</td></tr>
+            <tr><td style="text-align: left; padding-right: 10px;">Кол-во:</td><td>{qty}</td></tr>
+            <tr><td style="text-align: left; padding-right: 10px;">USDT:</td><td>{rounded_usdt}</td></tr>
+        </table>
+        """
+        return mark_safe(html)
 
-        return mark_safe(
-            f'Вход: {price} </br>'
-            f'Сторона: {obj.side} </br>'
-            f'Кол-во: {qty} </br>'
-            f'USDT: {rounded_usdt} </br>'
-        )
-
-    @admin.display(description='Объем позиции (USDT)')
-    def position_value_usdt(self, obj):
+    @admin.display(description='Актуальные данные')
+    def position_live_data(self, obj: OrderModel):
         if not obj.pk:
             return "-"
-        try:
-            price = Decimal(obj.price)
-            qty = Decimal(obj.qty_tokens)
-            value = price * qty
-            rounded = value.quantize(Decimal('0.001'))
-            return format_html(
-                '<span title="Полное значение: {}">{}</span>',
-                value,
-                rounded
-            )
-        except Exception:
-            return "-"
 
-    def get_readonly_fields(self, request, obj=None):
+        percent_profit = 0.1
+        entry_price = Decimal(obj.price)
+        qty = Decimal(obj.qty_tokens)
+        funding = Decimal(obj.accumulated_funding)
+        side = obj.side.lower()  # 'buy' | 'sell'
+
+        # ID элементов
+        price_span_id = f'curprice-{obj.pk}'
+        pnl_span_id = f'pnl-{obj.pk}'
+        indicator_id = f'socket-indicator-{obj.pk}'
+
+        html = f"""
+        <div style="position: relative;">
+            <!-- Индикатор статуса WebSocket -->
+            <div id="{indicator_id}"
+                 class="js-socket-indicator"
+                 title="Статус соединения"
+                 style="position: absolute; top: 2px; right: 2px;
+                        width: 10px; height: 10px; border-radius: 50%;
+                        background-color: gray;">
+            </div>
+
+            <table style="border-collapse: collapse; width: 100%; border: none;">
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">Сборы USDT:</td>
+                    <td>{funding.quantize(Decimal('0.001'))}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">Цель для {percent_profit}%:</td>
+                    <td>{obj.target_price_for_profit(1).quantize(Decimal('0.001'))}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">Статус:</td>
+                    <td>{obj.get_status_display().upper()}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">Курс:</td>
+                    <td><span id="{price_span_id}" class="js-current-price" data-symbol="BTCUSDT">—</span></td>
+                </tr>
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">P&L:</td>
+                    <td>
+                        <span
+                            id="{pnl_span_id}"
+                            class="js-pnl"
+                            data-entry-price="{entry_price}"
+                            data-qty="{qty}"
+                            data-funding="{funding}"
+                            data-side="{side}"
+                            data-symbol="BTCUSDT"
+                        >—</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
         """
-        Показываем поле 'position_value_usdt' только после создания ордера.
-        """
-        ro_fields = super().get_readonly_fields(request, obj)
-        if obj:  # если объект уже существует
-            # возвращаем новый tuple, не дублируя поле
-            return (*ro_fields, 'position_value_usdt')
-        return ro_fields
+        return mark_safe(html)
 
     @admin.display(description='Макс/Мин экстремумы')
     def redis_value(self, obj):
         if not obj.pk:
-            return "-"  # объект ещё не сохранён
-        _max = f'extremum:order:{obj.uuid}:MAX'
-        _min = f'extremum:order:{obj.uuid}:MIN'
+            return "-"
 
-        result = redis_server.mget([_max, _min], db=RedisDB.extremums)
-        if not result:
-            return '-'
-        result = [json.loads(i) if i else None for i in result]
-        val_0 = result[0]["value"] if len(result) > 0 and result[0] and "value" in result[0] else "—"
-        dt_0 = result[0]["dt"] if len(result) > 0 and result[0] and "dt" in result[0] else "—"
+        url = f"/api/order/extremum?uuid={obj.uuid}"
 
-        val_1 = result[1]["value"] if len(result) > 1 and result[1] and "value" in result[1] else "—"
-        dt_1 = result[1]["dt"] if len(result) > 1 and result[1] and "dt" in result[1] else "—"
-
-        return mark_safe(
-            f'<b>{val_0}</b> | {dt_0}<br>'
-            f'<hr>'
-            f'<b>{val_1}</b> | {dt_1}<br>'
-        )
+        html = f"""
+        <div class="js-extremum-block"
+             data-url="{url}"
+             id="extremum-{obj.uuid}"
+             style="position:relative;">
+            <div style="position:absolute; top:0; right:0; font-size:10px; color:gray;">
+                <span class="js-ext-counter">5</span>с
+            </div>
+            <table style="border-collapse: collapse; width: 100%; border: none;">
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">МАКС:</td>
+                    <td class="js-ext-max">—</td>
+                    <td class="js-ext-max-dt">—</td>
+                </tr>
+                <tr>
+                    <td style="text-align: left; padding-right: 10px;">МИН:</td>
+                    <td class="js-ext-min">—</td>
+                    <td class="js-ext-min-dt">—</td>
+                </tr>
+            </table>
+        </div>
+        """
+        return mark_safe(html)

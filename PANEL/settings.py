@@ -37,9 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'django_celery_beat',
+    'channels',
 
     'app.abstractions',
-    'app.sockets',
     'app.users',
     'app.frontend',
 
@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     'app.position',
     'app.order',
 ]
+
+
+ASGI_APPLICATION = 'PANEL.asgi.application'
+
 
 CHANNEL_LAYERS = {
     "default": {
@@ -178,6 +182,7 @@ STORAGES = {
             'location': 'TRADE',
         },
     },
+
     'staticfiles': {
         'BACKEND': 'storages.backends.s3.S3Storage',
         'OPTIONS': {
@@ -196,6 +201,8 @@ STATIC_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+
 
 ####################
 # Telegram
