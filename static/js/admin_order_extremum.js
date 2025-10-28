@@ -1,3 +1,7 @@
+// Fix for missing Grappelli grp object
+if (typeof window.grp === "undefined") {
+  window.grp = {};
+}
 (function () {
   const REFRESH_INTERVAL = 5; // секунд
   let blocks = [];

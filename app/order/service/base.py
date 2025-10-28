@@ -94,8 +94,9 @@ def get_order(
     )
     if not order_model:
         return response.NotFoundResponse(msg='Ордер не найден')
-    return OrderSchema.model_validate(order_model)
-
+    schema = OrderSchema.model_validate(order_model)
+    schema.status_title = order_model.get_status_display().upper()
+    return schema
 
 def get_list_open_orders() -> Union[List[OrderSchema], response.BaseResponse]:
     """

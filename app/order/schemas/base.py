@@ -1,5 +1,6 @@
 import time
 import uuid
+from decimal import Decimal
 
 from django.db.models import JSONField
 from pydantic import BaseModel, Field
@@ -22,7 +23,8 @@ class OrderSchema(BaseModel):
     side: Literal['buy', 'sell']
     qty_tokens: str
     price: str
-
+    status_title: Optional[str] = None
+    accumulated_funding: Decimal
     created_at: Any
 
 class OrderExtremumValueSchema(BaseModel):

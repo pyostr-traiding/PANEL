@@ -7,46 +7,50 @@
   let priceNodes = [];
   let pnlNodes = [];
   let reconnectTimer = null;
-
-  // === Индикаторы WebSocket активности ===
-  const indicators = {};
+  let reconnectCountdownTimer = null;
+  const RECONNECT_DELAY = 5; // сек
   const INACTIVE_TIMEOUT = 5000; // мс
+  let lastMessageTime = 0;
 
-  function setIndicatorState(id, state) {
-    const el = document.getElementById(id);
+  // ==== Элементы UI ====
+  function setIndicator(state, countdown = null) {
+    const el = document.getElementById("global-socket-indicator");
+    const textEl = document.getElementById("global-socket-status");
     if (!el) return;
-    el.style.backgroundColor = state === "ok" ? "limegreen" : "red";
+
+    switch (state) {
+      case "ok":
+        el.style.backgroundColor = "limegreen";
+        if (textEl) {
+          textEl.textContent = "Подключено";
+          textEl.style.color = "green";
+        }
+        break;
+      case "reconnecting":
+        el.style.backgroundColor = "orange";
+        if (textEl) {
+          textEl.textContent = countdown
+            ? `Переподключение через ${countdown}…`
+            : "Переподключение…";
+          textEl.style.color = "orange";
+        }
+        break;
+      default: // "red"
+        el.style.backgroundColor = "red";
+        if (textEl) {
+          textEl.textContent = "Нет соединения";
+          textEl.style.color = "red";
+        }
+    }
   }
 
-  function markSocketActive() {
-    const now = Date.now();
-    Object.entries(indicators).forEach(([id, obj]) => {
-      obj.lastUpdate = now;
-      setIndicatorState(id, "ok");
-    });
-  }
-
-  function checkIndicators() {
-    const now = Date.now();
-    Object.entries(indicators).forEach(([id, obj]) => {
-      if (now - obj.lastUpdate > INACTIVE_TIMEOUT) {
-        setIndicatorState(id, "red");
-      }
-    });
-  }
-
-  // === Работа с DOM ===
+  // ==== DOM ====
   function collectNodes() {
     priceNodes = Array.from(document.querySelectorAll(".js-current-price"));
     pnlNodes = Array.from(document.querySelectorAll(".js-pnl"));
-
-    document.querySelectorAll(".js-socket-indicator").forEach((el) => {
-      indicators[el.id] = { lastUpdate: 0 };
-      setIndicatorState(el.id, "red");
-    });
   }
 
-  // === Подключение WebSocket ===
+  // ==== WebSocket ====
   function connect() {
     if (socket) socket.close();
 
@@ -55,7 +59,8 @@
     socket.onopen = () => {
       console.log("[WebSocket] Connected to", wsUrl);
       collectNodes();
-      markSocketActive();
+      setIndicator("ok");
+      lastMessageTime = Date.now();
     };
 
     socket.onmessage = (event) => {
@@ -65,33 +70,53 @@
           const c = parseFloat(msg.data.data.c);
           if (!Number.isNaN(c)) {
             currentPrice = c;
-            markSocketActive();
+            lastMessageTime = Date.now();
+            setIndicator("ok");
             window.requestAnimationFrame(updateAll);
           }
         }
-      } catch (e) {
+      } catch {
         // ignore malformed messages
       }
     };
 
     socket.onclose = () => {
       console.log("[WebSocket] Disconnected, retry in 5s");
-      Object.keys(indicators).forEach((id) =>
-        setIndicatorState(id, "red")
-      );
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(connect, 5000);
+      handleReconnect();
     };
 
     socket.onerror = () => {
       console.warn("[WebSocket] Error");
-      try {
-        socket.close();
-      } catch {}
+      try { socket.close(); } catch {}
     };
   }
 
-  // === Обновление отображения ===
+  function handleReconnect() {
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    if (reconnectCountdownTimer) clearInterval(reconnectCountdownTimer);
+
+    let countdown = RECONNECT_DELAY;
+    setIndicator("reconnecting", countdown);
+
+    reconnectCountdownTimer = setInterval(() => {
+      countdown -= 1;
+      if (countdown <= 0) {
+        clearInterval(reconnectCountdownTimer);
+      } else {
+        setIndicator("reconnecting", countdown);
+      }
+    }, 1000);
+
+    reconnectTimer = setTimeout(connect, RECONNECT_DELAY * 1000);
+  }
+
+  function checkAlive() {
+    const now = Date.now();
+    if (now - lastMessageTime > INACTIVE_TIMEOUT) {
+      setIndicator("red");
+    }
+  }
+
   function updateAll() {
     if (currentPrice == null) return;
 
@@ -116,17 +141,9 @@
     }
   }
 
-  // === Инициализация ===
   document.addEventListener("DOMContentLoaded", () => {
     collectNodes();
     connect();
-    setInterval(checkIndicators, 1000);
-  });
-
-  // Для AJAX пагинации в админке
-  document.addEventListener("click", (e) => {
-    if (e.target.closest(".paginator") || e.target.closest(".actions")) {
-      setTimeout(collectNodes, 1000);
-    }
+    setInterval(checkAlive, 1000);
   });
 })();

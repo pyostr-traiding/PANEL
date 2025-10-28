@@ -63,11 +63,15 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
     class Media:
         js = (
             'js/admin_order_ws.js',
+            'js/admin_order_init.js',
             'js/admin_order_extremum.js',
+            'js/admin_order_live_info.js',
         )
         css = {
             'all': ('css/admin_order.css',)
         }
+    change_list_template = "html/change_list.html"
+
     search_fields = (
         'uuid',
     )
@@ -118,28 +122,32 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         entry_price = Decimal(obj.price)
         qty = Decimal(obj.qty_tokens)
         funding = Decimal(obj.accumulated_funding)
-        side = obj.side.lower()  # 'buy' | 'sell'
+        side = obj.side.lower()
+        symbol = obj.position.symbol.name
 
-        # ID элементов
         price_span_id = f'curprice-{obj.pk}'
         pnl_span_id = f'pnl-{obj.pk}'
         indicator_id = f'socket-indicator-{obj.pk}'
+        url = f"/api/order/?uuid={obj.uuid}"
 
         html = f"""
-        <div style="position: relative;">
-            <!-- Индикатор статуса WebSocket -->
-            <div id="{indicator_id}"
-                 class="js-socket-indicator"
-                 title="Статус соединения"
-                 style="position: absolute; top: 2px; right: 2px;
-                        width: 10px; height: 10px; border-radius: 50%;
-                        background-color: gray;">
+        <div style="position: relative;"
+             class="js-live-block"
+             data-url="{url}"
+             data-symbol="{symbol}"
+             id="live-block-{obj.uuid}">
+
+
+            <!-- Обратный отсчёт -->
+            <div class="js-refresh-counter"
+                 style="position:absolute; top:2px; right:4px; font-size:10px; color:gray;">
+                5с
             </div>
 
             <table style="border-collapse: collapse; width: 100%; border: none;">
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">Сборы USDT:</td>
-                    <td>{funding.quantize(Decimal('0.001'))}</td>
+                    <td class="js-funding">{funding.quantize(Decimal('0.001'))}</td>
                 </tr>
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">Цель для {percent_profit}%:</td>
@@ -147,11 +155,11 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                 </tr>
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">Статус:</td>
-                    <td>{obj.get_status_display().upper()}</td>
+                    <td class="js-status">{obj.get_status_display().upper()}</td>
                 </tr>
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">Курс:</td>
-                    <td><span id="{price_span_id}" class="js-current-price" data-symbol="BTCUSDT">—</span></td>
+                    <td><span id="{price_span_id}" class="js-current-price" data-symbol="{symbol}">—</span></td>
                 </tr>
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">P&L:</td>
@@ -163,7 +171,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                             data-qty="{qty}"
                             data-funding="{funding}"
                             data-side="{side}"
-                            data-symbol="BTCUSDT"
+                            data-symbol="{symbol}"
                         >—</span>
                     </td>
                 </tr>

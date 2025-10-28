@@ -1,0 +1,51 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+  {{ block.super }}
+
+  <!-- шаблон индикатора -->
+  <template id="ws-indicator-template">
+    <div class="ws-indicator-wrapper" style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <span style="font-weight:600;">WebSocket:</span>
+      <span id="global-socket-indicator"
+            style="display:inline-block;width:10px;height:10px;border-radius:50%;
+                   background-color:gray;box-shadow:0 0 3px rgba(0,0,0,0.3);"></span>
+      <span id="global-socket-status"
+            style="font-size:12px;color:gray;">Нет соединения</span>
+    </div>
+  </template>
+
+  <script>
+  (function() {
+    function mountIndicator() {
+      const actions = document.querySelector('.actions');
+      const tpl = document.querySelector('#ws-indicator-template');
+      if (!actions || !tpl) return;
+
+      // если уже вставили — выходим
+      if (document.getElementById('global-socket-indicator')) return;
+
+      const clone = tpl.content.firstElementChild.cloneNode(true);
+
+      actions.style.display = 'flex';
+      actions.style.justifyContent = 'space-between';
+      actions.style.alignItems = 'center';
+      actions.appendChild(clone);
+
+      console.log('[Admin WS] Индикатор вставлен');
+    }
+
+    // пробуем несколько раз — пока actions не появится
+    function tryMount(retries = 10) {
+      mountIndicator();
+      if (!document.getElementById('global-socket-indicator') && retries > 0) {
+        setTimeout(() => tryMount(retries - 1), 300);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      tryMount();
+    });
+  })();
+  </script>
+{% endblock %}
