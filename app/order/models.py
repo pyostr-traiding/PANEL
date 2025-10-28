@@ -103,6 +103,15 @@ class OrderModel(AbstractModel):
         null=True,
         blank=True,
     )
+
+    close_rate = models.DecimalField(
+        verbose_name='Курс закрытия',
+        decimal_places=18,
+        max_digits=40,
+        null=True,
+        blank=True,
+    )
+
     def get_extremum(self) -> List[OrderExtremumSchema]:
         """
         Получить экстремумы max/min для ордера.

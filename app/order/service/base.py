@@ -6,7 +6,7 @@ import django
 from django.db import transaction
 
 from app.order.models import OrderModel, OrderStatus
-from app.order.schemas.base import OrderSchema
+from app.order.schemas.base import OrderSchema, CloseOrderSchema
 from app.position.models import PositionModel, PositionStatus
 from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
@@ -109,4 +109,30 @@ def get_list_open_orders() -> Union[List[OrderSchema], response.BaseResponse]:
     )
     if not orders_models:
         return response.NotFoundResponse(msg='Ордеров не найдено')
+
     return [OrderSchema.model_validate(i) for i in orders_models]
+
+
+def close_order(
+        data: CloseOrderSchema
+) -> Union[OrderSchema, response.BaseResponse]:
+    """
+    Закрыть ордер
+    """
+    order_model: OrderModel = OrderModel.objects.get_or_none(
+        uuid=data.uuid,
+    )
+    if not order_model:
+        return response.NotFoundResponse(msg='Ордер не найден')
+
+    if order_model.status not in [
+        OrderStatus.ACCEPT_MONITORING,
+    ]:
+        return response.OtherErrorResponse(
+            msg='Ордер должен быть в статусе MONITORING'
+        )
+    order_model.status = OrderStatus.COMPLETED
+    order_model.close_rate = data.rate
+    order_model.save(update_fields=['status', 'close_rate'])
+
+    return OrderSchema.model_validate(order_model)

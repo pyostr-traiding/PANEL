@@ -3,8 +3,8 @@ from typing import Union
 from django.http import HttpRequest
 from ninja import Router
 
-from app.order.schemas.base import OrderSchema
-from app.order.service.base import get_order, get_list_open_orders
+from app.order.schemas.base import OrderSchema, CloseOrderSchema
+from app.order.service.base import get_order, get_list_open_orders, close_order
 from app.utils import response
 
 
@@ -52,6 +52,28 @@ def api_get_list_open_orders(
     """
 
     result = get_list_open_orders()
+    if isinstance(result, response.BaseResponse):
+        return response.return_response(result)
+    return result
+
+
+@router.post(
+    path='/close',
+)
+def api_close_orders(
+        request: HttpRequest,
+        data: CloseOrderSchema
+):
+    """
+    Закрыть ордер
+
+    Статусы:
+    * 200 - Успешно
+    * 409 - Ордер уше закрыт
+    * 404 - Не найдено
+    """
+
+    result = close_order(data=data)
     if isinstance(result, response.BaseResponse):
         return response.return_response(result)
     return result

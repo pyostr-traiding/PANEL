@@ -24,8 +24,11 @@ class OrderSchema(BaseModel):
     qty_tokens: str
     price: str
     status_title: Optional[str] = None
+
     accumulated_funding: Decimal
     target_rate: Decimal
+    close_rate: Optional[Decimal] = None
+
     created_at: Any
 
 class OrderExtremumValueSchema(BaseModel):
@@ -55,3 +58,9 @@ class OrderExtremumSchema(BaseModel):
             if all(part in parts for part in key_parts):
                 return title
         return self.key
+
+
+class CloseOrderSchema(BaseModel):
+
+    uuid: str
+    rate: Decimal
