@@ -4,13 +4,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Indicators</title>
+
+  <!-- Перед CSS применяем тему -->
+<script>
+  (function() {
+    // Получаем тему из localStorage
+    const storedTheme = localStorage.getItem("theme");
+    // Если пользователь не выбирал тему — используем системную
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+    // Устанавливаем атрибут <html data-theme="...">
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // Подписываемся на изменение темы (если пользователь переключает в админке)
+    window.addEventListener("storage", (event) => {
+      if (event.key === "theme") {
+        document.documentElement.setAttribute('data-theme', event.newValue || 'light');
+      }
+    });
+  })();
+  </script>
+
+  <!-- Admin CSS -->
+  <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="{% static 'css/indicator.css' %}">
 </head>
 <body>
-
   <div class="top-bar">
     <a href="/" class="back-btn">← Назад в админ панель</a>
-
     <div class="indicator-status">
       <span id="ws-status" class="status red"></span>
       <span id="ws-status-text">Отключено</span>

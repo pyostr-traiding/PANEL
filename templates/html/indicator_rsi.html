@@ -3,11 +3,26 @@
 {% block content %}
   <h2>RSI и Stoch RSI</h2>
 
-  <div id="rsi-blocks" class="indicator-grid">
-    <div class="interval-block" data-interval="1"></div>
-    <div class="interval-block" data-interval="5"></div>
-    <div class="interval-block" data-interval="15"></div>
-    <div class="interval-block" data-interval="30"></div>
+  <div id="rsi-layout" class="indicator-layout">
+    <div class="indicator-column">
+      <h3>RSI</h3>
+      <div class="indicator-grid" id="rsi-blocks">
+        <div class="interval-block" data-type="RSI" data-interval="1"></div>
+        <div class="interval-block" data-type="RSI" data-interval="5"></div>
+        <div class="interval-block" data-type="RSI" data-interval="15"></div>
+        <div class="interval-block" data-type="RSI" data-interval="30"></div>
+      </div>
+    </div>
+
+    <div class="indicator-column">
+      <h3>Stoch RSI</h3>
+      <div class="indicator-grid" id="stoch-blocks">
+        <div class="interval-block" data-type="STOCH_RSI" data-interval="1"></div>
+        <div class="interval-block" data-type="STOCH_RSI" data-interval="5"></div>
+        <div class="interval-block" data-type="STOCH_RSI" data-interval="15"></div>
+        <div class="interval-block" data-type="STOCH_RSI" data-interval="30"></div>
+      </div>
+    </div>
   </div>
 
   <script src="{% static 'js/indicator_rsi.js' %}"></script>
