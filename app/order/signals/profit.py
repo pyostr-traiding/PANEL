@@ -15,10 +15,10 @@ def create_order_crediting(sender, instance: OrderModel, created, **kwargs):
     if not created:
         return
 
-    # Берём комиссию биржи (например, Bybit)
+    # Берём комиссию биржи
     exchange = ExchangeModel.objects.get(name="bybit")
 
-    target_profit_usdt = Decimal("0.5")
+    target_profit_usdt = Decimal(exchange.target_percent)
 
     price = Decimal(instance.price)
     qty_tokens = Decimal(instance.qty_tokens)

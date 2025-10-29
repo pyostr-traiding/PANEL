@@ -78,6 +78,9 @@ class ExchangeModel(AbstractModel):
     taker_fee = models.FloatField(
         verbose_name='Комиссия тейкера',
     )
+    target_percent = models.FloatField(
+        verbose_name='Целевой процент',
+    )
 
     def __str__(self):
         return self.name
