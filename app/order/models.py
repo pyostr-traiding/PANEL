@@ -148,29 +148,29 @@ class OrderModel(AbstractModel):
 
         return result
 
-    def target_price_for_profit(self, profit_percent: float | str | Decimal) -> Decimal:
-        """
-        Возвращает цену, при которой ЧИСТАЯ прибыль составит profit_percent %
-        от стоимости позиции (в долларах), с учётом accumulated_funding (тоже в $).
-        """
-        price = _to_decimal(self.price, "price")
-        qty = _to_decimal(self.qty_tokens, "qty_tokens")
-        fees_usd = _to_decimal(self.accumulated_funding, "accumulated_funding")
-        p = _to_decimal(profit_percent, "profit_percent")
-
-        # Текущая стоимость позиции в долларах
-        position_value_usd = price * qty
-
-        # Желаемая прибыль в долларах
-        desired_profit_usd = position_value_usd * (p / Decimal(100))
-
-        # Целевая цена (лонг или шорт)
-        if self.side.lower() == "sell":
-            target_price = price - (desired_profit_usd + fees_usd) / qty
-        else:
-            target_price = price + (desired_profit_usd + fees_usd) / qty
-
-        return target_price
+    # def target_price_for_profit(self, profit_percent: float | str | Decimal) -> Decimal:
+    #     """
+    #     Возвращает цену, при которой ЧИСТАЯ прибыль составит profit_percent %
+    #     от стоимости позиции (в долларах), с учётом accumulated_funding (тоже в $).
+    #     """
+    #     price = _to_decimal(self.price, "price")
+    #     qty = _to_decimal(self.qty_tokens, "qty_tokens")
+    #     fees_usd = _to_decimal(self.accumulated_funding, "accumulated_funding")
+    #     p = _to_decimal(profit_percent, "profit_percent")
+    #
+    #     # Текущая стоимость позиции в долларах
+    #     position_value_usd = price * qty
+    #
+    #     # Желаемая прибыль в долларах
+    #     desired_profit_usd = position_value_usd * (p / Decimal(100))
+    #
+    #     # Целевая цена (лонг или шорт)
+    #     if self.side.lower() == "sell":
+    #         target_price = price - (desired_profit_usd + fees_usd) / qty
+    #     else:
+    #         target_price = price + (desired_profit_usd + fees_usd) / qty
+    #
+    #     return target_price
 class OrderHistoryModel(AbstractModel):
     class Meta:
         verbose_name = 'История ордера'

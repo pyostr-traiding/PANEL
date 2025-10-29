@@ -182,7 +182,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                        <td>{funding.quantize(Decimal('0.001'))}</td>
                    </tr>
                    <tr>
-                       <td style="text-align: left; padding-right: 10px;">Цель для 1$:</td>
+                       <td style="text-align: left; padding-right: 10px;">Цель для 0.5$:</td>
                        <td>{target_rate or '—'}</td>
                    </tr>
                    <tr>
