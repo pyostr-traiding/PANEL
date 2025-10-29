@@ -1,9 +1,15 @@
 """
 Базовые методы GET/POST
 """
-from django.http import HttpRequest
-from ninja import Router
+from typing import Optional, List
 
+from django.db.models import BigIntegerField
+from django.db.models.functions import Cast
+from django.http import HttpRequest
+from ninja import Router, Schema
+from pydantic import BaseModel
+
+from app.position.models import PositionModel
 from app.position.schemas.base import CreatePositionSchema
 from app.position.service.base import create_position, get_position, get_list_open_position
 from app.utils import response
@@ -99,3 +105,61 @@ def api_get_list_open_position(
     if isinstance(result, response.BaseResponse):
         return response.return_response(result)
     return result
+
+
+class Range(Schema):
+    # Либо список точек client_ms (минутные), либо диапазон start/end
+    ms: Optional[List[int]] = None
+    start_ms: Optional[int] = None
+    end_ms: Optional[int] = None
+    symbol: Optional[str] = None  # например BTCUSDT
+@router.get(
+    path='/search',
+)
+def api_get_positions(
+        request: HttpRequest,
+        ms: Optional[List[int]] = None,
+        start_ms: Optional[List[int]] = None,
+        end_ms: Optional[List[int]] = None,
+        symbol: Optional[List[str]] = None,
+):
+    """
+    Получить список в диапазоне
+
+    Статусы:
+    * 200 - ОК
+    * 404 - Не найдено
+    """
+    qs = PositionModel.objects.all().annotate(
+        kline_ms_int=Cast('kline_ms', output_field=BigIntegerField())
+    )
+
+    # фильтр по символу, если задан
+    if symbol:
+        qs = qs.filter(symbol__name=symbol)
+
+    # вариант 1: список точек ms
+    if ms:
+        qs = qs.filter(kline_ms_int__in=ms)
+
+    # вариант 2: диапазон
+    if start_ms is not None and end_ms is not None:
+        qs = qs.filter(
+            kline_ms_int__gte=start_ms,
+            kline_ms_int__lte=end_ms
+        )
+
+    data = [
+        {
+            "uuid": p.uuid,
+            "symbol": p.symbol.name,
+            "category": p.category,
+            "side": p.side,
+            "price": p.price,
+            "qty_tokens": p.qty_tokens,
+            "kline_ms": int(p.kline_ms),  # минутная свеча client_ms
+            "status": p.status,
+        }
+        for p in qs.order_by('-kline_ms_int')[:5000]  # safety-cap
+    ]
+    return {"results": data}

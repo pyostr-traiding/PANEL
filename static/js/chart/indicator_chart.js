@@ -5,6 +5,7 @@ const chartEl = document.getElementById('chart-container');
 const infoPanel = document.getElementById('chart-info');
 const intervalSelect = document.getElementById('interval-select');
 const pairSelect = document.getElementById('pair-select');
+const showPositionsCheckbox = document.getElementById('show-positions'); // ✅ чекбокс
 
 // === Настройки графика ===
 const chart = LightweightCharts.createChart(chartEl, {
@@ -57,6 +58,24 @@ if (infoPanel) {
   infoPanel.style.transition = 'background-color 0.3s, color 0.3s';
 }
 
+// === Tooltip для позиций (кастомный)
+const posTooltip = document.createElement('div');
+posTooltip.style.position = 'absolute';
+posTooltip.style.background = 'rgba(20,20,20,0.95)';
+posTooltip.style.color = '#e0e0e0';
+posTooltip.style.font = '12px/1.3 monospace';
+posTooltip.style.padding = '8px 10px';
+posTooltip.style.border = '1px solid #333';
+posTooltip.style.borderRadius = '6px';
+posTooltip.style.pointerEvents = 'none';
+posTooltip.style.zIndex = '20';
+posTooltip.style.display = 'none';
+posTooltip.style.maxWidth = '260px';
+posTooltip.style.whiteSpace = 'pre-wrap';
+posTooltip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+chartEl.parentElement.style.position = 'relative';
+chartEl.parentElement.appendChild(posTooltip);
+
 // === Глобальные переменные ===
 let currentSymbol = 'BTCUSDT';
 let currentInterval = '1';
@@ -67,7 +86,12 @@ let noMoreHistory = false;
 let allCandles = [];
 let lastCandle = null;
 let isCrosshairActive = false;
-let lastClosePrice = null; // 👈 для отслеживания изменений цены
+let lastClosePrice = null;
+
+// позиции
+let rawPositions = [];     // как пришли с бэка (client_ms)
+let alignedMarkers = [];   // маркеры, выровненные под текущий интервал
+let markersByBarTime = new Map(); // time(sec) -> массив позиций для tooltip
 
 // === Конвертация интервала в миллисекунды ===
 function intervalToMs(intervalStr) {
@@ -77,6 +101,12 @@ function intervalToMs(intervalStr) {
   if (intervalStr === 'W') return 7 * 24 * 60 * 60 * 1000;
   if (intervalStr === 'M') return 30 * 24 * 60 * 60 * 1000;
   return 60 * 1000;
+}
+
+// === Выравнивание минутного client_ms в старт бара выбранного ТФ
+function alignClientMsToIntervalBarStart(clientMs, intervalStr) {
+  const tfMs = intervalToMs(intervalStr);
+  return Math.floor(clientMs / tfMs) * tfMs; // бар начинается ровно тут
 }
 
 // === UI-индикатор статуса ===
@@ -226,6 +256,71 @@ async function loadMoreHistory() {
   isLoadingMore = false;
 }
 
+// === Загрузка позиций по видимому диапазону ===
+const loadPositionsDebounced = debounce(loadPositions, 250);
+
+async function loadPositions(startMs, endMs) {
+  if (!showPositionsCheckbox || !showPositionsCheckbox.checked) {
+    clearPositionMarkers();
+    return;
+  }
+  if (!currentSymbol) return;
+
+  const url = `/api/position/search?start_ms=${startMs}&end_ms=${endMs}&symbol=${encodeURIComponent(currentSymbol)}`;
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    rawPositions = Array.isArray(json.results) ? json.results : [];
+
+    // Преобразуем в маркеры под текущий ТФ
+    alignedMarkers = [];
+    markersByBarTime.clear();
+
+    for (const p of rawPositions) {
+      const clientMs = Number(p.kline_ms);      // 1m time
+      const barStartMs = alignClientMsToIntervalBarStart(clientMs, currentInterval);
+      const barTimeSec = Math.floor(barStartMs / 1000);
+
+      const marker = {
+        time: barTimeSec,
+        position: 'aboveBar',
+        color: p.side === 'buy' ? '#4CAF50' : '#F44336',
+        shape: p.side === 'buy' ? 'arrowUp' : 'arrowDown',
+        text: `POS`, // короткий текст над свечой
+      };
+      alignedMarkers.push(marker);
+
+      // для tooltip собираем список по времени бара
+      if (!markersByBarTime.has(barTimeSec)) markersByBarTime.set(barTimeSec, []);
+      markersByBarTime.get(barTimeSec).push(p);
+    }
+
+    candleSeries.setMarkers(alignedMarkers);
+  } catch (err) {
+    console.error('Ошибка загрузки позиций:', err);
+  }
+}
+
+function clearPositionMarkers() {
+  alignedMarkers = [];
+  markersByBarTime.clear();
+  candleSeries.setMarkers([]);
+  hidePosTooltip();
+}
+
+// === Tooltip по позициям ===
+function showPosTooltip(html, x, y) {
+  posTooltip.innerHTML = html;
+  posTooltip.style.left = Math.max(8, x - posTooltip.offsetWidth / 2) + 'px';
+  posTooltip.style.top = Math.max(8, y - posTooltip.offsetHeight - 8) + 'px';
+  posTooltip.style.display = 'block';
+}
+
+function hidePosTooltip() {
+  posTooltip.style.display = 'none';
+}
+
 // === Обновление инфо-панели ===
 function updateInfoPanel(candle) {
   if (!infoPanel || !candle) return;
@@ -244,20 +339,13 @@ function updateInfoPanel(candle) {
   const priceColor =
     close > open ? '#4CAF50' : close < open ? '#F44336' : '#e0e0e0';
 
-  // === Добавляем стрелку и анимацию ===
+  // стрелка + фон при апдейте
   let arrow = '';
   let highlight = '';
-
   if (lastClosePrice !== null) {
-    if (close > lastClosePrice) {
-      arrow = '▲';
-      highlight = 'rgba(76,175,80,0.15)';
-    } else if (close < lastClosePrice) {
-      arrow = '▼';
-      highlight = 'rgba(244,67,54,0.15)';
-    }
+    if (close > lastClosePrice) { arrow = '▲'; highlight = 'rgba(76,175,80,0.15)'; }
+    else if (close < lastClosePrice) { arrow = '▼'; highlight = 'rgba(244,67,54,0.15)'; }
   }
-
   infoPanel.style.background = highlight || 'rgba(0,0,0,0.45)';
   infoPanel.style.transition = 'background 0.5s ease';
   infoPanel.style.opacity = isCrosshairActive ? '0.9' : '1';
@@ -277,27 +365,94 @@ function updateInfoPanel(candle) {
   lastClosePrice = close;
 }
 
-// === Наведение курсора ===
+// === Наведение курсора (OHLC + позиции) ===
 chart.subscribeCrosshairMove((param) => {
   if (!param || !param.time || !param.seriesData.size) {
     isCrosshairActive = false;
     updateInfoPanel(lastCandle);
+    hidePosTooltip();
     return;
   }
 
   isCrosshairActive = true;
   const data = param.seriesData.get(candleSeries);
   if (data) updateInfoPanel(data);
-});
 
-// === Скролл влево ===
-chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
-  if (!range || isLoadingMore || noMoreHistory) return;
-  if (range.from < 10) {
-    console.log('Подгружаем предыдущие свечи...');
-    loadMoreHistory();
+  // показываем tooltip по позициям, если есть в этот бар
+  const barTimeSec = Number(param.time);
+  const barPositions = markersByBarTime.get(barTimeSec);
+  if (barPositions && barPositions.length > 0) {
+    const html = buildPositionsTooltip(barPositions);
+    // позиционируем у курсора
+    if (param.point) {
+      const rect = chartEl.getBoundingClientRect();
+      const x = rect.left + window.scrollX + param.point.x;
+      const y = rect.top + window.scrollY + param.point.y;
+      showPosTooltip(html, x, y);
+    } else {
+      hidePosTooltip();
+    }
+  } else {
+    hidePosTooltip();
   }
 });
+
+// === Tooltip HTML
+function buildPositionsTooltip(items) {
+  // несколько позиций в одной свече — покажем списком
+  const rows = items.map((p) => {
+    const sideClr = p.side === 'buy' ? '#4CAF50' : '#F44336';
+    const time = new Date(Number(p.kline_ms)).toISOString().replace('T',' ').split('.')[0];
+    return `
+      <div style="margin-bottom:6px;">
+        <div><b style="color:${sideClr}">${p.side.toUpperCase()}</b> ${p.symbol}</div>
+        <div>Price: ${p.price}</div>
+        <div>Qty: ${p.qty_tokens}</div>
+        <div>Time: ${time} UTC</div>
+        <div>Status: ${p.status}</div>
+        <div style="font-size:11px;color:#9aa;">UUID: ${p.uuid}</div>
+      </div>
+    `;
+  }).join('<hr style="border:none;border-top:1px solid #333;margin:6px 0;">');
+
+  return `<div style="min-width:180px;">${rows}</div>`;
+}
+
+// === Скролл/зум: подгрузка истории и позиций ===
+chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
+  if (!range) return;
+
+  // подгрузка старых свечей
+  if (!isLoadingMore && !noMoreHistory && range.from < 10) {
+    loadMoreHistory();
+  }
+
+  // диапазон баров -> миллисекунды
+  const vis = candleSeries.barsInLogicalRange(range);
+  if (!vis || !vis.from || !vis.to) return;
+
+  const startMs = Number(vis.from.time) * 1000;
+  const endMs = Number(vis.to.time) * 1000;
+
+  // подгружаем позиции с дебаунсом
+  loadPositionsDebounced(startMs, endMs);
+});
+
+// === Чекбокс "Показывать позиции" ===
+if (showPositionsCheckbox) {
+  showPositionsCheckbox.addEventListener('change', () => {
+    if (!showPositionsCheckbox.checked) {
+      clearPositionMarkers();
+      return;
+    }
+    // загрузим по текущему видимому диапазону
+    const range = chart.timeScale().getVisibleLogicalRange();
+    const vis = range ? candleSeries.barsInLogicalRange(range) : null;
+    if (vis && vis.from && vis.to) {
+      loadPositions(Number(vis.from.time) * 1000, Number(vis.to.time) * 1000);
+    }
+  });
+}
 
 // === Смена пары/интервала ===
 intervalSelect.addEventListener('change', async (e) => {
@@ -306,9 +461,19 @@ intervalSelect.addEventListener('change', async (e) => {
   allCandles = [];
   earliestTime = null;
   candleSeries.setData([]);
+  clearPositionMarkers();
   if (ws) ws.close();
   await loadHistory(currentSymbol, currentInterval);
   connectSocket();
+
+  // если чекбокс включён — перезагрузить позиции
+  if (showPositionsCheckbox?.checked) {
+    const range = chart.timeScale().getVisibleLogicalRange();
+    const vis = range ? candleSeries.barsInLogicalRange(range) : null;
+    if (vis && vis.from && vis.to) {
+      loadPositions(Number(vis.from.time) * 1000, Number(vis.to.time) * 1000);
+    }
+  }
 });
 
 pairSelect.addEventListener('change', async (e) => {
@@ -317,18 +482,45 @@ pairSelect.addEventListener('change', async (e) => {
   allCandles = [];
   earliestTime = null;
   candleSeries.setData([]);
+  clearPositionMarkers();
   if (ws) ws.close();
   await loadHistory(currentSymbol, currentInterval);
   connectSocket();
+
+  if (showPositionsCheckbox?.checked) {
+    const range = chart.timeScale().getVisibleLogicalRange();
+    const vis = range ? candleSeries.barsInLogicalRange(range) : null;
+    if (vis && vis.from && vis.to) {
+      loadPositions(Number(vis.from.time) * 1000, Number(vis.to.time) * 1000);
+    }
+  }
 });
 
 // === Инициализация ===
 (async () => {
   await loadHistory(currentSymbol, currentInterval);
   connectSocket();
+
+  // при старте — если включены позиции, подгрузить по видимому диапазону
+  if (showPositionsCheckbox?.checked) {
+    const range = chart.timeScale().getVisibleLogicalRange();
+    const vis = range ? candleSeries.barsInLogicalRange(range) : null;
+    if (vis && vis.from && vis.to) {
+      loadPositions(Number(vis.from.time) * 1000, Number(vis.to.time) * 1000);
+    }
+  }
 })();
 
 // === Очистка при закрытии ===
 window.addEventListener('beforeunload', () => {
   if (ws) ws.close();
 });
+
+// === Хелперы ===
+function debounce(fn, wait) {
+  let t;
+  return function (...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), wait);
+  };
+}
