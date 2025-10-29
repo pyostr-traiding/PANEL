@@ -9,6 +9,7 @@ from django.db import transaction
 from app.order.models import OrderModel, OrderStatus
 from app.order.schemas.base import OrderSchema, CloseOrderSchema
 from app.position.models import PositionModel, PositionStatus
+from app.position.schemas.status import ChangeStatusSchema
 from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
 
@@ -23,6 +24,7 @@ def __create_order(
 
 def __create_order_test(
         position: PositionModel,
+        data: ChangeStatusSchema,
 ) -> Union[OrderModel, response.BaseResponse]:
     try:
         with transaction.atomic():
@@ -32,7 +34,8 @@ def __create_order_test(
                 )
 
             position.status = PositionStatus.COMPLETED
-            position.save(update_fields=['status'])
+            position.kline_ms = data.kline_ms
+            position.save(update_fields=['status', 'kline_ms'])
 
             result_create = OrderModel.objects.create(
                 position=position,
@@ -63,6 +66,7 @@ def __create_order_test(
 
 def create_order(
         position: PositionModel,
+        data: ChangeStatusSchema,
 ):
     """
     Создать новый ордер
@@ -70,7 +74,7 @@ def create_order(
     Во время создания статус позиции будет изменен на Исполнен
     """
     if position.is_test:
-        order_model = __create_order_test(position=position)
+        order_model = __create_order_test(position=position, data=data)
     else:
         order_model = __create_order(position=position)
 

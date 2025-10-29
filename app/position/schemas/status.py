@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 
@@ -9,3 +9,4 @@ class ChangeStatusSchema(BaseModel):
     """
     uuid: str
     status: Literal['monitoring', 'completed', 'cancel']
+    kline_ms: Optional[str] = None

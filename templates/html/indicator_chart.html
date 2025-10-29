@@ -1,0 +1,32 @@
+{% extends 'html/base_indicator.html' %}
+{% load static %}
+{% block content %}
+<h2>График</h2>
+
+<div class="chart-controls">
+  <div class="pair-select">
+    <label>Пара:</label>
+    <select id="pair-select">
+      <option value="BTCUSDT" selected>BTC/USDT</option>
+    </select>
+  </div>
+
+  <div class="interval-select">
+    <label>Интервал:</label>
+    <select id="interval-select">
+      <option value="1" selected>1m</option>
+      <option value="5">5m</option>
+      <option value="15">15m</option>
+      <option value="30">30m</option>
+      <option value="60">1h</option>
+    </select>
+  </div>
+</div>
+
+<div class="chart-wrapper" style="position:relative;">
+  <div id="chart-container" style="height:600px;"></div>
+  <div id="chart-info"></div>
+</div>
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="{% static 'js/indicator_chart.js' %}"></script>
+{% endblock %}

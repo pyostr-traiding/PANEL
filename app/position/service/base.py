@@ -44,6 +44,7 @@ def create_position(
             symbol = SymbolModel.objects.get(name=position_data.symbol_name)
             qty_tokens = get_position_qty(symbol=symbol, position_data=position_data)
             result_create = PositionModel.objects.create(
+                kline_ms=position_data.kline_ms,
                 symbol=symbol,
                 uuid=position_data.uuid,
                 category=position_data.category,

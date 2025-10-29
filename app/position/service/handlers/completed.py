@@ -20,6 +20,7 @@ def handle_accept_monitoring(
         data,
 ) -> Union[PositionSchema, response.BaseResponse]:
     result_create = create_order(
-        position=position
+        position=position,
+        data=data
     )
     return result_create

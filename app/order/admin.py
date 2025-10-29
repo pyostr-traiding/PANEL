@@ -226,7 +226,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                </div>
                <table style="border-collapse: collapse; width: 100%; border: none;">
                    <tr><td>Сборы USDT:</td><td class="js-funding">{funding}</td></tr>
-                   <tr><td>Цель для 1$:</td><td>{target_rate or '—'}</td></tr>
+                   <tr><td>Цель для 0.5$:</td><td>{target_rate or '—'}</td></tr>
                    <tr><td>Статус:</td><td class="js-status">{obj.get_status_display().upper()}</td></tr>
                    <tr><td>Курс:</td><td><span id="{price_span_id}" class="js-current-price" data-symbol="{symbol}">—</span></td></tr>
                    <tr><td>P&L:</td><td><span id="{pnl_span_id}" class="js-pnl"

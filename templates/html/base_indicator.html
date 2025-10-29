@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{% static 'css/indicator.css' %}">
+  <link rel="stylesheet" href="{% static 'css/chart.css' %}">
 </head>
 <body>
   <div class="top-bar">
@@ -41,6 +42,7 @@
   </div>
 
   <nav class="tabs">
+    <a href="{% url 'indicator_chart' %}" class="{% if '/chart/' in path %}active{% endif %}">График</a>
     <a href="{% url 'indicator_rsi' %}" class="{% if '/rsi/' in path %}active{% endif %}">RSI / Stoch RSI</a>
     <a href="{% url 'indicator_candles' %}" class="{% if '/candles/' in path %}active{% endif %}">Свечи</a>
   </nav>

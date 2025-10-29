@@ -81,4 +81,8 @@ class PositionModel(AbstractModel):
     is_test = models.BooleanField(
         verbose_name='Тест-позиция',
     )
+    kline_ms = models.CharField(
+        verbose_name='Свеча сигнала',
+        max_length=100,
+    )
 

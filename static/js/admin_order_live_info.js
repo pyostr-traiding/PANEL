@@ -103,7 +103,7 @@ function convertBlockToClosed(block, data) {
   const html = `
     <table style="border-collapse: collapse; width: 100%; border: none;">
       <tr><td>Сборы USDT:</td><td>${funding.toFixed(3)}</td></tr>
-      <tr><td>Цель для 1$:</td><td>${targetRate}</td></tr>
+      <tr><td>Цель для 0.5$:</td><td>${targetRate}</td></tr>
       <tr><td>Статус:</td><td>${(data.status_title || data.status).toUpperCase()}</td></tr>
       <tr><td>Курс закрытия:</td><td>${closeRate.toFixed(3)}</td></tr>
       <tr><td>P&L:</td><td><span style="color:${color};">${pnl.toFixed(3)}</span></td></tr>

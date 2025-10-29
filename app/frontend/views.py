@@ -29,6 +29,9 @@ class IndicatorRSIView(IndicatorBaseView):
 class IndicatorCandlesView(IndicatorBaseView):
     template_name = 'html/indicator_candles.html'
 
+class IndicatorChartView(TemplateView):
+    template_name = 'html/indicator_chart.html'
+
 # class DocumentationView(TemplateView):
 #     template_name = 'html/documentation.html'
 #
