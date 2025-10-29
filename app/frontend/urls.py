@@ -1,10 +1,10 @@
 from django.urls import path
 
-from ..sockets import consumers
-from .views import DocumentationView
+from app.frontend.views import IndicatorRSIView, IndicatorCandlesView
 
 urlpatterns = [
 
-    path('list/', DocumentationView.as_view(), name='doc-list'),  # список без выбранного
-    path('list/<int:doc_id>/', DocumentationView.as_view(), name='doc-detail'),  # конкретный документ по id
+    path('indicator/rsi/', IndicatorRSIView.as_view(), name='indicator_rsi'),
+    path('indicator/candles/', IndicatorCandlesView.as_view(), name='indicator_candles'),
+
 ]

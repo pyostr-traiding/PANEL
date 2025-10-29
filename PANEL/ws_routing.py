@@ -1,7 +1,9 @@
 from django.urls import re_path
 
-from PANEL.consumer import KlineConsumer
+from consumers.kline import KlineConsumer
+from consumers.signals import SignalsConsumer
 
 websocket_urlpatterns = [
     re_path(r'ws/kline/$', KlineConsumer.as_asgi()),
+    re_path(r'ws/signals/$', SignalsConsumer.as_asgi()),
 ]

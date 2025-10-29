@@ -5,12 +5,30 @@ import pyotp
 import qrcode
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.views.generic import TemplateView
 
 from app.frontend.models import CustomUser
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django import forms
 from app.frontend import twofa_state
+
+class IndicatorBaseView(TemplateView):
+    """Базовый шаблон для вкладок с индикаторами"""
+    template_name = 'html/base_indicator.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['path'] = self.request.path
+        return ctx
+
+class IndicatorRSIView(IndicatorBaseView):
+    """Вкладка с RSI и Stoch RSI"""
+    template_name = 'html/indicator_rsi.html'
+
+class IndicatorCandlesView(IndicatorBaseView):
+    template_name = 'html/indicator_candles.html'
+
 # class DocumentationView(TemplateView):
 #     template_name = 'html/documentation.html'
 #
