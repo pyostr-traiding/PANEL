@@ -1,11 +1,90 @@
-import { initBaseChart } from './core/chart_base.js';
-import { initSocket } from './core/chart_ws.js';
-import { initPositionsModule } from './indicators/indicator_positions.js';
-import { initUIControls } from './ui/ui_controls.js';
+export function initInfoPanel(ctx) {
+  const { chart, candleSeries } = ctx;
+  const infoPanel = document.getElementById('chart-info');
+  if (!infoPanel) return;
 
-(async () => {
-  const ctx = await initBaseChart();
-  initSocket(ctx);
-  initUIControls(ctx);
-  initPositionsModule(ctx);
-})();
+  let isCrosshairActive = false;
+  let lastCandle = null;
+  let lastClosePrice = null;
+
+  // === оформление ===
+  Object.assign(infoPanel.style, {
+    position: 'absolute',
+    top: '10px',
+    left: '15px',
+    color: '#e0e0e0',
+    fontFamily: 'monospace',
+    fontSize: '13px',
+    background: 'rgba(0,0,0,0.45)',
+    padding: '6px 10px',
+    borderRadius: '6px',
+    pointerEvents: 'none',
+    userSelect: 'none',
+    zIndex: '10',
+    transition: 'background-color 0.3s, color 0.3s, opacity 0.3s',
+  });
+
+  // === обновление содержимого ===
+  function updateInfoPanel(candle) {
+    if (!candle) return;
+
+    const open = parseFloat(candle.open ?? candle.value ?? 0);
+    const high = parseFloat(candle.high ?? candle.value ?? open);
+    const low = parseFloat(candle.low ?? candle.value ?? open);
+    const close = parseFloat(candle.close ?? candle.value ?? open);
+    const volume = parseFloat(candle.volume ?? 0);
+    const date = new Date(candle.time * 1000).toISOString().replace('T', ' ').split('.')[0];
+    const priceColor = close > open ? '#4CAF50' : close < open ? '#F44336' : '#e0e0e0';
+
+    let arrow = '';
+    let highlight = '';
+    if (lastClosePrice !== null) {
+      if (close > lastClosePrice) {
+        arrow = '▲';
+        highlight = 'rgba(76,175,80,0.15)';
+      } else if (close < lastClosePrice) {
+        arrow = '▼';
+        highlight = 'rgba(244,67,54,0.15)';
+      }
+    }
+
+    infoPanel.style.background = highlight || 'rgba(0,0,0,0.45)';
+    infoPanel.innerHTML = `
+      <div><b>${ctx.currentSymbol}</b> (${ctx.currentInterval}m)</div>
+      <div>${date} UTC</div>
+      <div>
+        O: ${open.toFixed(2)} &nbsp;
+        H: ${high.toFixed(2)} &nbsp;
+        L: ${low.toFixed(2)} &nbsp;
+        C: <span style="color:${priceColor}">${close.toFixed(2)} ${arrow}</span> &nbsp;
+        V: ${volume.toFixed(2)}
+      </div>
+    `;
+    lastClosePrice = close;
+  }
+
+  // === при получении свечи от WebSocket ===
+  ctx.subscribeToCandle((candle) => {
+    lastCandle = candle;
+    if (!isCrosshairActive) updateInfoPanel(candle);
+  });
+
+  // === при наведении курсора ===
+  chart.subscribeCrosshairMove((param) => {
+    if (!param || !param.time || !param.seriesData.size) {
+      isCrosshairActive = false;
+      updateInfoPanel(lastCandle);
+      return;
+    }
+
+    isCrosshairActive = true;
+    const data = param.seriesData.get(candleSeries);
+    if (data) updateInfoPanel(data);
+  });
+
+  // === при инициализации (первый рендер) ===
+  if (ctx.allCandles?.length) {
+    lastCandle = ctx.allCandles[ctx.allCandles.length - 1];
+    updateInfoPanel(lastCandle);
+  }
+}
