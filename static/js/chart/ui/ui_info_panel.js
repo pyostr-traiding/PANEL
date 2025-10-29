@@ -4,8 +4,8 @@ import { initPositionsModule } from './indicators/indicator_positions.js';
 import { initUIControls } from './ui/ui_controls.js';
 
 (async () => {
-  const chartCtx = await initBaseChart();
-  initSocket(chartCtx);
-  initUIControls(chartCtx);
-  initPositionsModule(chartCtx);
+  const ctx = await initBaseChart();
+  initSocket(ctx);
+  initUIControls(ctx);
+  initPositionsModule(ctx);
 })();

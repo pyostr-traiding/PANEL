@@ -21,16 +21,27 @@
       <option value="60">1h</option>
     </select>
   </div>
+
+  <div class="indicators-select">
+    <label>Индикации:</label>
+    <div class="dropdown">
+      <button id="indicators-btn">Выбрать ▾</button>
+      <div id="indicators-menu" class="dropdown-content">
+        <label>
+          <input type="checkbox" id="show-positions" />
+          Показывать позиции
+        </label>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="chart-wrapper" style="position:relative;">
   <div id="chart-container" style="height:600px;"></div>
   <div id="chart-info"></div>
 </div>
-<label style="margin-left: 10px;">
-  <input type="checkbox" id="show-positions">
-  Показывать позиции
-</label>
+
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
-<script src="{% static 'js/chart/indicator_chart.js' %}"></script>
+
+<script type="module" src="{% static 'js/chart/indicator_chart.js' %}"></script>
 {% endblock %}

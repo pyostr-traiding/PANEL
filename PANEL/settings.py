@@ -62,6 +62,7 @@ CHANNEL_LAYERS = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # ← должно быть первым
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,13 +147,14 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(',')
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() in ['true', '1', 'yes']
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_METHODS = os.getenv('CORS_ALLOW_METHODS').split(',')
-CORS_ALLOW_HEADERS = os.getenv('CORS_ALLOW_HEADERS').split(',')
+CORS_ALLOW_METHODS = os.getenv('CORS_ALLOW_METHODS', 'GET,POST,OPTIONS,PUT,DELETE').split(',')
+CORS_ALLOW_HEADERS = os.getenv('CORS_ALLOW_HEADERS', 'accept,content-type,authorization,x-csrftoken,x-requested-with').split(',')
+
 
 AUTH_USER_MODEL = 'frontend.CustomUser'
 
