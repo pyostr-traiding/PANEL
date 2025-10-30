@@ -3,18 +3,22 @@ import { initSocket } from './core/chart_ws.js';
 import { initPositionsModule } from './indicators/indicator_positions.js';
 import { initUIControls } from './ui/ui_controls.js';
 import { initInfoPanel } from './ui/ui_info_panel.js';
+import { initPredictIndicators } from "./indicators/indicator_predict.js";
 
 (async () => {
-  // Инициализируем базу
   const ctx = await initBaseChart();
 
-  // Привязываем WebSocket и функции управления
-  ctx.connectSocket = () => initSocket(ctx); // ✅ теперь доступно из ui_controls
-  ctx.ws = null; // просто для хранения ссылки, если нужно закрывать
+  ctx.connectSocket = () => initSocket(ctx);
+  ctx.ws = null;
 
-  // Модули
-  initSocket(ctx);
+  // UI можно инициализировать до сокета
   initUIControls(ctx);
   initPositionsModule(ctx);
+
+  // 💡 подключаем сокет ДО info panel
+  await initSocket(ctx);
+
+  // теперь можно безопасно обращаться к subscribeToCandle
   initInfoPanel(ctx);
+  initPredictIndicators(ctx);
 })();

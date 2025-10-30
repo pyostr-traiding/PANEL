@@ -1,8 +1,29 @@
 {% extends 'html/base_indicator.html' %}
 {% load static %}
 {% block content %}
-<h2>График</h2>
 
+<!-- === ВЕРХНЯЯ ПАНЕЛЬ (заголовок + статусы) === -->
+<div class="chart-header">
+  <h2 class="chart-title">График</h2>
+
+  <div class="ws-status-container">
+    <div class="ws-status-item">
+      <span class="ws-label">Свечи:</span>
+      <span id="ws-status-kline" class="ws-dot gray"></span>
+      <span id="ws-status-kline-text">—</span>
+      <span id="ws-kline-last-update" class="ws-time"></span>
+    </div>
+
+    <div class="ws-status-item">
+      <span class="ws-label">Сигналы:</span>
+      <span id="ws-status-signals" class="ws-dot gray"></span>
+      <span id="ws-status-signals-text">—</span>
+      <span id="ws-signals-last-update" class="ws-time"></span>
+    </div>
+  </div>
+</div>
+
+<!-- === ВТОРАЯ ПАНЕЛЬ (твои фильтры, dropdown и т.д.) === -->
 <div class="chart-controls">
   <div class="pair-select">
     <label>Пара:</label>
@@ -27,25 +48,24 @@
     <div class="dropdown">
       <button id="indicators-btn">Выбрать ▾</button>
       <div id="indicators-menu" class="dropdown-content">
-        <label>
-          <input type="checkbox" id="show-positions" />
-          Показывать позиции
-        </label>
+        <label><input type="checkbox" id="show-positions" /> Показывать позиции</label><br>
+        <label><input type="checkbox" id="show-rsi" /> Показать RSI</label>
+        <label><input type="checkbox" id="show-stochrsi" /> Показать StochRSI</label>
       </div>
     </div>
   </div>
+
   <div class="reset-container">
     <button id="reset-settings">Сбросить настройки</button>
   </div>
-
 </div>
 
+<!-- === ГРАФИК === -->
 <div class="chart-wrapper" style="position:relative;">
-  <div id="chart-container" style="height:600px;"></div>
+  <div id="chart-container" class="chart-container"></div>
   <div id="chart-info"></div>
 </div>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
-
 <script type="module" src="{% static 'js/chart/indicator_chart.js' %}"></script>
 {% endblock %}
