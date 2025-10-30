@@ -1,5 +1,5 @@
 /* ============================================================
-   SIDEBAR — COLLAPSIBLE FIXED PANEL
+   SIDEBAR — PREMIUM STRICT STYLE (Bloomberg / Binance-like)
    ============================================================ */
 
 .sidebar {
@@ -7,54 +7,76 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 72px;
+  width: 45px;
   background: var(--panel-bg);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  transition: width .2s ease;
-  z-index: 100;
+  transition: width var(--transition-normal), box-shadow var(--transition-normal);
+  z-index: 200;
   overflow: hidden;
 }
 
-/* При ховере расширяется */
+/* Расширяется только по ховеру */
 .sidebar:hover {
-  width: 240px;
+  width: 200px;
+  box-shadow: 6px 0 14px rgba(0, 0, 0, 0.3);
 }
 
-/* Верхняя часть (бренд + навигация) */
+/* ============================================================
+   BRAND SECTION — FIXED TOP-LEFT LOGO + TEXT REVEAL
+   ============================================================ */
+
 .sidebar__brand {
-  padding: 12px 10px;
+  height: 45px;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* всегда прижато к левому краю */
+  padding: 0 10px;
+  overflow: hidden;
+  position: relative;
 }
 
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none;
   color: var(--text-color);
 }
 
 .brand-logo {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
+  opacity: 1;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, opacity 0.2s ease;
 }
 
+/* логотип остаётся на месте */
+.sidebar:hover .brand-logo {
+  transform: none;
+  opacity: 1;
+}
+
+/* текст появляется справа */
 .brand-text {
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 14px;
   white-space: nowrap;
   opacity: 0;
-  transform: translateX(-10px);
-  transition: opacity .15s ease, transform .15s ease;
+  transform: translateX(-6px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  pointer-events: none;
 }
 
 .sidebar:hover .brand-text {
   opacity: 1;
   transform: translateX(0);
+  pointer-events: auto;
 }
 
 /* ============================================================
@@ -65,27 +87,29 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 6px;
-  gap: 4px;
-  margin-top: 0;
+  padding: 4px;
+  gap: 2px;
   flex-grow: 1;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
   color: var(--text-color);
   text-decoration: none;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: background-color .15s, border-color .15s, transform .05s;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform 0.05s ease;
 }
 
 .nav-item:hover {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-color: var(--border-color);
 }
 
@@ -94,9 +118,10 @@
 }
 
 .nav-icon {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  opacity: 0.9;
 }
 
 .nav-label {
@@ -104,8 +129,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity .15s ease, transform .15s ease;
+  transform: translateX(-5px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .sidebar:hover .nav-label {
@@ -115,143 +140,79 @@
 
 /* Активный пункт */
 .nav-item.active {
-  background: rgba(0, 122, 255, 0.12);
-  border-color: rgba(0, 122, 255, 0.5);
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
 }
 
 /* ============================================================
-   BOTTOM SECTION (Тема + Назад)
+   BOTTOM SECTION
    ============================================================ */
 
 .sidebar__bottom {
-  padding: 8px 6px;
+  padding: 6px;
   border-top: 1px solid var(--border-color);
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  overflow: hidden;
+  gap: 4px;
 }
 
-/* Кнопки внизу */
 .sidebar__bottom .nav-item {
   justify-content: center;
-  padding: 10px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 8px;
 }
 
-.sidebar:not(:hover) .nav-item .nav-label {
-  display: none; /* полностью скрываем подписи в свёрнутом виде */
-}
-
-.sidebar:hover .nav-item .nav-label {
-  display: inline;
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity .15s ease, transform .15s ease;
-}
-
-/* Кнопка темы */
-#theme-toggle {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border-color);
-}
-
-#theme-toggle:hover {
-  background: rgba(0,122,255,0.12);
-  border-color: rgba(0,122,255,0.4);
-}
-
-/* Кнопка "Назад в админку" */
-.back-btn-sidebar {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border-color);
-}
-
-.back-btn-sidebar:hover {
-  background: rgba(0,122,255,0.15);
-  border-color: rgba(0,122,255,0.4);
+/* подписи скрываем, но не трогаем логотип */
+.sidebar:not(:hover) .nav-label {
+  display: none;
 }
 
 /* ============================================================
-   APP MAIN (Контент справа от сайдбара)
+   BUTTONS (THEME / BACK)
+   ============================================================ */
+
+#theme-toggle,
+.back-btn-sidebar {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-normal);
+}
+
+#theme-toggle:hover,
+.back-btn-sidebar:hover {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 6px rgba(0, 122, 255, 0.25);
+}
+
+/* ============================================================
+   CONTENT ADJACENT AREA
    ============================================================ */
 
 .app-main {
-  margin-left: 72px; /* ширина свернутого сайдбара */
+  margin-left: 45px;
   padding: 16px;
-  transition: margin-left .2s ease;
-}
-
-.sidebar:hover ~ .app-main {
-  margin-left: 240px;
-}
-
-@media (max-width: 960px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-
-  .sidebar:hover {
-    transform: translateX(0);
-    width: 240px;
-  }
-
-  .app-main {
-    margin-left: 0;
-  }
+  transition: none;
 }
 
 /* ============================================================
-   TOP BAR (совместимость)
+   VISUAL POLISH
    ============================================================ */
 
-.top-bar {
-  margin-bottom: 12px;
-}
-
-/* ============================================================
-   DATA TABS & CARDS
-   ============================================================ */
-
-.data-tabs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.data-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 30px 20px;
-  color: var(--text-color);
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.data-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: #007aff;
-  transform: translateY(-3px);
-}
-
-.data-card i {
-  width: 32px;
-  height: 32px;
-}
-
-.data-card.disabled {
-  opacity: 0.5;
+/* Эффект фокуса на контенте при раскрытии */
+.sidebar:hover ~ .app-main::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(1px);
+  z-index: 150;
   pointer-events: none;
+  transition: opacity 0.25s ease;
 }

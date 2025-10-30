@@ -1,10 +1,9 @@
 {% extends 'html/chart/base_app.html' %}
 {% load static %}
 
-{% block title %}Indicators{% endblock %}
+{% block title %}Панель{% endblock %}
 
 {% block main %}
-
 
   {# Показываем вкладки только на странице данных (rsi / candles) #}
   {% if '/rsi/' in path or '/candles/' in path %}

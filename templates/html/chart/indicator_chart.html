@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<!-- === ВТОРАЯ ПАНЕЛЬ (твои фильтры, dropdown и т.д.) === -->
+<!-- === ФИЛЬТРЫ / НАСТРОЙКИ === -->
 <div class="chart-controls">
   <div class="pair-select">
     <label>Пара:</label>
@@ -60,12 +60,15 @@
   </div>
 </div>
 
-<!-- === ГРАФИК === -->
-<div class="chart-wrapper" style="position:relative;">
+<!-- === КОНТЕЙНЕР ГРАФИКА === -->
+<div class="chart-wrapper">
   <div id="chart-container" class="chart-container"></div>
   <div id="chart-info"></div>
 </div>
 
+<!-- === СКРИПТЫ === -->
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <script type="module" src="{% static 'js/chart/indicator_chart.js' %}"></script>
+
+
 {% endblock %}

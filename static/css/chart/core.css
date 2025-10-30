@@ -1,0 +1,42 @@
+/* ============================================================
+   CORE THEME — BASE VARIABLES & COLORS
+   ============================================================ */
+
+/* Светлая тема по умолчанию */
+:root,
+:root[data-theme="light"] {
+  --bg-color: #f8f9fa;
+  --panel-bg: #ffffff;
+  --border-color: #dcdcdc;
+  --text-color: #1e1e1e;
+  --muted-color: #7a7a7a;
+  --accent-color: #007aff;
+  --accent-hover: #005fcc;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* Тёмная тема */
+:root[data-theme="dark"] {
+  --bg-color: #111;
+  --panel-bg: #181818;
+  --border-color: #2a2a2a;
+  --text-color: #e4e4e4;
+  --muted-color: #9a9a9a;
+  --accent-color: #0a84ff;
+  --accent-hover: #339aff;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

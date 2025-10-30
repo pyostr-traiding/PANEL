@@ -172,37 +172,46 @@ s3_client = boto3.resource(
 
 )
 
-STORAGES = {
-    'default': {
-        'BACKEND': 'storages.backends.s3.S3Storage',
-        'OPTIONS': {
-            'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
-            'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
-            'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
-            'endpoint_url': os.getenv('AWS_S3_ENDPOINT_URL'),
-            'signature_version': 's3',
-            'location': 'TRADE',
-        },
-    },
+if DEBUG:
+    # --- Локальные файлы ---
+    STATIC_URL = "static/"
+    STATIC_ROOT = BASE_DIR / "staticfiles"
 
-    'staticfiles': {
-        'BACKEND': 'storages.backends.s3.S3Storage',
-        'OPTIONS': {
-            'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
-            'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
-            'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
-            'endpoint_url': os.getenv('AWS_S3_ENDPOINT_URL'),
-            'signature_version': 's3',
-            'location': 'TRADE',
+    STATICFILES_DIRS = [
+        BASE_DIR / "static",
+    ]
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+
+else:
+    # --- Хранение на S3 ---
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
+                'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
+                'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
+                'endpoint_url': os.getenv('AWS_S3_ENDPOINT_URL'),
+                'signature_version': 's3',
+                'location': 'TRADE',
+            },
+        },
+        'staticfiles': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
+                'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
+                'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
+                'endpoint_url': os.getenv('AWS_S3_ENDPOINT_URL'),
+                'signature_version': 's3',
+                'location': 'TRADE',
+            },
         },
     }
-}
 
-MEDIA_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/media/"
-STATIC_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+    MEDIA_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/media/"
+    STATIC_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/static/"
 
 
 
@@ -323,3 +332,8 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
+
+#############
+# Для загрузки в прод FORCE_COLLECTSTATIC=True python manage.py collectstatic --noinput
+if os.getenv('FORCE_COLLECTSTATIC', '').lower() in ['true', '1', 'yes']:
+    DEBUG = False
