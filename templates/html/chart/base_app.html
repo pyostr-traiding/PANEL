@@ -1,0 +1,38 @@
+                         {% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Panel{% endblock %}</title>
+
+  <script>
+    (function() {
+      const storedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+      window.addEventListener("storage", (e) => {
+        if (e.key === "theme") document.documentElement.setAttribute('data-theme', e.newValue || 'light');
+      });
+    })();
+  </script>
+
+  <!-- Admin / ваш UI -->
+  <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
+
+  <!-- Глобальные -->
+  <link rel="stylesheet" href="{% static 'css/chart/indicator.css' %}">
+  <link rel="stylesheet" href="{% static 'css/chart/chart.css' %}">
+  <link rel="stylesheet" href="{% static 'css/chart/layout/sidebar.css' %}">
+
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  {% include 'html/chart/partials/sidebar.html' %}
+
+  <main class="app-main">
+    {% block main %}{% endblock %}
+  </main>
+</body>
+</html>

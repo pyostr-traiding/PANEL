@@ -1,55 +1,20 @@
+{% extends 'html/chart/base_app.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>Indicators</title>
 
-  <!-- Перед CSS применяем тему -->
-<script>
-  (function() {
-    // Получаем тему из localStorage
-    const storedTheme = localStorage.getItem("theme");
-    // Если пользователь не выбирал тему — используем системную
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = storedTheme || (prefersDark ? 'dark' : 'light');
-    // Устанавливаем атрибут <html data-theme="...">
-    document.documentElement.setAttribute('data-theme', theme);
+{% block title %}Indicators{% endblock %}
 
-    // Подписываемся на изменение темы (если пользователь переключает в админке)
-    window.addEventListener("storage", (event) => {
-      if (event.key === "theme") {
-        document.documentElement.setAttribute('data-theme', event.newValue || 'light');
-      }
-    });
-  })();
-  </script>
+{% block main %}
 
-  <!-- Admin CSS -->
-  <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
-  <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="{% static 'css/indicator.css' %}">
-  <link rel="stylesheet" href="{% static 'css/chart/chart.css' %}">
-</head>
-<body>
-  <div class="top-bar">
-    <a href="/" class="back-btn">← Назад в админ панель</a>
-    <div class="indicator-status">
-      <span id="ws-status" class="status red"></span>
-      <span id="ws-status-text">Отключено</span>
-    </div>
-  </div>
 
-  <nav class="tabs">
-    <a href="{% url 'indicator_chart' %}" class="{% if '/chart/' in path %}active{% endif %}">График</a>
-    <a href="{% url 'indicator_rsi' %}" class="{% if '/rsi/' in path %}active{% endif %}">RSI / Stoch RSI</a>
-    <a href="{% url 'indicator_candles' %}" class="{% if '/candles/' in path %}active{% endif %}">Свечи</a>
-  </nav>
+  {# Показываем вкладки только на странице данных (rsi / candles) #}
+  {% if '/rsi/' in path or '/candles/' in path %}
+    <nav class="tabs">
+      <a href="{% url 'indicator_rsi' %}" class="{% if '/rsi/' in path %}active{% endif %}">RSI / Stoch RSI</a>
+      <a href="{% url 'indicator_candles' %}" class="{% if '/candles/' in path %}active{% endif %}">Свечи</a>
+    </nav>
+  {% endif %}
 
   <div class="content">
     {% block content %}{% endblock %}
   </div>
-</body>
-
-</html>
+{% endblock %}

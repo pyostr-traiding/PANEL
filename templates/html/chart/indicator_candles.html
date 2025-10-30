@@ -2,8 +2,11 @@
 {% load static %}
 
 {% block content %}
+  <div class="indicator-status">
+    <span id="ws-status" class="status red"></span>
+    <span id="ws-status-text">Отключено</span>
+  </div>
   <h2>Обновления свечей</h2>
-
   <div id="candles-blocks" class="indicator-grid">
     <div class="interval-block" data-interval="1"></div>
     <div class="interval-block" data-interval="5"></div>
@@ -12,5 +15,5 @@
     <div class="interval-block" data-interval="60"></div>
   </div>
 
-  <script src="{% static 'js/indicator_candles.js' %}"></script>
+  <script src="{% static 'js/chart/indicators/indicator_candles.js' %}"></script>
 {% endblock %}

@@ -2,30 +2,34 @@ import { intervalToMs } from './chart_utils.js';
 
 export async function initBaseChart() {
   const chartEl = document.getElementById('chart-container');
+
+  // 🔥 Берём цвета из CSS-переменных
+  const getColor = (name, fallback) =>
+    getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim() || fallback;
+
   const chart = LightweightCharts.createChart(chartEl, {
     layout: {
-      background: { color: '#131722' },
-      textColor: '#d1d4dc',
+      background: { color: getColor('--panel-bg', '#ffffff') },
+      textColor: getColor('--text-color', '#111'),
     },
     grid: {
-      vertLines: { color: '#2B2B43' },
-      horzLines: { color: '#2B2B43' },
+      vertLines: { color: getColor('--border-color', '#dcdcdc') },
+      horzLines: { color: getColor('--border-color', '#dcdcdc') },
     },
-    rightPriceScale: { borderColor: '#485c7b' },
-    timeScale: { borderColor: '#485c7b', timeVisible: true },
+    rightPriceScale: { borderColor: getColor('--border-color', '#dcdcdc') },
+    timeScale: { borderColor: getColor('--border-color', '#dcdcdc'), timeVisible: true },
   });
 
-  // === Отступ справа и автофоллоу графика ===
   chart.timeScale().applyOptions({
-    rightOffset: 5, // небольшой “воздух” справа от последней свечи
-    barSpacing: 6, // плотность свечей (можно подправить под вкус)
-    rightBarStaysOnScroll: true, // чтобы скролл в реальном времени не сбивался
+    rightOffset: 5,
+    barSpacing: 6,
+    rightBarStaysOnScroll: true,
   });
 
-  // График сразу следует за ценой
   chart.timeScale().scrollToRealTime();
 
-  // === Создаём серию свечей ===
   const candleSeries = chart.addCandlestickSeries({
     upColor: '#26a69a',
     borderUpColor: '#26a69a',
@@ -35,7 +39,23 @@ export async function initBaseChart() {
     wickDownColor: '#ef5350',
   });
 
-  // === Внутренние состояния ===
+  // === 💡 Реагируем на смену темы ===
+  window.addEventListener('themeChanged', () => {
+    chart.applyOptions({
+      layout: {
+        background: { color: getColor('--panel-bg', '#ffffff') },
+        textColor: getColor('--text-color', '#111'),
+      },
+      grid: {
+        vertLines: { color: getColor('--border-color', '#dcdcdc') },
+        horzLines: { color: getColor('--border-color', '#dcdcdc') },
+      },
+      rightPriceScale: { borderColor: getColor('--border-color', '#dcdcdc') },
+      timeScale: { borderColor: getColor('--border-color', '#dcdcdc') },
+    });
+  });
+
+  // === Состояние ===
   let currentSymbol = 'BTCUSDT';
   let currentInterval = '1';
   let earliestTime = null;
@@ -43,7 +63,6 @@ export async function initBaseChart() {
   let noMoreHistory = false;
   let isLoadingMore = false;
 
-  // === История свечей ===
   async function loadHistory(symbol = currentSymbol, interval = currentInterval) {
     const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=1000`;
     const res = await fetch(url);
@@ -68,14 +87,10 @@ export async function initBaseChart() {
     allCandles = candles;
     earliestTime = candles[0].time * 1000;
     candleSeries.setData(candles);
-
-    // после загрузки график центрируется на последних свечах
     chart.timeScale().scrollToRealTime();
-
     return candles;
   }
 
-  // === Догрузка старой истории ===
   async function loadMoreHistory() {
     if (isLoadingMore || noMoreHistory || !earliestTime) return;
     isLoadingMore = true;
@@ -112,7 +127,6 @@ export async function initBaseChart() {
     isLoadingMore = false;
   }
 
-  // === Получить диапазон в миллисекундах ===
   function getVisibleRange(range) {
     if (!range) return { startMs: 0, endMs: 0 };
     const vis = candleSeries.barsInLogicalRange(range);
@@ -123,18 +137,14 @@ export async function initBaseChart() {
     };
   }
 
-  // === Первичная загрузка ===
   await loadHistory();
 
-  // === Возврат контекста ===
   return {
     chart,
     candleSeries,
     getVisibleRange,
     loadHistory,
     loadMoreHistory,
-
-    // состояния (важно, чтобы модули могли их менять)
     get currentSymbol() {
       return currentSymbol;
     },

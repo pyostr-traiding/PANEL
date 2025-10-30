@@ -24,13 +24,17 @@ class IndicatorBaseView(TemplateView):
 
 class IndicatorRSIView(IndicatorBaseView):
     """Вкладка с RSI и Stoch RSI"""
-    template_name = 'html/indicator_rsi.html'
+    template_name = 'html/chart/indicator_rsi.html'
 
 class IndicatorCandlesView(IndicatorBaseView):
-    template_name = 'html/indicator_candles.html'
+    template_name = 'html/chart/indicator_candles.html'
 
 class IndicatorChartView(TemplateView):
     template_name = 'html/chart/indicator_chart.html'
+
+class IndicatorDataView(IndicatorBaseView):
+    """Главная страница раздела Данные"""
+    template_name = 'html/chart/indicator_data.html'
 
 # class DocumentationView(TemplateView):
 #     template_name = 'html/documentation.html'

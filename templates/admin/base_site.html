@@ -1,14 +1,99 @@
 {% extends "admin/base.html" %}
 
-{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block title %}
+  {% if subtitle %}{{ subtitle }} | {% endif %}
+  {{ title }} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
 
 {% block branding %}
-<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></div>
-<li><a href="{% url 'indicator_rsi' %}">Моя страница</a></li>
+<style>
+  /* ====== CUSTOM ADMIN HEADER STYLING ====== */
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: var(--header-bg, #0d1117);
+    border-bottom: 1px solid var(--border-color, #30363d);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
 
-{% if user.is_anonymous %}
-  {% include "admin/color_theme_toggle.html" %}
-{% endif %}
+  #site-name a {
+    font-weight: 700;
+    color: var(--header-link-color, #fff);
+    text-decoration: none;
+    font-size: 18px;
+  }
+
+  #site-name a:hover {
+    color: var(--accent-color, #4CAF50);
+  }
+
+  /* ====== ПАНЕЛЬ ====== */
+  .admin-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+  }
+
+  .admin-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--panel-bg, #1e1e1e);
+    color: var(--text-color, #e0e0e0);
+    border: 1px solid var(--border-color, #2a2a2a);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s;
+  }
+
+  .admin-links a:hover {
+    background-color: var(--accent-color, #4CAF50);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .admin-links svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ====== ADAPTIVE LIGHT/DARK ====== */
+  :root[data-theme='light'] {
+    --header-bg: #ffffff;
+    --header-link-color: #111;
+    --panel-bg: #f5f5f5;
+    --border-color: #dcdcdc;
+    --text-color: #111;
+  }
+
+  :root[data-theme='dark'] {
+    --header-bg: #0d1117;
+    --header-link-color: #fff;
+    --panel-bg: #1e1e1e;
+    --border-color: #2a2a2a;
+    --text-color: #e0e0e0;
+  }
+</style>
+
+<div id="site-name">
+
+</div>
+
+<div class="admin-links">
+  <a href="{% url 'indicator_chart' %}" title="Перейти в торговую панель">
+    Панель
+  </a>
+
+  {% if user.is_anonymous %}
+    {% include "admin/color_theme_toggle.html" %}
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}

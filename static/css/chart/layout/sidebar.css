@@ -1,0 +1,257 @@
+/* ============================================================
+   SIDEBAR — COLLAPSIBLE FIXED PANEL
+   ============================================================ */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 72px;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: width .2s ease;
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* При ховере расширяется */
+.sidebar:hover {
+  width: 240px;
+}
+
+/* Верхняя часть (бренд + навигация) */
+.sidebar__brand {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.brand-text {
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.sidebar:hover .brand-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 6px;
+  gap: 4px;
+  margin-top: 0;
+  flex-grow: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text-color);
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color .15s, border-color .15s, transform .05s;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--border-color);
+}
+
+.nav-item:active {
+  transform: scale(0.98);
+}
+
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+}
+
+.nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.sidebar:hover .nav-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Активный пункт */
+.nav-item.active {
+  background: rgba(0, 122, 255, 0.12);
+  border-color: rgba(0, 122, 255, 0.5);
+}
+
+/* ============================================================
+   BOTTOM SECTION (Тема + Назад)
+   ============================================================ */
+
+.sidebar__bottom {
+  padding: 8px 6px;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  overflow: hidden;
+}
+
+/* Кнопки внизу */
+.sidebar__bottom .nav-item {
+  justify-content: center;
+  padding: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar:not(:hover) .nav-item .nav-label {
+  display: none; /* полностью скрываем подписи в свёрнутом виде */
+}
+
+.sidebar:hover .nav-item .nav-label {
+  display: inline;
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+/* Кнопка темы */
+#theme-toggle {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+}
+
+#theme-toggle:hover {
+  background: rgba(0,122,255,0.12);
+  border-color: rgba(0,122,255,0.4);
+}
+
+/* Кнопка "Назад в админку" */
+.back-btn-sidebar {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+}
+
+.back-btn-sidebar:hover {
+  background: rgba(0,122,255,0.15);
+  border-color: rgba(0,122,255,0.4);
+}
+
+/* ============================================================
+   APP MAIN (Контент справа от сайдбара)
+   ============================================================ */
+
+.app-main {
+  margin-left: 72px; /* ширина свернутого сайдбара */
+  padding: 16px;
+  transition: margin-left .2s ease;
+}
+
+.sidebar:hover ~ .app-main {
+  margin-left: 240px;
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar:hover {
+    transform: translateX(0);
+    width: 240px;
+  }
+
+  .app-main {
+    margin-left: 0;
+  }
+}
+
+/* ============================================================
+   TOP BAR (совместимость)
+   ============================================================ */
+
+.top-bar {
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   DATA TABS & CARDS
+   ============================================================ */
+
+.data-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.data-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 30px 20px;
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.data-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #007aff;
+  transform: translateY(-3px);
+}
+
+.data-card i {
+  width: 32px;
+  height: 32px;
+}
+
+.data-card.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

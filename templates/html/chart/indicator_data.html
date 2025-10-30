@@ -1,0 +1,32 @@
+{% extends 'html/chart/base_app.html' %}
+{% load static %}
+
+{% block title %}Данные{% endblock %}
+
+{% block main %}
+
+  <h2 class="chart-title">Данные</h2>
+  <p class="subtitle">Здесь вы можете просмотреть различные индикаторы и графики.</p>
+
+  <div class="data-tabs">
+    <a href="{% url 'indicator_rsi' %}" class="data-card">
+      <i data-lucide="activity"></i>
+      <span>RSI / Stoch RSI</span>
+    </a>
+
+    <a href="{% url 'indicator_candles' %}" class="data-card">
+      <i data-lucide="candlestick-chart"></i>
+      <span>Свечи</span>
+    </a>
+
+    <!-- можно добавлять новые -->
+    <a href="#" class="data-card disabled">
+      <i data-lucide="bar-chart-2"></i>
+      <span>Новый индикатор</span>
+    </a>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>window.lucide?.createIcons());</script>
+
+{% endblock %}
