@@ -1,94 +1,89 @@
 /* ============================================================
-   CHART PANEL — STRICT, MINIMAL UI (FIXED RESIZE BUG)
+   CHARTS & DATA — PREMIUM EXCHANGE STYLE
    ============================================================ */
 
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 420px);
+  min-height: 420px;
+  position: relative;
+  box-sizing: border-box;
+}
+.chart-container {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--panel-bg);
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Chart header */
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-soft);
+}
+.chart-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+/* Controls */
 .chart-controls {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: var(--panel-bg);
-  padding: 8px 10px;
+  background: var(--panel-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  margin-bottom: 12px;
+  padding: 8px 10px;
+  box-shadow: var(--shadow-soft);
   flex-wrap: wrap;
 }
-
 .chart-controls label {
   font-weight: 600;
-  margin-right: 4px;
   font-size: 13px;
 }
 
+/* Dropdown */
 .dropdown {
   position: relative;
   display: inline-block;
 }
-
-#indicators-btn {
-  background-color: var(--panel-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 5px 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-#indicators-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
 .dropdown-content {
   display: none;
   position: absolute;
   background-color: var(--panel-bg);
-  min-width: 180px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 8px;
+  box-shadow: var(--shadow-strong);
   z-index: 50;
 }
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.dropdown-content label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 13px;
-  color: var(--text-color);
-}
-
-/* === ГРАФИК === */
-.chart-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: calc(100vh - 480px);
-  min-height: 420px;
-}
-
-.chart-container {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background-color: var(--panel-bg);
-  overflow: hidden;
-}
+.dropdown:hover .dropdown-content { display: block; }
 
 /* === Кнопка сброса === */
 .reset-container {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  animation: fadeSlideIn 0.4s ease;
 }
 
 #reset-settings {
-  background-color: var(--panel-bg);
+  background: var(--panel-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
@@ -96,94 +91,73 @@
   font-size: 13px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color var(--transition-fast),
-              border-color var(--transition-fast),
-              transform 0.1s ease;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-normal),
+    transform 0.1s ease;
 }
 
+/* Hover: красный акцент */
 #reset-settings:hover {
-  background-color: var(--danger-bg, rgba(255, 60, 60, 0.15));
-  border-color: var(--danger-border, rgba(255, 60, 60, 0.6));
-  color: var(--danger-text, #ff6b6b);
+  background-color: rgba(255, 60, 60, 0.15);
+  border-color: rgba(255, 60, 60, 0.6);
+  color: #ff6b6b;
+  box-shadow: 0 0 6px rgba(255, 60, 60, 0.3);
 }
 
 #reset-settings:active {
   transform: scale(0.97);
-  background-color: var(--danger-active-bg, rgba(255, 60, 60, 0.25));
+  background-color: rgba(255, 60, 60, 0.25);
 }
 
-/* === Заголовок и статусы === */
-.chart-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  margin-bottom: 8px;
+/* Анимация появления */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-.chart-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-color);
-  margin: 0;
-}
-
+/* WS Status */
 .ws-status-container {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .ws-status-item {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  color: var(--text-color);
-  font-family: monospace;
+  gap: 6px;
 }
-
-.ws-label {
-  font-weight: 600;
-  color: #aaa;
-}
-
 .ws-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #666;
-  transition: background-color 0.3s ease;
+  background: #666;
+  transition: background-color 0.3s;
 }
+.ws-dot.green { background: #35c76f; }
+.ws-dot.yellow { background: #f0c94a; }
+.ws-dot.red { background: #f35a5a; }
 
-.ws-dot.green { background-color: #4caf50; }
-.ws-dot.yellow { background-color: #ffc107; }
-.ws-dot.red { background-color: #f44336; }
-.ws-dot.gray { background-color: #777; }
-
-.ws-time {
-  font-size: 11px;
-  color: #999;
-}
-
-.ws-time.stale {
-  color: #666;
-}
 /* ============================================================
-   DATA CARDS — GRID STYLE FOR PAGE "ДАННЫЕ"
+   DATA CARDS — FIXED TILE GRID (Stable Squares)
    ============================================================ */
 
 .data-tabs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   margin-top: 16px;
+  justify-content: flex-start;
 }
 
 .data-card {
+  flex: 0 0 180px;              /* фиксированная ширина */
+  height: 120px;                /* фиксированная высота */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -192,20 +166,23 @@
   background: var(--panel-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 20px 14px;
+  padding: 12px;
   color: var(--text-color);
   text-decoration: none;
   font-weight: 500;
   font-size: 13px;
+  box-shadow: var(--shadow-soft);
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
-    transform 0.15s ease;
+    transform 0.15s ease,
+    box-shadow var(--transition-normal);
 }
 
 .data-card:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--accent-soft);
   border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(36,156,255,0.15);
   transform: translateY(-2px);
 }
 
@@ -224,57 +201,199 @@
   opacity: 0.4;
   pointer-events: none;
   border-style: dashed;
+  box-shadow: none;
 }
+
 /* ============================================================
-   DATA CARDS — GRID STYLE FOR PAGE "ДАННЫЕ"
+   CUSTOM CHECKBOXES (Indicators dropdown)
    ============================================================ */
 
-.data-tabs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
-  margin-top: 16px;
+.dropdown-content label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--text-color);
+  cursor: pointer;
 }
 
-.data-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.dropdown-content input[type="checkbox"] {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background-color: var(--panel-bg);
+  position: relative;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.dropdown-content input[type="checkbox"]:checked {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.dropdown-content input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 1px;
+  width: 5px;
+  height: 8px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+}
+
+/* ============================================================
+   МОДАЛЬНОЕ ОКНО НАСТРОЕК — СТИЛЬНЫЙ ВИД
+   ============================================================ */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.6);
   justify-content: center;
-  gap: 8px;
+  align-items: center;
+}
+
+.modal-content {
   background: var(--panel-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  display: flex;
+  width: 70%; height: 70%;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  animation: fadeIn 0.25s ease;
+}
+
+.modal-sidebar {
+  width: 20%;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--panel-bg);
+  padding: 20px;
+}
+
+.modal-sidebar ul {
+  list-style: none;
+  margin: 0; padding: 0;
+}
+
+.modal-sidebar li {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--muted-color);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.modal-sidebar li:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.modal-sidebar li.active {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.modal-body {
+  width: 80%;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.section h3 {
+  color: var(--accent-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  font-size: 15px;
+}
+
+/* === СТИЛИ ДЛЯ ЧЕКБОКСОВ === */
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.02);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 20px 14px;
-  color: var(--text-color);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 13px;
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    transform 0.15s ease;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  user-select: none;
 }
 
-.data-card:hover {
-  background: rgba(255, 255, 255, 0.04);
+.setting-item:hover {
+  background-color: rgba(255,255,255,0.05);
   border-color: var(--accent-color);
-  transform: translateY(-2px);
 }
 
-.data-card i {
-  width: 22px;
-  height: 22px;
-  opacity: 0.9;
+.setting-item input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
 }
 
-.data-card span {
-  text-align: center;
-  line-height: 1.3;
+.setting-item input[type="checkbox"]:checked {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
 }
 
-.data-card.disabled {
-  opacity: 0.4;
-  pointer-events: none;
-  border-style: dashed;
+.setting-item input[type="checkbox"]:checked::after {
+  content: '✔';
+  position: absolute;
+  left: 3px;
+  top: -1px;
+  color: white;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.setting-item span {
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+#open-modal-btn {
+  padding: 6px 12px;
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#open-modal-btn:hover {
+  background-color: color-mix(in srgb, var(--accent-color) 85%, black);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }

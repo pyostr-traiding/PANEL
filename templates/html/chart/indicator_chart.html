@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 
-<!-- === ВЕРХНЯЯ ПАНЕЛЬ (заголовок + статусы) === -->
 <div class="chart-header">
   <h2 class="chart-title">График</h2>
 
@@ -23,7 +22,6 @@
   </div>
 </div>
 
-<!-- === ФИЛЬТРЫ / НАСТРОЙКИ === -->
 <div class="chart-controls">
   <div class="pair-select">
     <label>Пара:</label>
@@ -45,14 +43,7 @@
 
   <div class="indicators-select">
     <label>Индикации:</label>
-    <div class="dropdown">
-      <button id="indicators-btn">Выбрать ▾</button>
-      <div id="indicators-menu" class="dropdown-content">
-        <label><input type="checkbox" id="show-positions" /> Показывать позиции</label><br>
-        <label><input type="checkbox" id="show-rsi" /> Показать RSI</label>
-        <label><input type="checkbox" id="show-stochrsi" /> Показать StochRSI</label>
-      </div>
-    </div>
+    <button id="open-modal-btn">Открыть настройки</button>
   </div>
 
   <div class="reset-container">
@@ -60,15 +51,95 @@
   </div>
 </div>
 
-<!-- === КОНТЕЙНЕР ГРАФИКА === -->
 <div class="chart-wrapper">
   <div id="chart-container" class="chart-container"></div>
   <div id="chart-info"></div>
 </div>
 
-<!-- === СКРИПТЫ === -->
+<!-- === МОДАЛЬНОЕ ОКНО === -->
+<div id="settings-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-sidebar">
+      <ul>
+        <li class="active" data-section="indicators">Индикаторы</li>
+        <li data-section="signals">Сигналы</li>
+        <li data-section="params">Параметры</li>
+      </ul>
+    </div>
+
+    <div class="modal-body">
+      <div class="section active" id="section-indicators">
+        <h3>Индикаторы</h3>
+        <label class="setting-item">
+          <input type="checkbox" id="show-rsi">
+          <span>RSI</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="show-stochrsi">
+          <span>StochRSI</span>
+        </label>
+      </div>
+
+      <div class="section" id="section-signals">
+        <h3>Сигналы</h3>
+        <label class="setting-item">
+          <input type="checkbox" id="show-buy-signal">
+          <span>Показывать сигналы покупки</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="show-sell-signal">
+          <span>Показывать сигналы продажи</span>
+        </label>
+      </div>
+
+      <div class="section" id="section-params">
+        <h3>Параметры отображения</h3>
+        <label class="setting-item">
+          <input type="checkbox" id="show-positions">
+          <span>Показывать позиции</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="show-orders">
+          <span>Показывать ордера</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <script type="module" src="{% static 'js/chart/indicator_chart.js' %}"></script>
 
+<script>
+  const modal = document.getElementById('settings-modal');
+  const openBtn = document.getElementById('open-modal-btn');
+  const resetBtn = document.getElementById('reset-settings');
+
+  openBtn.onclick = () => modal.style.display = 'flex';
+  modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+  document.querySelectorAll('.modal-sidebar li').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.modal-sidebar li').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById(`section-${item.dataset.section}`).classList.add('active');
+    });
+  });
+
+  const checkboxes = document.querySelectorAll('.modal-body input[type="checkbox"]');
+  window.addEventListener('load', () => {
+    checkboxes.forEach(chk => {
+      const saved = localStorage.getItem(chk.id);
+      if (saved !== null) chk.checked = saved === 'true';
+    });
+  });
+  checkboxes.forEach(chk => chk.addEventListener('change', () => {
+    localStorage.setItem(chk.id, chk.checked);
+  }));
+  resetBtn.onclick = () => {
+    checkboxes.forEach(chk => { chk.checked = false; localStorage.removeItem(chk.id); });
+  };
+</script>
 
 {% endblock %}

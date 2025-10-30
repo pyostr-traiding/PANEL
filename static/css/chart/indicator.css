@@ -1,5 +1,5 @@
 /* ============================================================
-   INDICATOR PANEL — STRICT, CLEAN STYLE
+   INDICATOR PANEL — PREMIUM, FIXED TILE LAYOUT
    ============================================================ */
 
 .indicator-status {
@@ -15,7 +15,6 @@
   padding: 5px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
-  box-shadow: none;
   width: auto;
   white-space: nowrap;
 }
@@ -88,24 +87,37 @@
   font-weight: 600;
 }
 
+/* ============================================================
+   INDICATOR GRID — FIXED TILE SIZE
+   ============================================================ */
+
 .indicator-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: 10px;
 }
 
 .interval-block {
+   flex: 0 0 200px;              /* чуть шире, чтобы помещался текст */
+  height: 200px;                /* фиксированная высота */
   background-color: var(--panel-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
-  min-height: 80px;
   transition: background-color var(--transition-fast), transform 0.15s;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .interval-block:hover {
   transform: translateY(-2px);
   background-color: rgba(255,255,255,0.02);
+  border-color: var(--accent-color);
 }
 
 .interval-block.updated {

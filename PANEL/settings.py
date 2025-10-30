@@ -175,7 +175,6 @@ s3_client = boto3.resource(
 if DEBUG:
     # --- Локальные файлы ---
     STATIC_URL = "static/"
-    STATIC_ROOT = BASE_DIR / "staticfiles"
 
     STATICFILES_DIRS = [
         BASE_DIR / "static",

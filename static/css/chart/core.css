@@ -1,17 +1,19 @@
 /* ============================================================
-   CORE THEME — BASE VARIABLES & COLORS
+   CORE THEME — PREMIUM EXCHANGE STYLE (Light / Dark)
    ============================================================ */
 
-/* Светлая тема по умолчанию */
 :root,
 :root[data-theme="light"] {
-  --bg-color: #f8f9fa;
+  --bg-color: #f6f7f9;
   --panel-bg: #ffffff;
-  --border-color: #dcdcdc;
-  --text-color: #1e1e1e;
-  --muted-color: #7a7a7a;
-  --accent-color: #007aff;
-  --accent-hover: #005fcc;
+  --border-color: #e2e3e5;
+  --border-strong: #c9cacc;
+  --text-color: #1a1a1a;
+  --text-secondary: #6c6c6c;
+  --muted-color: #8d8d8d;
+  --accent-color: #249cff;
+  --accent-hover: #52b1ff;
+  --accent-soft: rgba(36,156,255,0.1);
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -19,18 +21,27 @@
 
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
+
+  --shadow-soft: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-strong: 0 8px 22px rgba(0, 0, 0, 0.1);
 }
 
-/* Тёмная тема */
 :root[data-theme="dark"] {
-  --bg-color: #111;
-  --panel-bg: #181818;
-  --border-color: #2a2a2a;
-  --text-color: #e4e4e4;
-  --muted-color: #9a9a9a;
-  --accent-color: #0a84ff;
-  --accent-hover: #339aff;
+  --bg-color: #0f1114;
+  --panel-bg: #181b20;
+  --border-color: #2a2d33;
+  --border-strong: #383c43;
+  --text-color: #e6e8ea;
+  --text-secondary: #a3a7ad;
+  --muted-color: #7f838a;
+  --accent-color: #249cff;
+  --accent-hover: #52b1ff;
+  --accent-soft: rgba(36,156,255,0.12);
+
+  --shadow-soft: 0 2px 10px rgba(0,0,0,0.3);
+  --shadow-strong: 0 8px 24px rgba(0,0,0,0.45);
 }
+
 
 body {
   font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -38,5 +49,24 @@ body {
   color: var(--text-color);
   margin: 0;
   padding: 0;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  font-size: 14px;
+  letter-spacing: 0.1px;
+}
+
+button, input, select {
+  font-family: inherit;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--accent-hover); }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }

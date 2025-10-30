@@ -20,7 +20,6 @@ export function initUIControls(ctx) {
     await ctx.loadHistory(ctx.currentSymbol, ctx.currentInterval);
     ctx.connectSocket();
 
-    // если включены позиции — обновить их
     const positionsCheckbox = document.getElementById('show-positions');
     if (positionsCheckbox?.checked && ctx.loadPositions) {
       const range = ctx.chart.timeScale().getVisibleLogicalRange();
@@ -63,7 +62,7 @@ export function initUIControls(ctx) {
     saveUserSettings();
   });
 
-  // === Сохранение и восстановление пользовательских настроек ===
+  // === Сохранение пользовательских настроек ===
   function saveUserSettings() {
     const settings = {
       symbol: ctx.currentSymbol,
@@ -73,80 +72,108 @@ export function initUIControls(ctx) {
     localStorage.setItem('chartSettings', JSON.stringify(settings));
   }
 
+  // === Загрузка пользовательских настроек ===
   async function loadUserSettings() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('chartSettings'));
-    if (!saved) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem('chartSettings'));
+      if (!saved) return;
 
-    let needReload = false;
+      let needReload = false;
 
-    if (saved.symbol) {
-      const pairSelect = document.getElementById('pair-select');
-      if (pairSelect) {
-        pairSelect.value = saved.symbol;
-        if (ctx.currentSymbol !== saved.symbol) {
-          ctx.currentSymbol = saved.symbol;
-          needReload = true;
+      if (saved.symbol) {
+        const pairSelect = document.getElementById('pair-select');
+        if (pairSelect) {
+          pairSelect.value = saved.symbol;
+          if (ctx.currentSymbol !== saved.symbol) {
+            ctx.currentSymbol = saved.symbol;
+            needReload = true;
+          }
         }
       }
-    }
 
-    if (saved.interval) {
-      const intervalSelect = document.getElementById('interval-select');
-      if (intervalSelect) {
-        intervalSelect.value = saved.interval;
-        if (ctx.currentInterval !== saved.interval) {
-          ctx.currentInterval = saved.interval;
-          needReload = true;
+      if (saved.interval) {
+        const intervalSelect = document.getElementById('interval-select');
+        if (intervalSelect) {
+          intervalSelect.value = saved.interval;
+          if (ctx.currentInterval !== saved.interval) {
+            ctx.currentInterval = saved.interval;
+            needReload = true;
+          }
         }
       }
-    }
 
-    const showPositionsCheckbox = document.getElementById('show-positions');
-    if (showPositionsCheckbox) {
-      showPositionsCheckbox.checked = !!saved.showPositions;
-    }
+      const showPositionsCheckbox = document.getElementById('show-positions');
+      if (showPositionsCheckbox) {
+        showPositionsCheckbox.checked = !!saved.showPositions;
+      }
 
-    // если что-то изменилось — перезагрузим график
-    if (needReload) {
-      if (ctx.ws) ctx.ws.close();
-      await ctx.loadHistory(ctx.currentSymbol, ctx.currentInterval);
-      ctx.connectSocket();
+      // если нужно — перезагрузим график
+      if (needReload) {
+        if (ctx.ws) ctx.ws.close();
+        await ctx.loadHistory(ctx.currentSymbol, ctx.currentInterval);
+        ctx.connectSocket();
 
-      // если включены позиции — обновить
-      const showPositions = document.getElementById('show-positions');
-      if (showPositions?.checked && ctx.loadPositions) {
-        const vis = ctx.chart.timeScale().getVisibleLogicalRange();
-        const range = ctx.candleSeries.barsInLogicalRange(vis);
-        if (range && range.from && range.to) {
-          ctx.loadPositions(Number(range.from.time) * 1000, Number(range.to.time) * 1000);
+        const showPositions = document.getElementById('show-positions');
+        if (showPositions?.checked && ctx.loadPositions) {
+          const vis = ctx.chart.timeScale().getVisibleLogicalRange();
+          const range = ctx.candleSeries.barsInLogicalRange(vis);
+          if (range && range.from && range.to) {
+            ctx.loadPositions(Number(range.from.time) * 1000, Number(range.to.time) * 1000);
+          }
         }
       }
+    } catch (err) {
+      console.warn('Ошибка загрузки настроек:', err);
     }
-  } catch (err) {
-    console.warn('Ошибка загрузки настроек:', err);
   }
-}
 
-
-  // === Кнопка сброса ===
-  function setupResetButton() {
+  // === Полный сброс всех настроек ===
+ function setupResetButton() {
   const resetBtn = document.getElementById('reset-settings');
   if (!resetBtn) return;
 
-  resetBtn.addEventListener('click', () => {
-    // 1️⃣ Устанавливаем дефолтные значения
-    const defaultSettings = {
-      symbol: 'BTCUSDT',
-      interval: '1',
-      showPositions: false,
-    };
+  resetBtn.addEventListener('click', async () => {
+    // 1️⃣ Очистка localStorage
+    localStorage.clear();
 
-    // 2️⃣ Сохраняем их в localStorage (чтобы при загрузке страницы они подхватились)
-    localStorage.setItem('chartSettings', JSON.stringify(defaultSettings));
+    // 2️⃣ Сбрасываем все чекбоксы (в модалке и на панели)
+    document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+      chk.checked = false;
+    });
 
-    // 3️⃣ Перезагружаем страницу
-    window.location.reload();
+    // 3️⃣ Устанавливаем дефолты
+    const defaultSymbol = 'BTCUSDT';
+    const defaultInterval = '1';
+
+    ctx.currentSymbol = defaultSymbol;
+    ctx.currentInterval = defaultInterval;
+    ctx.noMoreHistory = false;
+    ctx.allCandles = [];
+    ctx.earliestTime = null;
+    ctx.candleSeries.setData([]);
+
+    // 4️⃣ Очищаем индикаторы и сигналы (если есть методы)
+    if (ctx.removeAllIndicators) {
+      ctx.removeAllIndicators(); // твой метод удаления индикаторов
+    }
+    if (ctx.removeAllSignals) {
+      ctx.removeAllSignals(); // твой метод удаления сигналов
+    }
+
+    // 5️⃣ Обновляем выпадающие селекты
+    const pairSelect = document.getElementById('pair-select');
+    const intervalSelect = document.getElementById('interval-select');
+    if (pairSelect) pairSelect.value = defaultSymbol;
+    if (intervalSelect) intervalSelect.value = defaultInterval;
+
+    // 6️⃣ Перезапускаем график
+    if (ctx.ws) ctx.ws.close();
+    await ctx.loadHistory(ctx.currentSymbol, ctx.currentInterval);
+    ctx.connectSocket();
+
+    // 7️⃣ Закрываем модальное окно (если открыто)
+    const modal = document.getElementById('settings-modal');
+    if (modal) modal.style.display = 'none';
   });
 }
 
@@ -155,6 +182,6 @@ export function initUIControls(ctx) {
   loadUserSettings();
   setupResetButton();
 
-  // Подписки на сохранение при изменениях
+  // Подписки
   document.getElementById('show-positions')?.addEventListener('change', saveUserSettings);
 }
