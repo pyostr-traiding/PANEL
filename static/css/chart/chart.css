@@ -6,8 +6,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100vh - 420px);
-  min-height: 420px;
   position: relative;
   box-sizing: border-box;
 }
@@ -396,4 +394,49 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
+}
+/* ============================================================
+   Лейаут: Книга ордеров / Глубина / Балансы — слева от графика
+   ============================================================ */
+/* ============================================================
+   График и книга ордеров — одинаковая высота и нижнее выравнивание
+   ============================================================ */
+
+.chart-layout {
+  display: flex;
+  align-items: stretch; /* ✅ выравниваем оба блока по нижнему краю */
+  gap: 16px;
+  width: 100%;
+  height: calc(100vh - 420px); /* ✅ подстраиваем под экран, уменьшая за счёт хедера и контролов */
+  box-sizing: border-box;
+}
+
+/* Левая панель */
+.chart-layout .market-tabs {
+  flex: 0 0 440px;
+  height: 100%; /* ✅ занимает всю доступную высоту */
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Контент внутри вкладок */
+.market-tabs .tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Правая часть — график */
+.chart-layout .chart-wrapper {
+  flex: 1;
+  height: 100%; /* ✅ одинаковая высота с market-tabs */
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
 }
