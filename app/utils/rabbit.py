@@ -8,7 +8,7 @@ from app.utils.serializer import json_serializer
 
 def send_to_rabbitmq(
         queue: str,
-        message: dict,
+        message: str,
 ) -> bool:
     """
     Отправить сообщение в RabbitMQ.

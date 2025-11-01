@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}Panel{% endblock %}</title>
+  <title>{% block title %}Панель{% endblock %}</title>
 
   <script>
     (function() {
@@ -22,11 +22,9 @@
   <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
 
   <!-- Глобальные -->
-  <link rel="stylesheet" href="{% static 'css/chart/core.css' %}">
-  <link rel="stylesheet" href="{% static 'css/chart/indicator_orderbook.css' %}">
-  <link rel="stylesheet" href="{% static 'css/chart/indicator.css' %}">
-  <link rel="stylesheet" href="{% static 'css/chart/chart.css' %}">
-  <link rel="stylesheet" href="{% static 'css/chart/layout/sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site/chart/layout/sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site/chart/core.css' %}">
+
 
   {% block head_extra %}{% endblock %}
 </head>

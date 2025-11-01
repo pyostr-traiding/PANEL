@@ -169,66 +169,6 @@
 }
 
 
-/* ============================================================
-   🧩 DATA CARDS — КАРТОЧКИ ДАННЫХ / ИНДИКАТОРОВ
-   ============================================================ */
-
-.data-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 16px;
-  justify-content: flex-start;
-}
-
-.data-card {
-  flex: 0 0 180px;
-  height: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  color: var(--text-color);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 13px;
-  box-shadow: var(--shadow-soft);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    transform 0.15s ease,
-    box-shadow var(--transition-normal);
-}
-
-.data-card:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-color);
-  box-shadow: 0 4px 12px rgba(36,156,255,0.15);
-  transform: translateY(-2px);
-}
-
-.data-card i {
-  width: 22px;
-  height: 22px;
-  opacity: 0.9;
-}
-
-.data-card span {
-  text-align: center;
-  line-height: 1.3;
-}
-
-.data-card.disabled {
-  opacity: 0.4;
-  pointer-events: none;
-  border-style: dashed;
-  box-shadow: none;
-}
 
 
 /* ============================================================

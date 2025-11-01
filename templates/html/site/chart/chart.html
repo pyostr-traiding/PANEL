@@ -1,6 +1,12 @@
 {% extends 'html/site/base_app.html' %}
 {% load static %}
 
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/chart/orderbook.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site/chart/chart.css' %}">
+{% endblock %}
+
+
 {% block content %}
   {% include 'html/site/chart/blocks/header.html' %}
 

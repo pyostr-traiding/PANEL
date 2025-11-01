@@ -156,7 +156,8 @@ CORS_ALLOW_METHODS = os.getenv('CORS_ALLOW_METHODS', 'GET,POST,OPTIONS,PUT,DELET
 CORS_ALLOW_HEADERS = os.getenv('CORS_ALLOW_HEADERS', 'accept,content-type,authorization,x-csrftoken,x-requested-with').split(',')
 
 
-AUTH_USER_MODEL = 'frontend.CustomUser'
+AUTH_USER_MODEL = 'auth.User'
+
 
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False

@@ -1,4 +1,3 @@
-# C:\Users\Professional\PROJECT\TRAIDING\BACKEND\PANEL\PANEL\api.py
 
 from ninja_extra import NinjaExtraAPI
 

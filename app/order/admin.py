@@ -69,7 +69,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
             'js/admin/admin_order_lifetime.js',
         )
         css = {
-            'all': ('css/admin_order.css',)
+            'all': ('css/admin/admin_order.css',)
         }
     change_list_template = "html/admin/change_list.html"
 

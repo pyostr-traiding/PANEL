@@ -1,6 +1,3 @@
-"""
-Abstractions for admin panel
-"""
 from pprint import pprint
 
 from django import forms
@@ -15,7 +12,7 @@ from app.abstractions.preview import show_preview_display
 
 class AdminImageWidget(AdminFileWidget):
     """
-    Preview for image field in admin panel
+    Превью для изображений
     """
     def render(self, name, value, attrs=None, renderer=None):
         output = []
@@ -33,7 +30,6 @@ class ToggleSwitchWidget(forms.CheckboxInput):
 
     def render(self, name, value, attrs=None, renderer=None):
         attrs = attrs or {}
-        print(name, value, attrs)
         attrs['id'] = attrs.get('id', f'id_{name}')
         attrs['name'] = name
         attrs['type'] = 'checkbox'

@@ -1,9 +1,7 @@
 import json
-from decimal import Decimal, getcontext, InvalidOperation
 from typing import List
 
 from django_fsm import FSMField
-
 from django.db import models
 from pydantic import ValidationError
 
@@ -13,38 +11,59 @@ from app.abstractions.models import AbstractModel
 from app.order.schemas.base import OrderExtremumSchema, OrderExtremumValueSchema
 
 
+# -----------------------------------------------------
+# Определение статусов ордера.
+# -----------------------------------------------------
 class OrderStatus(models.TextChoices):
-    CREATED = 'created', 'Ожидание подтверждения'
-    ACCEPT_MONITORING = 'monitoring', 'Мониторинг'
-
-    COMPLETED = 'completed', 'Исполнено'
-
-    CANCEL = 'cancel', 'Отменено'
+    CREATED = 'created', 'Ожидание подтверждения'   # ордер создан, но еще не принят мониторингом
+    ACCEPT_MONITORING = 'monitoring', 'Мониторинг'  # ордер находится под мониторингом
+    COMPLETED = 'completed', 'Исполнено'            # ордер успешно завершён
+    CANCEL = 'cancel', 'Отменено'                   # ордер отменён
 
     @classmethod
     def get_open_status_list(cls):
+        """
+        Возвращает список статусов, при которых ордер считается "открытым".
+        Используется, например, для фильтрации активных ордеров.
+        """
         return [
             cls.CREATED,
             cls.ACCEPT_MONITORING,
         ]
 
 
-def _to_decimal(value: str, name: str) -> Decimal:
-    if isinstance(value, Decimal):
-        return value
-    try:
-        # чистим пробелы, заменяем запятую на точку на всякий случай
-        s = str(value).strip().replace(',', '.')
-        return Decimal(s)
-    except (InvalidOperation, ValueError):
-        raise ValueError(f"{name} должно быть числом, получено: {value!r}")
+# -----------------------------------------------------
+# Типы зачислений по ордеру — например, комиссия или фандинг.
+# -----------------------------------------------------
+class OrderCreditingType(models.TextChoices):
+    FEE = 'fee', 'Комиссия'
+    FUNDING = 'funding', 'Фандинг'
 
 
+# -----------------------------------------------------
+# Валидатор для поля type в OrderCreditingModel.
+# Проверяет, что значение входит в список допустимых типов.
+# -----------------------------------------------------
+def validate_type(value):
+    allowed = ['fee', 'funding']
+    if value not in allowed:
+        raise ValidationError(f"Недопустимый тип: {value}. Допустимые значения: {', '.join(allowed)}")
+
+
+# -----------------------------------------------------
+# Основная модель ордера.
+# -----------------------------------------------------
 class OrderModel(AbstractModel):
+    """
+    Модель описывает ордер пользователя на платформе.
+    Хранит всю информацию о торговой операции, включая состояние, цену, количество токенов и т.п.
+    """
+
     class Meta:
         verbose_name = 'Ордер'
         verbose_name_plural = 'Ордера'
 
+    # Привязка ордера к конкретной позиции (один ордер — одна позиция)
     position = models.OneToOneField(
         verbose_name='Позиция',
         to='position.PositionModel',
@@ -52,6 +71,7 @@ class OrderModel(AbstractModel):
         related_name='order',
     )
 
+    # Уникальный идентификатор ордера (используется и в Redis, и во внешних API)
     uuid = models.CharField(
         verbose_name='UUID',
         max_length=255,
@@ -59,36 +79,43 @@ class OrderModel(AbstractModel):
         default='string'
     )
 
+    # Категория рынка (например, "option", "spot" и т.д.)
     category = models.CharField(
         verbose_name='Рынок',
         max_length=20,
         default='option',
     )
 
+    # Сторона ордера — покупка (buy) или продажа (sell)
     side = models.CharField(
         verbose_name='Сторона',
         max_length=6,
         default='sell'
     )
 
+    # Цена исполнения ордера
     price = models.CharField(
         verbose_name='Цена',
         max_length=255,
         default='100000',
     )
 
+    # Количество токенов, участвующих в ордере
     qty_tokens = models.CharField(
         verbose_name='Кол-во токенов',
         max_length=255,
         default='0.00123'
     )
 
+    # FSMField — поле для управления состояниями ордера.
+    # Позволяет использовать переходы между статусами с помощью django-fsm.
     status = FSMField(
         verbose_name='Статус',
         choices=OrderStatus.choices,
         default=OrderStatus.CREATED,
     )
 
+    # Накопленный фандинг — сумма начисленного дохода/расхода по позиции
     accumulated_funding = models.DecimalField(
         verbose_name='Накопленный фандинг',
         decimal_places=18,
@@ -96,6 +123,7 @@ class OrderModel(AbstractModel):
         default=0
     )
 
+    # Целевая цена, при достижении которой ордер должен закрыться с прибылью
     target_rate = models.DecimalField(
         verbose_name='Цель для профита',
         decimal_places=18,
@@ -104,6 +132,7 @@ class OrderModel(AbstractModel):
         blank=True,
     )
 
+    # Цена, по которой ордер был закрыт (фиксируется при исполнении)
     close_rate = models.DecimalField(
         verbose_name='Курс закрытия',
         decimal_places=18,
@@ -111,67 +140,63 @@ class OrderModel(AbstractModel):
         null=True,
         blank=True,
     )
+
+    # Время закрытия ордера
     close_at = models.DateTimeField(
         verbose_name='Время закрытия',
         null=True,
         blank=True,
     )
 
+    # -----------------------------------------------------
+    # Метод получения экстремумов (максимума и минимума цены)
+    # -----------------------------------------------------
     def get_extremum(self) -> List[OrderExtremumSchema]:
         """
-        Получить экстремумы max/min для ордера.
+        Извлекает из Redis экстремумы (max и min) для ордера.
+        Хранение экстремумов в Redis позволяет быстро получать значения без обращения к БД.
         """
         keys = [
             f"extremum:{self.uuid}:max",
             f"extremum:{self.uuid}:min",
         ]
 
+        # Получаем сразу оба значения из Redis в одном запросе (оптимально)
         values = redis_server.mget(keys, db=RedisDB.extremums)
 
         result = []
         for k, v in zip(keys, values):
             if v is None:
+                # Если данных нет — просто создаём объект с ключом без значения
                 result.append(OrderExtremumSchema(key=k))
                 continue
 
-            # безопасное декодирование
+            # Redis хранит данные в байтах, поэтому декодируем при необходимости
             v_str = v.decode() if isinstance(v, bytes) else v
 
             try:
+                # Пробуем распарсить строку как JSON и привести к схеме Pydantic
                 parsed_value = json.loads(v_str)
                 value_schema = OrderExtremumValueSchema(**parsed_value)
             except Exception:
-                # если в Redis не JSON — просто сохраним как строку
+                # Если формат неожиданный (например, просто строка), не падаем
+                # и сохраняем значение как есть
                 value_schema = OrderExtremumValueSchema(value=v_str, dt="")
 
+            # Формируем итоговую структуру
             result.append(OrderExtremumSchema(key=k, value=value_schema))
 
         return result
 
-    # def target_price_for_profit(self, profit_percent: float | str | Decimal) -> Decimal:
-    #     """
-    #     Возвращает цену, при которой ЧИСТАЯ прибыль составит profit_percent %
-    #     от стоимости позиции (в долларах), с учётом accumulated_funding (тоже в $).
-    #     """
-    #     price = _to_decimal(self.price, "price")
-    #     qty = _to_decimal(self.qty_tokens, "qty_tokens")
-    #     fees_usd = _to_decimal(self.accumulated_funding, "accumulated_funding")
-    #     p = _to_decimal(profit_percent, "profit_percent")
-    #
-    #     # Текущая стоимость позиции в долларах
-    #     position_value_usd = price * qty
-    #
-    #     # Желаемая прибыль в долларах
-    #     desired_profit_usd = position_value_usd * (p / Decimal(100))
-    #
-    #     # Целевая цена (лонг или шорт)
-    #     if self.side.lower() == "sell":
-    #         target_price = price - (desired_profit_usd + fees_usd) / qty
-    #     else:
-    #         target_price = price + (desired_profit_usd + fees_usd) / qty
-    #
-    #     return target_price
+
+# -----------------------------------------------------
+# Модель истории ордера.
+# -----------------------------------------------------
 class OrderHistoryModel(AbstractModel):
+    """
+    Хранит изменения, происходящие с ордером — действия пользователя,
+    обновления статусов, изменения параметров и комментарии.
+    """
     class Meta:
         verbose_name = 'История ордера'
         verbose_name_plural = 'История ордера'
@@ -183,30 +208,31 @@ class OrderHistoryModel(AbstractModel):
         related_name='history',
     )
 
+    # Название действия (например: "создан", "обновлён", "отменён")
     action_name = models.CharField(
         verbose_name='Действие',
         max_length=255,
     )
 
+    # JSON с изменёнными данными, чтобы можно было отследить детали апдейта
     update_data = models.JSONField(
         verbose_name='Данные обновления'
     )
 
+    # Текстовое описание события
     comment = models.TextField(
         verbose_name='Описание'
     )
 
-class OrderCreditingType(models.TextChoices):
-    FEE = 'fee', 'Комиссия'
-    FUNDING = 'funding', 'Фандинг'
 
-def validate_type(value):
-    allowed = ['fee', 'funding']
-    if value not in allowed:
-        raise ValidationError(f"Недопустимый тип: {value}. Допустимые значения: {', '.join(allowed)}")
-
-
+# -----------------------------------------------------
+# Модель зачислений (начислений по ордеру).
+# -----------------------------------------------------
 class OrderCreditingModel(AbstractModel):
+    """
+    Описывает операции зачисления по ордеру — например, начисление комиссии (fee)
+    или фандинга (funding). Привязана к конкретному ордеру.
+    """
     class Meta:
         verbose_name = 'Зачисления'
         verbose_name_plural = 'Зачисления'
@@ -218,20 +244,22 @@ class OrderCreditingModel(AbstractModel):
         related_name='crediting',
     )
 
+    # Тип зачисления (fee / funding)
     type = models.CharField(
         verbose_name='Тип',
         max_length=20,
         choices=OrderCreditingType.choices,
         validators=[validate_type],
-
     )
 
+    # Количество начисленных единиц (в токенах, USDT и т.д.)
     count = models.DecimalField(
         verbose_name='Кол-во',
         decimal_places=18,
         max_digits=40,
     )
 
+    # Описание причины начисления
     comment = models.TextField(
         verbose_name='Описание'
     )

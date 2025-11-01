@@ -1,6 +1,10 @@
 {% extends 'html/site/data/main.html' %}
 {% load static %}
 
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/data/blocks.css' %}">
+{% endblock %}
+
 {% block content %}
   {% include 'html/site/data/tabs.html' %}
     <div class="indicator-status">

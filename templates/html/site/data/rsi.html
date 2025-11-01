@@ -1,6 +1,12 @@
 {% extends 'html/site/base_app.html' %}
 {% load static %}
 {% block content %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/data/blocks.css' %}">
+{% endblock %}
+
+
 {% include 'html/site/data/tabs.html' %}
  <div class="indicator-status">
     <span id="ws-status" class="status red"></span>
