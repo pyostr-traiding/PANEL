@@ -1,7 +1,7 @@
 from functools import wraps
 from pprint import pprint
 
-from app.position.models import PositionStatus, PositionModel
+from app.position.models import PositionModel, PositionStatus
 from app.utils import response
 
 # Глобальный реестр обработчиков

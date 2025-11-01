@@ -1,7 +1,6 @@
 import uuid
-
 from decimal import Decimal
-from typing import Literal, Optional, Any
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel
 

@@ -1,6 +1,6 @@
 import pymysql
-
 from dotenv import load_dotenv
+
 from PANEL.celery_conf import app as celery_app
 
 load_dotenv()

@@ -4,9 +4,8 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from app.order.models import OrderModel
+from app.order.models import OrderCreditingModel, OrderModel
 from app.setting.models import ExchangeModel
-from app.order.models import OrderCreditingModel
 
 
 @receiver(post_save, sender=OrderModel)

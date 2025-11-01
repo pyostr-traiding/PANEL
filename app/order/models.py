@@ -1,14 +1,15 @@
 import json
 from typing import List
 
-from django_fsm import FSMField
 from django.db import models
+
+from django_fsm import FSMField
 from pydantic import ValidationError
 
-from PANEL.redis_conf import RedisDB
-from PANEL.settings import redis_server
 from app.abstractions.models import AbstractModel
 from app.order.schemas.base import OrderExtremumSchema, OrderExtremumValueSchema
+from PANEL.redis_conf import RedisDB
+from PANEL.settings import redis_server
 
 
 # -----------------------------------------------------

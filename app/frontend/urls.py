@@ -1,6 +1,11 @@
 from django.urls import path
 
-from app.frontend.views import IndicatorRSIView, IndicatorCandlesView, IndicatorChartView, IndicatorDataView
+from app.frontend.views import (
+    IndicatorCandlesView,
+    IndicatorChartView,
+    IndicatorDataView,
+    IndicatorRSIView,
+)
 
 urlpatterns = [
 

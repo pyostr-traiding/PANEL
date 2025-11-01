@@ -4,11 +4,12 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminFileWidget
 from django.db import models
-
 from django.utils.safestring import mark_safe
+
 from django_json_widget.widgets import JSONEditorWidget
 
 from app.abstractions.preview import show_preview_display
+
 
 class AdminImageWidget(AdminFileWidget):
     """
@@ -125,7 +126,14 @@ class AbstractAdmin(admin.ModelAdmin):
 
 #####################################################################
 from django.contrib import admin
-from django_celery_beat.models import PeriodicTask, CrontabSchedule, IntervalSchedule, SolarSchedule
+
+from django_celery_beat.models import (
+    CrontabSchedule,
+    IntervalSchedule,
+    PeriodicTask,
+    SolarSchedule,
+)
+
 
 # Свертываем PeriodicTask
 class PeriodicTaskAdmin(admin.ModelAdmin):

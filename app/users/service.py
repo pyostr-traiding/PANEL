@@ -1,9 +1,13 @@
 from django.db import transaction
 
-
-from app.users.models import TelegramUserModel, BotPermissionModel
-from app.users.schema import TGUserSchema, GetBalanceTgUserSchema, PermissionsSchema, CreateTGUserSchema, \
-    BalanceTgUserSchema
+from app.users.models import BotPermissionModel, TelegramUserModel
+from app.users.schema import (
+    BalanceTgUserSchema,
+    CreateTGUserSchema,
+    GetBalanceTgUserSchema,
+    PermissionsSchema,
+    TGUserSchema,
+)
 
 
 def get_or_create_tg_user(

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from app.users.models import TelegramUserModel, BotPermissionModel
+
+from app.users.models import BotPermissionModel, TelegramUserModel
+
 
 # Inline для прав доступа
 class BotPermissionInline(admin.TabularInline):

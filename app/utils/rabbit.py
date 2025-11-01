@@ -2,8 +2,8 @@ import json
 
 import pika
 
-from PANEL.settings import connection_params
 from app.utils.serializer import json_serializer
+from PANEL.settings import connection_params
 
 
 def send_to_rabbitmq(

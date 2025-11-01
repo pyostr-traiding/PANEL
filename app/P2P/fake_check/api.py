@@ -2,6 +2,7 @@ import random
 from typing import Optional
 
 from django.http import HttpRequest
+
 from ninja import Router
 from pydantic import BaseModel
 

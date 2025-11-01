@@ -1,5 +1,7 @@
 import os
+
 import redis
+
 
 class RedisDB:
     stream: int = 0

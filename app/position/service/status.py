@@ -1,11 +1,10 @@
 import logging
 
-from app.position.models import PositionModel
-from app.utils import response
-
-from app.position.service.handlers.status_handlers import STATUS_HANDLERS
-
 from django_fsm import TransitionNotAllowed
+
+from app.position.models import PositionModel
+from app.position.service.handlers.status_handlers import STATUS_HANDLERS
+from app.utils import response
 
 logger = logging.getLogger(__name__)
 

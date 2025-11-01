@@ -1,8 +1,12 @@
 
 from ninja_extra import NinjaExtraAPI
 
-# Импорт роутеров из других модулей
-from app.users.api import router as router_users
+#####
+# Ордера
+from app.order.routes.base import router as router_order_base
+from app.order.routes.crediting import router as router_order_crediting
+from app.order.routes.extremum import router as router_order_extremum
+from app.order.routes.status import router as router_order_status
 from app.P2P.fake_check.api import router as router_fake_p2p
 
 #####
@@ -10,13 +14,8 @@ from app.P2P.fake_check.api import router as router_fake_p2p
 from app.position.routes.base import router as router_position_base
 from app.position.routes.status import router as router_position_status
 
-#####
-# Ордера
-from app.order.routes.base import router as router_order_base
-from app.order.routes.status import router as router_order_status
-from app.order.routes.crediting import router as router_order_crediting
-from app.order.routes.extremum import router as router_order_extremum
-
+# Импорт роутеров из других модулей
+from app.users.api import router as router_users
 
 # Создание API с уникальным namespace
 api_route = NinjaExtraAPI(

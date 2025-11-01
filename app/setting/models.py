@@ -3,7 +3,6 @@ from django.db import models
 from app.abstractions.models import AbstractModel
 
 
-
 class SymbolModel(AbstractModel):
     """
     Модель символов

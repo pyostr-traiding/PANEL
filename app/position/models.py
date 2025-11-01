@@ -1,7 +1,7 @@
-from django.db import models
-from django_fsm import FSMField
-
 from django.core.exceptions import ValidationError
+from django.db import models
+
+from django_fsm import FSMField
 
 from app.abstractions.models import AbstractModel
 

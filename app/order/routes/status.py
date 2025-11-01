@@ -1,9 +1,10 @@
 from django.http import HttpRequest
+
 from ninja import Router
 
-from app.utils import response
 from app.order.schemas.status import ChangeOrderStatusSchema
 from app.order.service.status import change_status_order
+from app.utils import response
 
 router = Router(
     tags=['Ордера'],

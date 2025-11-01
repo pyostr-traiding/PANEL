@@ -1,8 +1,9 @@
 import json
-from django.db.models.signals import pre_save, post_save
-from django.dispatch import receiver
-from app.order.models import OrderModel, OrderHistoryModel
 
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+
+from app.order.models import OrderHistoryModel, OrderModel
 
 _PREVIOUS_STATE = {}
 

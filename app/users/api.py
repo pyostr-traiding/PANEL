@@ -1,8 +1,8 @@
+from django.http import HttpRequest, JsonResponse
+
 from ninja import Router
 
-from django.http import JsonResponse, HttpRequest
-
-from app.users.schema import TGUserSchema, GetBalanceTgUserSchema, CreateTGUserSchema
+from app.users.schema import CreateTGUserSchema, GetBalanceTgUserSchema, TGUserSchema
 from app.users.service import get_or_create_tg_user, tg_user_balance
 
 router = Router(

@@ -1,10 +1,9 @@
 import logging
 from typing import Union
 
-from app.order.models import OrderStatus, OrderModel
+from app.order.models import OrderModel, OrderStatus
 from app.order.schemas.base import OrderSchema
 from app.order.service.handlers.status_handlers import status_order_handler
-
 from app.utils import response
 
 logger = logging.getLogger(__name__)

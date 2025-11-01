@@ -1,11 +1,11 @@
-from typing import Union
 import logging
+from typing import Union
 
-from app.position.models import PositionStatus, PositionModel
+from app.position.models import PositionModel, PositionStatus
 from app.position.schemas.base import PositionSchema
 from app.position.service.handlers.status_handlers import status_handler
-from app.utils.rabbit import send_to_rabbitmq
 from app.utils import response
+from app.utils.rabbit import send_to_rabbitmq
 
 logger = logging.getLogger(__name__)
 

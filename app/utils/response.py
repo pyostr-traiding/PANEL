@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from django.http import JsonResponse
+
 from pydantic import BaseModel
 
 

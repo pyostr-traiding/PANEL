@@ -1,12 +1,11 @@
 import json
 from decimal import Decimal
+from typing import List, Union
 
 import django
-import pika
-
-from typing import Union, List
-
 from django.db import transaction
+
+import pika
 
 from app.order.models import OrderModel, OrderStatus
 from app.position.models import PositionModel, PositionStatus

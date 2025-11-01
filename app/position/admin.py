@@ -2,12 +2,12 @@ import json
 
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+
 from fsm_admin2.admin import FSMTransitionMixin
 
+from app.position.models import PositionModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-from app.position.models import PositionModel
-
 
 
 @admin.register(PositionModel)

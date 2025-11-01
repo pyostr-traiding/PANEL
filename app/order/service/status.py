@@ -2,10 +2,9 @@ import logging
 
 from django_fsm import TransitionNotAllowed
 
-from app.utils import response
-
 from app.order.models import OrderModel
 from app.order.service.handlers.status_handlers import STATUS_ORDER_HANDLERS
+from app.utils import response
 
 logger = logging.getLogger(__name__)
 

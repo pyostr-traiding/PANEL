@@ -1,4 +1,4 @@
-from app.order.models import OrderStatus, OrderModel
+from app.order.models import OrderModel, OrderStatus
 from app.order.service.handlers.status_handlers import status_order_handler
 
 

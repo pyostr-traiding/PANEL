@@ -6,4 +6,4 @@ class OrderConfig(AppConfig):
     name = 'app.order'
 
     def ready(self):
-        from app.order.signals import history, crediting, profit
+        from app.order.signals import crediting, history, profit

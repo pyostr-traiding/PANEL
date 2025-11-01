@@ -3,6 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+
 class PermissionsSchema(BaseModel):
     main_menu: bool
     glaz_menu: bool

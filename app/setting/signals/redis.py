@@ -1,9 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from app.setting.models import BanSymbolModel, SymbolModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-from app.setting.models import SymbolModel, BanSymbolModel
 
 
 # Сигнал для автоматического создания блокировок при создании символа

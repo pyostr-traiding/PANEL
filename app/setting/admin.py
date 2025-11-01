@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.admin import TabularInline
 
+from app.abstractions.admin import AbstractAdmin
+from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-from app.abstractions.admin import AbstractAdmin
-from app.setting.models import BanSymbolModel, SymbolModel, ExchangeModel
 
 
 class BanSymbolModelAdminTabularInline(TabularInline):

@@ -1,11 +1,11 @@
 import json
 
 from django.http import HttpRequest
+
 from ninja import Router
 
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-
 
 router = Router(
     tags=['Ордера'],

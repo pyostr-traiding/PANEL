@@ -1,10 +1,9 @@
-import os
 import asyncio
 import json
+import os
+
 import redis.asyncio as aioredis
-
 from channels.generic.websocket import AsyncWebsocketConsumer
-
 from dotenv import load_dotenv
 
 load_dotenv()

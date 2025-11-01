@@ -2,12 +2,13 @@
 Методы для управления позицией
 """
 from django.http import HttpRequest
+
 from ninja import Router
 
-from app.order.service.funding import accumulate_funding
-from app.utils import response
 from app.order.schemas.status import ChangeOrderStatusSchema
+from app.order.service.funding import accumulate_funding
 from app.order.service.status import change_status_order
+from app.utils import response
 
 router = Router(
     tags=['Ордера'],

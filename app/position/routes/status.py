@@ -2,11 +2,12 @@
 Методы для управления позицией
 """
 from django.http import HttpRequest
+
 from ninja import Router
 
-from app.utils import response
 from app.position.schemas.status import ChangeStatusSchema
 from app.position.service.status import change_status_position
+from app.utils import response
 
 router = Router(
     tags=['Позиции'],

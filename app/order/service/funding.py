@@ -2,11 +2,17 @@ from datetime import datetime, time
 from decimal import Decimal
 from typing import List
 
-from django.utils import timezone as dj_tz
 from django.db import transaction
+from django.utils import timezone as dj_tz
 
-from app.order.models import OrderModel, OrderStatus, OrderCreditingModel, OrderHistoryModel
 from pybit.unified_trading import HTTP
+
+from app.order.models import (
+    OrderCreditingModel,
+    OrderHistoryModel,
+    OrderModel,
+    OrderStatus,
+)
 
 
 def get_current_funding_rate(symbol="BTCUSDT", category="linear") -> Decimal:

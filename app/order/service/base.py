@@ -6,12 +6,11 @@ import django
 from django.db import transaction
 
 from app.order.models import OrderModel, OrderStatus
-from app.order.schemas.base import OrderSchema, CloseOrderSchema
+from app.order.schemas.base import CloseOrderSchema, OrderSchema
 from app.position.models import PositionModel, PositionStatus
 from app.position.schemas.status import ChangeStatusSchema
 from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
-
 
 logger = logging.getLogger(__name__)
 

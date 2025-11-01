@@ -1,13 +1,11 @@
 # using Django 5.2.7.
 import ast
 import os
+from pathlib import Path
 
 import boto3
 import pika
 import redis
-
-from pathlib import Path
-
 from dotenv import load_dotenv
 from telebot import TeleBot
 

@@ -1,9 +1,8 @@
 import uuid
 from decimal import Decimal
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
-from typing import Literal, Optional, Any
-
 
 
 class CreditingSchema(BaseModel):

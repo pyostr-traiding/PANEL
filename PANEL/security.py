@@ -1,5 +1,6 @@
-from ninja.security import HttpBearer
 from secrets import compare_digest
+
+from ninja.security import HttpBearer
 
 
 class GlobalAuth(HttpBearer):

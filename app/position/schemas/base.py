@@ -1,10 +1,10 @@
 import time
 import uuid
+from typing import Any, Literal, Optional
 
 from django.db.models import JSONField
-from pydantic import BaseModel, Field
-from typing import Literal, Optional, Any
 
+from pydantic import BaseModel, Field
 from pydantic_core.core_schema import JsonSchema
 
 

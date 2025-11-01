@@ -1,17 +1,22 @@
 """
 Базовые методы GET/POST
 """
-from typing import Optional, List
+from typing import List, Optional
 
 from django.db.models import BigIntegerField
 from django.db.models.functions import Cast
 from django.http import HttpRequest
+
 from ninja import Router, Schema
 from pydantic import BaseModel
 
 from app.position.models import PositionModel
 from app.position.schemas.base import CreatePositionSchema
-from app.position.service.base import create_position, get_position, get_list_open_position
+from app.position.service.base import (
+    create_position,
+    get_list_open_position,
+    get_position,
+)
 from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
 

@@ -1,15 +1,21 @@
 import json
-from decimal import Decimal, ROUND_DOWN
+from decimal import ROUND_DOWN, Decimal
 
 from django.contrib import admin
 from django.contrib.admin import TabularInline
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+
 from fsm_admin2.admin import FSMTransitionMixin
 
+from app.order.models import (
+    OrderCreditingModel,
+    OrderHistoryModel,
+    OrderModel,
+    OrderStatus,
+)
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
-from app.order.models import OrderModel, OrderHistoryModel, OrderCreditingModel, OrderStatus
 
 
 class OrderHistoryModelAdmin(TabularInline):
