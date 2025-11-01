@@ -15,7 +15,7 @@ from app.frontend import twofa_state
 
 class IndicatorBaseView(TemplateView):
     """Базовый шаблон для вкладок с индикаторами"""
-    template_name = 'html/base_indicator.html'
+    template_name = 'html/site/chart/base_indicator.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -24,74 +24,17 @@ class IndicatorBaseView(TemplateView):
 
 class IndicatorRSIView(IndicatorBaseView):
     """Вкладка с RSI и Stoch RSI"""
-    template_name = 'html/chart/indicator_rsi.html'
+    template_name = 'html/site/data/rsi.html'
 
 class IndicatorCandlesView(IndicatorBaseView):
-    template_name = 'html/chart/indicator_candles.html'
+    template_name = 'html/site/data/klines.html'
 
 class IndicatorChartView(TemplateView):
-    template_name = 'html/chart/indicator_chart.html'
+    template_name = 'html/site/chart/indicator_chart.html'
 
 class IndicatorDataView(IndicatorBaseView):
     """Главная страница раздела Данные"""
-    template_name = 'html/chart/indicator_data.html'
-
-# class DocumentationView(TemplateView):
-#     template_name = 'html/documentation.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#
-#         # Получаем все документы
-#         docs_qs = DocumentationModel.objects.all()
-#
-#         # Сгруппируем по категориям
-#         docs = defaultdict(list)
-#         for doc in docs_qs:
-#             docs[doc.category].append(doc)
-#
-#         # Отсортируем внутри категорий, чтобы "Введение" было первым (если есть)
-#         for category, docs_list in docs.items():
-#             docs_list.sort(key=lambda d: (0 if d.title == "Введение" else 1, d.title))
-#
-#         context['docs'] = dict(docs)
-#
-#         doc_id = self.kwargs.get('doc_id')
-#
-#         if not doc_id:
-#             # Если не указан doc_id, ищем документ с названием "Введение"
-#             intro_doc = docs_qs.filter(title="Введение").first()
-#             if intro_doc:
-#                 doc_id = intro_doc.id
-#
-#         context['selected_id'] = doc_id
-#         context['readme_html'] = ""
-#
-#         if doc_id:
-#             doc = get_object_or_404(DocumentationModel, id=doc_id)
-#             context['selected_doc'] = doc
-#
-#             try:
-#                 token = os.getenv('GITHUB_AUTH_TOKEN')
-#                 headers = {
-#                     'Authorization': f'token {token}' if token else '',
-#                     'Accept': 'application/vnd.github.v3.raw'
-#                 }
-#                 response = requests.get(doc.url, headers=headers)
-#                 if response.status_code == 404:
-#                     context['readme_html'] = "<p style='color:red'>Ошибка: Документ не найден.</p>"
-#                 else:
-#                     response.raise_for_status()
-#                     md_text = response.text
-#                     if not md_text:
-#                         context['readme_html'] = "<p style='color:red'>Документ пуст</p>"
-#                     else:
-#                         context['readme_html'] = markdown(md_text)
-#             except Exception as e:
-#                 context['readme_html'] = f"<p style='color:red'>Ошибка: {e}</p>"
-#
-#         return context
-
+    template_name = 'html/site/data/main.html'
 
 @login_required
 def setup_2fa(request):
@@ -129,7 +72,7 @@ def login_view(request):
                 return redirect(f'/2fa/?uid={user.id}')
     else:
         form = LoginForm()
-    return render(request, 'html/login.html', {'form': form})
+    return render(request, 'html/admin/login.html', {'form': form})
 
 @login_required
 def setup_2fa(request):
@@ -150,7 +93,7 @@ def setup_2fa(request):
     qr.save(buffer, format='PNG')
     qr_b64 = base64.b64encode(buffer.getvalue()).decode()
 
-    return render(request, 'html/setup_2fa.html', {
+    return render(request, 'html/admin/setup_2fa.html', {
         'qr_code': qr_b64,
         'secret': user.totp_secret,
     })
@@ -189,4 +132,4 @@ def two_factor_view(request):
     else:
         form = TwoFactorForm()
 
-    return render(request, 'html/two_factor.html', {'form': form})
+    return render(request, 'html/admin/two_factor.html', {'form': form})

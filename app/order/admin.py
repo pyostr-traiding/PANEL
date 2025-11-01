@@ -62,16 +62,16 @@ class OrderCreditingModelAdmin(admin.TabularInline):
 class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
     class Media:
         js = (
-            'js/admin_order_ws.js',
-            'js/admin_order_init.js',
-            'js/admin_order_extremum.js',
-            'js/admin_order_live_info.js',
-            'js/admin_order_lifetime.js',
+            'js/admin/admin_order_ws.js',
+            'js/admin/admin_order_init.js',
+            'js/admin/admin_order_extremum.js',
+            'js/admin/admin_order_live_info.js',
+            'js/admin/admin_order_lifetime.js',
         )
         css = {
             'all': ('css/admin_order.css',)
         }
-    change_list_template = "html/change_list.html"
+    change_list_template = "html/admin/change_list.html"
 
     search_fields = (
         'uuid',
