@@ -1,0 +1,43 @@
+{% load static %}
+
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="{% static 'js/site/chart/indicators/orderbook/ws_manager.js' %}"></script>
+<script src="{% static 'js/site/chart/indicators/orderbook/orderbook.js' %}"></script>
+<script src="{% static 'js/site/chart/indicators/orderbook/depth.js' %}"></script>
+<script src="{% static 'js/site/chart/indicators/orderbook/balances.js' %}"></script>
+<script type="module" src="{% static 'js/site/chart/chart.js' %}"></script>
+
+<script>
+  // Переключение вкладок
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  // Модалка
+  const modal = document.getElementById('settings-modal');
+  const openModalBtn = document.getElementById('open-modal-btn');
+  if (openModalBtn && modal) {
+    openModalBtn.addEventListener('click', () => (modal.style.display = 'flex'));
+    modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+  }
+
+  // Вкладки модалки
+  const modalTabs = document.querySelectorAll('.modal-sidebar li');
+  const modalSections = document.querySelectorAll('.modal-body .section');
+  modalTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      modalTabs.forEach(t => t.classList.remove('active'));
+      modalSections.forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      const section = document.getElementById(`section-${tab.dataset.section}`);
+      section?.classList.add('active');
+    });
+  });
+</script>

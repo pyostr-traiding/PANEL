@@ -1,0 +1,32 @@
+<div class="tab-content active" id="tab-orderbook">
+  <div class="tab-header">
+    <div class="tab-title">
+      <h3>Книга ордеров</h3>
+      <span class="tooltip-icon"
+            data-tooltip="Отображает активные лимитные ордера на покупку и продажу."></span>
+    </div>
+    <div class="ws-status-block">
+      <div class="ws-indicator" id="ws-status-orderbook"></div>
+      <div class="ws-status-text" id="ws-text-orderbook">—</div>
+    </div>
+  </div>
+
+  <div id="orderbook-wrapper" class="orderbook-wrapper">
+    <div class="orderbook">
+      <div class="orderbook-side">
+        <h4>Покупки (Bids)</h4>
+        <table id="orderbook-bids" class="orderbook-table">
+          <thead><tr><th>Цена</th><th>Объём</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="orderbook-side">
+        <h4>Продажи (Asks)</h4>
+        <table id="orderbook-asks" class="orderbook-table">
+          <thead><tr><th>Цена</th><th>Объём</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
