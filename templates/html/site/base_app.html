@@ -1,4 +1,4 @@
-                         {% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -32,9 +32,8 @@
 </head>
 <body>
   {% include 'html/site/sidebar.html' %}
-
   <main class="app-main">
-    {% block main %}{% endblock %}
+    {% block content %}{% endblock %}
   </main>
 </body>
 </html>

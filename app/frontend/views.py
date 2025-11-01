@@ -15,7 +15,7 @@ from app.frontend import twofa_state
 
 class IndicatorBaseView(TemplateView):
     """Базовый шаблон для вкладок с индикаторами"""
-    template_name = 'html/site/chart/base_indicator.html'
+    template_name = 'html/site/base_app.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -30,7 +30,7 @@ class IndicatorCandlesView(IndicatorBaseView):
     template_name = 'html/site/data/klines.html'
 
 class IndicatorChartView(TemplateView):
-    template_name = 'html/site/chart/indicator_chart.html'
+    template_name = 'html/site/chart/chart.html'
 
 class IndicatorDataView(IndicatorBaseView):
     """Главная страница раздела Данные"""

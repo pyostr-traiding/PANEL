@@ -1,5 +1,10 @@
 /* ============================================================
-   CHARTS & DATA — PREMIUM EXCHANGE STYLE
+   📊 CHARTS & DATA — PREMIUM EXCHANGE STYLE
+   ============================================================ */
+
+
+/* ============================================================
+   🧩 ОСНОВНОЙ КОНТЕЙНЕР ГРАФИКА
    ============================================================ */
 
 .chart-wrapper {
@@ -9,6 +14,7 @@
   position: relative;
   box-sizing: border-box;
 }
+
 .chart-container {
   flex: 1;
   border: 1px solid var(--border-color);
@@ -20,7 +26,11 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Chart header */
+
+/* ============================================================
+   🧠 ЗАГОЛОВОК ГРАФИКА И WS-СТАТУС
+   ============================================================ */
+
 .chart-header {
   display: flex;
   align-items: center;
@@ -32,13 +42,46 @@
   margin-bottom: 10px;
   box-shadow: var(--shadow-soft);
 }
+
 .chart-title {
   font-weight: 600;
   font-size: 16px;
   color: var(--text-color);
 }
 
-/* Controls */
+/* --- WebSocket статус --- */
+.ws-status-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ws-status-item {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ws-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+  transition: background-color 0.3s;
+}
+
+.ws-dot.green { background: #35c76f; }
+.ws-dot.yellow { background: #f0c94a; }
+.ws-dot.red { background: #f35a5a; }
+
+
+/* ============================================================
+   🧩 КОНТРОЛЫ ГРАФИКА
+   ============================================================ */
+
 .chart-controls {
   display: flex;
   align-items: center;
@@ -50,16 +93,18 @@
   box-shadow: var(--shadow-soft);
   flex-wrap: wrap;
 }
+
 .chart-controls label {
   font-weight: 600;
   font-size: 13px;
 }
 
-/* Dropdown */
+/* --- Dropdown --- */
 .dropdown {
   position: relative;
   display: inline-block;
 }
+
 .dropdown-content {
   display: none;
   position: absolute;
@@ -70,9 +115,16 @@
   box-shadow: var(--shadow-strong);
   z-index: 50;
 }
-.dropdown:hover .dropdown-content { display: block; }
 
-/* === Кнопка сброса === */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+
+/* ============================================================
+   ♻️ КНОПКА "СБРОСИТЬ НАСТРОЙКИ"
+   ============================================================ */
+
 .reset-container {
   margin-left: auto;
   display: flex;
@@ -110,39 +162,15 @@
   background-color: rgba(255, 60, 60, 0.25);
 }
 
-/* Анимация появления */
+/* --- Анимация появления --- */
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateX(10px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* WS Status */
-.ws-status-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.ws-status-item {
-  font-family: monospace;
-  font-size: 12px;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.ws-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #666;
-  transition: background-color 0.3s;
-}
-.ws-dot.green { background: #35c76f; }
-.ws-dot.yellow { background: #f0c94a; }
-.ws-dot.red { background: #f35a5a; }
 
 /* ============================================================
-   DATA CARDS — FIXED TILE GRID (Stable Squares)
+   🧩 DATA CARDS — КАРТОЧКИ ДАННЫХ / ИНДИКАТОРОВ
    ============================================================ */
 
 .data-tabs {
@@ -154,8 +182,8 @@
 }
 
 .data-card {
-  flex: 0 0 180px;              /* фиксированная ширина */
-  height: 120px;                /* фиксированная высота */
+  flex: 0 0 180px;
+  height: 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -202,8 +230,9 @@
   box-shadow: none;
 }
 
+
 /* ============================================================
-   CUSTOM CHECKBOXES (Indicators dropdown)
+   🧩 DROPDOWN CHECKBOXES (Индикаторы)
    ============================================================ */
 
 .dropdown-content label {
@@ -244,16 +273,19 @@
   transform: rotate(45deg);
 }
 
+
 /* ============================================================
-   МОДАЛЬНОЕ ОКНО НАСТРОЕК — СТИЛЬНЫЙ ВИД
+   ⚙️ МОДАЛЬНОЕ ОКНО НАСТРОЕК
    ============================================================ */
 
 .modal {
   display: none;
   position: fixed;
   z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0,0,0,0.6);
   justify-content: center;
   align-items: center;
@@ -264,12 +296,14 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   display: flex;
-  width: 70%; height: 70%;
+  width: 70%;
+  height: 70%;
   overflow: hidden;
   box-shadow: var(--shadow-soft);
   animation: fadeIn 0.25s ease;
 }
 
+/* --- Левая панель модалки --- */
 .modal-sidebar {
   width: 20%;
   border-right: 1px solid var(--border-color);
@@ -279,7 +313,8 @@
 
 .modal-sidebar ul {
   list-style: none;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .modal-sidebar li {
@@ -301,19 +336,15 @@
   color: #fff;
 }
 
+/* --- Правая часть (контент) --- */
 .modal-body {
   width: 80%;
   padding: 25px;
   overflow-y: auto;
 }
 
-.section {
-  display: none;
-}
-
-.section.active {
-  display: block;
-}
+.section { display: none; }
+.section.active { display: block; }
 
 .section h3 {
   color: var(--accent-color);
@@ -323,8 +354,7 @@
   font-size: 15px;
 }
 
-/* === СТИЛИ ДЛЯ ЧЕКБОКСОВ === */
-
+/* --- Элементы настроек --- */
 .setting-item {
   display: flex;
   align-items: center;
@@ -377,6 +407,7 @@
   font-weight: 500;
 }
 
+/* --- Кнопка открытия настроек --- */
 #open-modal-btn {
   padding: 6px 12px;
   background-color: var(--accent-color);
@@ -395,26 +426,25 @@
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
+
+
 /* ============================================================
-   Лейаут: Книга ордеров / Глубина / Балансы — слева от графика
-   ============================================================ */
-/* ============================================================
-   График и книга ордеров — одинаковая высота и нижнее выравнивание
+   🧩 ЛЕЙАУТ: ГРАФИК + ВКЛАДКИ (левая и правая часть)
    ============================================================ */
 
 .chart-layout {
   display: flex;
-  align-items: stretch; /* ✅ выравниваем оба блока по нижнему краю */
+  align-items: stretch;
   gap: 16px;
   width: 100%;
-  height: calc(100vh - 420px); /* ✅ подстраиваем под экран, уменьшая за счёт хедера и контролов */
+  height: calc(100vh - 420px);
   box-sizing: border-box;
 }
 
-/* Левая панель */
+/* --- Левая часть --- */
 .chart-layout .market-tabs {
   flex: 0 0 440px;
-  height: 100%; /* ✅ занимает всю доступную высоту */
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--panel-bg);
@@ -424,7 +454,7 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Контент внутри вкладок */
+/* --- Контент вкладок --- */
 .market-tabs .tab-content {
   flex: 1;
   overflow-y: auto;
@@ -432,10 +462,10 @@
   box-sizing: border-box;
 }
 
-/* Правая часть — график */
+/* --- Правая часть (график) --- */
 .chart-layout .chart-wrapper {
   flex: 1;
-  height: 100%; /* ✅ одинаковая высота с market-tabs */
+  height: 100%;
   min-height: 420px;
   display: flex;
   flex-direction: column;

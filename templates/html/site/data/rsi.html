@@ -1,7 +1,8 @@
-{% extends 'html/site/chart/base_indicator.html' %}
+{% extends 'html/site/base_app.html' %}
 {% load static %}
 {% block content %}
-  <div class="indicator-status">
+{% include 'html/site/data/tabs.html' %}
+ <div class="indicator-status">
     <span id="ws-status" class="status red"></span>
     <span id="ws-status-text">Отключено</span>
   </div>

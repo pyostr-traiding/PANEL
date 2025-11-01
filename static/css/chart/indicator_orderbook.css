@@ -1,5 +1,10 @@
 /* ============================================================
-   ORDERBOOK — стиль таблиц и вкладок
+   💹 ORDERBOOK — стиль таблиц и вкладок
+   ============================================================ */
+
+
+/* ============================================================
+   🧩 ОСНОВНАЯ ОБЁРТКА И ТАБЛИЦЫ
    ============================================================ */
 
 .orderbook-wrapper {
@@ -19,7 +24,10 @@
   justify-content: space-between;
   gap: 16px;
 }
-.orderbook-side { flex: 1; }
+
+.orderbook-side {
+  flex: 1;
+}
 
 .orderbook-side h4 {
   margin: 4px 0 4px;
@@ -34,41 +42,63 @@
   font-size: 12px;
   line-height: 1.2;
 }
-.orderbook-table th, .orderbook-table td {
+
+.orderbook-table th,
+.orderbook-table td {
   padding: 3px 6px;
   text-align: right;
 }
+
 .orderbook-table th {
   color: var(--muted-color);
   font-weight: 500;
   border-bottom: 1px solid var(--border-color);
 }
+
 .orderbook-table tr:nth-child(even) {
   background-color: rgba(255, 255, 255, 0.02);
 }
+
 .orderbook-table tr:hover {
   background-color: var(--accent-soft);
 }
 
-:root, :root[data-theme="light"] {
+
+/* ============================================================
+   🟢🔴 BID / ASK цвета
+   ============================================================ */
+
+:root,
+:root[data-theme="light"] {
   --bid-color: #0a9c5b;
   --ask-color: #d64141;
 }
+
 :root[data-theme="dark"] {
   --bid-color: #1ec97f;
   --ask-color: #ff5c5c;
 }
-.bid { color: var(--bid-color); font-weight: 600; }
-.ask { color: var(--ask-color); font-weight: 600; }
+
+.bid {
+  color: var(--bid-color);
+  font-weight: 600;
+}
+
+.ask {
+  color: var(--ask-color);
+  font-weight: 600;
+}
 
 @keyframes rowFlash {
   from { background-color: var(--accent-soft); }
   to { background-color: transparent; }
 }
 
+
 /* ============================================================
-   MARKET TABS (слева от графика)
+   🧭 MARKET TABS (слева от графика)
    ============================================================ */
+
 .market-tabs {
   background: var(--panel-bg);
   border-radius: var(--radius-md);
@@ -77,12 +107,13 @@
   border: 1px solid var(--border-color);
   width: 440px;
   flex-shrink: 0;
-  height: 75vh; /* ✅ та же высота, что у графика */
+  height: 75vh;
   display: flex;
   flex-direction: column;
   margin-top: 4px;
 }
 
+/* --- Кнопки вкладок --- */
 .tab-buttons {
   display: flex;
   flex-shrink: 0;
@@ -101,13 +132,18 @@
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
+
 .tab-btn.active {
   color: var(--accent-color);
   background: var(--panel-bg);
   border-bottom: 2px solid var(--accent-color);
 }
-.tab-btn:hover { background: var(--accent-soft); }
 
+.tab-btn:hover {
+  background: var(--accent-soft);
+}
+
+/* --- Контент вкладок --- */
 .tab-content {
   display: none;
   flex: 1;
@@ -115,12 +151,30 @@
   padding: 10px;
   box-sizing: border-box;
 }
-.tab-content.active { display: block; }
 
-.depth-chart { height: 220px; }
-.balances-list { font-size: 12px; color: var(--text-secondary); }
+.tab-content.active {
+  display: block;
+}
 
-/* === Заголовки и статус === */
+
+/* ============================================================
+   📊 ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ: ГЛУБИНА, БАЛАНСЫ
+   ============================================================ */
+
+.depth-chart {
+  height: 220px;
+}
+
+.balances-list {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+
+/* ============================================================
+   💬 TOOLTIP И WS-СТАТУС
+   ============================================================ */
+
 .tab-header {
   display: flex;
   justify-content: space-between;
@@ -128,6 +182,7 @@
   margin-bottom: 6px;
 }
 
+/* --- Подсказки --- */
 .tooltip-icon {
   display: inline-block;
   width: 16px;
@@ -142,10 +197,12 @@
   position: relative;
   cursor: help;
 }
+
 .tooltip-icon::after {
   content: "?";
   font-weight: bold;
 }
+
 .tooltip-icon:hover::before {
   content: attr(data-tooltip);
   position: absolute;
@@ -163,7 +220,11 @@
   z-index: 100;
 }
 
-.ws-status-block { text-align: right; }
+/* --- WS индикаторы --- */
+.ws-status-block {
+  text-align: right;
+}
+
 .ws-indicator {
   width: 10px;
   height: 10px;
@@ -171,18 +232,22 @@
   display: inline-block;
   margin-right: 6px;
 }
+
 .ws-status-text {
   font-size: 11px;
   color: var(--text-secondary);
   display: inline-block;
 }
-.ws-connected { background: #2cc870; }
-.ws-connecting { background: #ffb300; }
+
+.ws-connected    { background: #2cc870; }
+.ws-connecting   { background: #ffb300; }
 .ws-disconnected { background: #e53935; }
 
+
 /* ============================================================
-   Лейаут: вкладки слева, график справа
+   🧱 ЛЕЙАУТ: вкладки слева, график справа
    ============================================================ */
+
 .chart-layout {
   display: flex;
   flex-direction: row;
@@ -207,13 +272,15 @@
 
 .chart-layout .chart-wrapper {
   flex: 1;
-  height: 75vh; /* ✅ одинаково с вкладками */
+  height: 75vh;
   min-height: 420px;
 }
 
+
 /* ============================================================
-   Адаптивность
+   📱 АДАПТИВНОСТЬ
    ============================================================ */
+
 @media (max-width: 1100px) {
   .chart-layout {
     flex-direction: column;
