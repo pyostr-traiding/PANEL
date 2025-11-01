@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class SignalsConsumer(AsyncWebsocketConsumer):
+class RSIConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
 
