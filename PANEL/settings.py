@@ -1,4 +1,3 @@
-# using Django 5.2.7.
 import ast
 import os
 from pathlib import Path
@@ -8,24 +7,27 @@ import pika
 import redis
 from dotenv import load_dotenv
 from telebot import TeleBot
-
 from PANEL.redis_conf import RedisServer
 
-load_dotenv()
 
+# =========================
+# === BASE CONFIGURATION ==
+# =========================
+
+load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = os.getenv('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ast.literal_eval(os.getenv('DEBUG', False))
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', []).split(',')
+DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False'))
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 ALLOWED_HOSTS.append('admin-panel')
 
+# ======================
+# === DJANGO APPS ======
+# ======================
 
 INSTALLED_APPS = [
+    # --- Admin & system ---
     'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -33,34 +35,44 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # --- Third-party ---
     'corsheaders',
     'django_celery_beat',
     'channels',
 
+    # --- Local apps ---
     'app.abstractions',
     'app.users',
     'app.frontend',
-
     'app.setting',
     'app.position',
     'app.order',
 ]
 
+# =======================
+# === CHANNELS CONFIG ===
+# =======================
 
 ASGI_APPLICATION = 'PANEL.asgi.application'
-
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}"],
+            "hosts": [
+                f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}"
+            ],
         },
     },
 }
 
+# ======================
+# === MIDDLEWARE =======
+# ======================
+
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ← должно быть первым
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,12 +82,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ======================
+# === URLS & TEMPLATES =
+# ======================
+
 ROOT_URLCONF = 'PANEL.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,59 +105,54 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PANEL.wsgi.application'
 
-
-# Database
+# ======================
+# === DATABASE =========
+# ======================
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DATABASE'),
-        'USER': os.environ.get('MYSQL_USER'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
-        'HOST': os.environ.get('MYSQL_DATABASE_HOST'),
-        'PORT': os.environ.get('MYSQL_DATABASE_PORT'),
+        'NAME': os.getenv('MYSQL_DATABASE'),
+        'USER': os.getenv('MYSQL_USER'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
+        'HOST': os.getenv('MYSQL_DATABASE_HOST'),
+        'PORT': os.getenv('MYSQL_DATABASE_PORT'),
         'OPTIONS': {
-                'charset': 'utf8mb4',
-                'use_unicode': True,
-                'sql_mode': 'traditional',
-                'isolation_level': 'serializable',
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+            'sql_mode': 'traditional',
+            'isolation_level': 'serializable',
         },
     }
 }
 
-# Password validation
+# ======================
+# === AUTH & SECURITY ==
+# ======================
+
+AUTH_USER_MODEL = 'auth.User'
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Internationalization
+# ======================
+# === LOCALIZATION =====
+# ======================
 
 LANGUAGE_CODE = 'ru'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
-####
-# CSRF
+# ======================
+# === SECURITY & CORS ==
+# ======================
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -149,40 +160,29 @@ CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() in ['true', '1', 'yes']
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_METHODS = os.getenv('CORS_ALLOW_METHODS', 'GET,POST,OPTIONS,PUT,DELETE').split(',')
 CORS_ALLOW_HEADERS = os.getenv('CORS_ALLOW_HEADERS', 'accept,content-type,authorization,x-csrftoken,x-requested-with').split(',')
-
-
-AUTH_USER_MODEL = 'auth.User'
-
 
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False
 
+# ======================
+# === S3 STORAGE =======
+# ======================
 
-####
-# S3 bucket
 s3_client = boto3.resource(
     service_name='s3',
     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
     endpoint_url='https://s3.timeweb.com',
-
 )
 
 if DEBUG:
-    # --- Локальные файлы ---
     STATIC_URL = "static/"
-
-    STATICFILES_DIRS = [
-        BASE_DIR / "static",
-    ]
+    STATICFILES_DIRS = [BASE_DIR / "static"]
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
-
 else:
-    # --- Хранение на S3 ---
     STORAGES = {
         'default': {
             'BACKEND': 'storages.backends.s3.S3Storage',
@@ -210,50 +210,53 @@ else:
 
     MEDIA_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/media/"
     STATIC_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/static/"
+    STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# ======================
+# === TELEGRAM =========
+# ======================
 
-
-####################
-# Telegram
 tg_client = TeleBot(
     token=os.getenv('BOT_TOKEN'),
-    parse_mode='HTML'
+    parse_mode='HTML',
 )
 
-
-#####################
-# RabbitMQ
+# ======================
+# === RABBITMQ =========
+# ======================
 
 credentials = pika.PlainCredentials(
     username=os.getenv('RABBITMQ_USERNAME'),
-    password=os.getenv('RABBITMQ_PASSWORD')
+    password=os.getenv('RABBITMQ_PASSWORD'),
 )
 
 connection_params = pika.ConnectionParameters(
     host=os.getenv('RABBITMQ_HOST'),
     port=int(os.getenv('RABBITMQ_PORT')),
     virtual_host=os.getenv('RABBITMQ_VIRTUAL_HOST'),
-    credentials=credentials
+    credentials=credentials,
 )
 
+# ======================
+# === CELERY ===========
+# ======================
 
-#####
-# Celery
-
-CELERY_BROKER_URL = f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}/44"  # или RabbitMQ
-CELERY_RESULT_BACKEND = f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}/44"
+CELERY_BROKER_URL = (
+    f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}/44"
+)
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_RESULT_EXTENDED = True
-CELERY_BEAT_MAX_LOOP_INTERVAL = 1  # в секундах
+CELERY_BEAT_MAX_LOOP_INTERVAL = 1  # сек
 
-
-#####
-# Redis
+# ======================
+# === REDIS ============
+# ======================
 
 redis_server = RedisServer()
 
-
-#####
-# Logger
+# ======================
+# === LOGGING ==========
+# ======================
 
 LOGGING = {
     'version': 1,
@@ -277,21 +280,18 @@ LOGGING = {
     },
 
     'handlers': {
-        # Показывает всё в консоль только если DEBUG=True
         'console_debug': {
             'class': 'logging.StreamHandler',
             'formatter': 'colored',
             'level': 'INFO',
             'filters': ['require_debug_true'],
         },
-        # Показывает только ошибки в консоли при DEBUG=False
         'console_production': {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
             'level': 'ERROR',
             'filters': ['require_debug_false'],
         },
-
         'file': {
             'class': 'logging.FileHandler',
             'filename': str(BASE_DIR / 'logs' / 'panel.log'),
@@ -313,7 +313,6 @@ LOGGING = {
 
     'loggers': {
         'django': {
-            # 'handlers': ['console_debug', 'console_production'],
             'handlers': ['console_debug'],
             'level': 'INFO',
             'propagate': True,
@@ -331,7 +330,9 @@ LOGGING = {
     },
 }
 
-#############
-# Для загрузки в прод FORCE_COLLECTSTATIC=True python manage.py collectstatic --noinput
+# ======================
+# === COLLECTSTATIC ====
+# ======================
+
 if os.getenv('FORCE_COLLECTSTATIC', '').lower() in ['true', '1', 'yes']:
     DEBUG = False

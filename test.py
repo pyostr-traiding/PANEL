@@ -1,0 +1,5 @@
+from pprint import pprint
+
+x = {"kline_ms": 1761990300000, "symbol": "BTCUSDT", "type": "PREDICT.RSI", "ex": "bybit", "data": {"current_value": "{\"kline_ms\":1761990300000,\"hist\":-5.4,\"macd\":-25.25,\"sign\":-19.85}", "predict": ["{\"kline_ms\":1761991200000,\"hist\":-33.8335,\"macd\":24.0829,\"sign\":57.9165}", "{\"kline_ms\":1761992100000,\"hist\":-40.8167,\"macd\":6.8956,\"sign\":47.7123}", "{\"kline_ms\":1761993000000,\"hist\":-46.6671,\"macd\":-10.6215,\"sign\":36.0455}", "{\"kline_ms\":1761993900000,\"hist\":-51.3943,\"macd\":-28.1974,\"sign\":23.197}", "{\"kline_ms\":1761994800000,\"hist\":-55.0527,\"macd\":-45.6189,\"sign\":9.4338}", "{\"kline_ms\":1761995700000,\"hist\":-57.7239,\"macd\":-62.721,\"sign\":-4.9972}", "{\"kline_ms\":1761996600000,\"hist\":-59.5047,\"macd\":-79.378,\"sign\":-19.8734}"], "rev": {"step": 6, "predicted_close": 110241.2, "macd": 50.9742, "signal": 46.289, "hist": 4.6853, "time_ms": 1761995700000, "direction": "bullish"}}}
+
+pprint(x)

@@ -20,5 +20,6 @@ import { initPredictIndicators } from "./indicators/indicator_predict.js";
 
   // теперь можно безопасно обращаться к subscribeToCandle
   initInfoPanel(ctx);
-  initPredictIndicators(ctx);
+  await initPredictIndicators(ctx);
+
 })();
