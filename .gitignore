@@ -54,3 +54,4 @@ docs/_build/
 /env
 .idea
 /test.py
+test.py

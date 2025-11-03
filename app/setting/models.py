@@ -83,3 +83,24 @@ class ExchangeModel(AbstractModel):
 
     def __str__(self):
         return self.name
+
+
+class PromptModel(AbstractModel):
+    class Meta:
+        verbose_name = 'Промпт'
+        verbose_name_plural = 'Промпты'
+
+    title = models.CharField(
+        verbose_name='Название',
+        max_length=100,
+    )
+    code = models.CharField(
+        verbose_name='Код',
+        max_length=40,
+    )
+    prompt = models.TextField(
+        verbose_name='Текст промпта'
+    )
+    description = models.TextField(
+        verbose_name='Описание'
+    )

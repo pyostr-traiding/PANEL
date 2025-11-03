@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import TabularInline
 
 from app.abstractions.admin import AbstractAdmin
-from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel
+from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel, PromptModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
 
@@ -55,5 +55,13 @@ class ExchangeModelAdmin(AbstractAdmin):
         'maker_fee',
         'taker_fee',
         'base_url',
+        'id',
+    )
+
+@admin.register(PromptModel)
+class PromptModelAdmin(AbstractAdmin):
+    list_display = (
+        'title',
+        'code',
         'id',
     )
