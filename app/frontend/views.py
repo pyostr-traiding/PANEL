@@ -17,14 +17,16 @@ class IndicatorRSIView(IndicatorBaseView):
 class IndicatorCandlesView(IndicatorBaseView):
     template_name = 'html/site/data/klines.html'
 
-class IndicatorChartView(TemplateView):
+class IndicatorChartView(IndicatorBaseView):
     template_name = 'html/site/chart/chart.html'
 
 class IndicatorDataView(IndicatorBaseView):
-    """Главная страница раздела Данные"""
     template_name = 'html/site/data/main.html'
 
 
 class GPTAnalizView(IndicatorBaseView):
-    """Главная страница раздела Данные"""
     template_name = 'html/site/GPT/gpt.html'
+
+
+class ServerView(IndicatorBaseView):
+    template_name = 'html/site/server/server.html'

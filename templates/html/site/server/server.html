@@ -1,0 +1,78 @@
+{% extends 'html/site/base_app.html' %}
+{% load static %}
+
+{% block title %}Сервисы (Docker){% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/server/server.css' %}">
+{% endblock %}
+
+{% block content %}
+
+  <!-- Верхняя панель -->
+  <div class="srv-header">
+    <div class="srv-title">
+      <span class="srv-title-text">Рабочие сервисы</span>
+      <small class="srv-subtitle">мониторинг контейнеров, ресурсы, логи</small>
+    </div>
+    <div class="ws-indicator">
+      <span id="ws-dot" class="ws-dot red"></span>
+      <span id="ws-status" class="ws-status">Нет соединения</span>
+    </div>
+  </div>
+
+  <!-- Плитки ресурсов системы -->
+  <section class="srv-section">
+    <div class="srv-cards" id="system-cards">
+      <!-- Рендерится из JS -->
+      <div class="card skeleton">
+        <div class="card-top">
+          <span>CPU</span>
+          <span class="pill muted">—</span>
+        </div>
+        <div class="card-val">—</div>
+        <div class="card-bar"><span style="width:0%"></span></div>
+        <div class="card-foot">Загрузка процессора</div>
+      </div>
+
+      <div class="card skeleton">
+        <div class="card-top">
+          <span>Память</span>
+          <span class="pill muted">—</span>
+        </div>
+        <div class="card-val">—</div>
+        <div class="card-bar"><span style="width:0%"></span></div>
+        <div class="card-foot">Использование ОЗУ</div>
+      </div>
+
+      <div class="card skeleton">
+        <div class="card-top">
+          <span>Диск</span>
+          <span class="pill muted">—</span>
+        </div>
+        <div class="card-val">—</div>
+        <div class="card-bar"><span style="width:0%"></span></div>
+        <div class="card-foot">Заполнено дискового пространства</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Плитки контейнеров -->
+  <section class="srv-section">
+    <div class="srv-grid-head">
+      <div class="grid-title">Контейнеры</div>
+      <div class="grid-actions">
+        <button id="btn-refresh" class="btn ghost" title="Обновить сейчас">↻</button>
+        <span id="containers-count" class="muted">—</span>
+      </div>
+    </div>
+    <div id="containers-grid" class="srv-cards srv-cards--containers">
+      <!-- Рендерится из JS -->
+      <div class="empty muted">Загрузка списка контейнеров…</div>
+    </div>
+  </section>
+
+  {% include 'html/site/server/modals.html' %}
+
+  <script src="{% static 'js/site/server/server.js' %}"></script>
+{% endblock %}

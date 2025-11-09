@@ -1,0 +1,94 @@
+<!-- Модалка контейнера (детали + действия) -->
+<div id="modal-container" class="modal hidden" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modal-container-title">
+    <div class="modal__head">
+      <div class="modal__title">
+        <strong id="modal-container-title">Сервис</strong>
+        <span id="modal-container-status" class="pill">—</span>
+      </div>
+      <button class="icon-btn" data-close aria-label="Закрыть">✕</button>
+    </div>
+
+    <div class="modal__body">
+      <div class="kv">
+        <div>Имя</div><div id="mc-name">—</div>
+        <div>ID</div><div id="mc-id" class="mono">—</div>
+        <div>Образ</div><div id="mc-image" class="mono">—</div>
+        <div>Создан</div><div id="mc-created">—</div>
+        <div>Порты</div><div id="mc-ports" class="mono">—</div>
+        <div>Тома</div><div id="mc-mounts" class="mono">—</div>
+      </div>
+    </div>
+
+    <div class="modal__foot">
+      <div class="modal-actions-left">
+        <button id="act-start" class="btn">Старт</button>
+        <button id="act-stop" class="btn warn">Стоп</button>
+        <button id="act-restart" class="btn primary">Перезапуск</button>
+        <button id="act-remove" class="btn danger">Удалить</button>
+      </div>
+      <div class="modal-actions-right">
+        <button id="act-logs" class="btn ghost">Логи (tail)</button>
+        <button id="act-stream" class="btn ghost">Стрим логов</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка логов (tail) -->
+<div id="modal-logs" class="modal hidden" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog modal__dialog--wide" role="dialog" aria-modal="true" aria-labelledby="modal-logs-title">
+    <div class="modal__head">
+      <div class="modal__title">
+        <strong id="modal-logs-title">Логи</strong>
+        <span id="ml-container" class="pill">—</span>
+      </div>
+      <button class="icon-btn" data-close aria-label="Закрыть">✕</button>
+    </div>
+
+    <div class="modal__body">
+      <div class="logs-toolbar">
+        <label class="mono">tail:
+          <input id="ml-tail" type="number" min="10" step="10" value="200">
+        </label>
+        <button id="ml-refresh" class="btn ghost">Обновить</button>
+        <span id="ml-status" class="muted">—</span>
+      </div>
+      <pre id="logs-pre" class="logs"></pre>
+    </div>
+
+    <div class="modal__foot">
+      <button class="btn" data-close>Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка стриминга логов -->
+<div id="modal-stream" class="modal hidden" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog modal__dialog--wide" role="dialog" aria-modal="true" aria-labelledby="modal-stream-title">
+    <div class="modal__head">
+      <div class="modal__title">
+        <strong id="modal-stream-title">Стрим логов</strong>
+        <span id="ms-container" class="pill">—</span>
+      </div>
+      <button class="icon-btn" data-close aria-label="Закрыть">✕</button>
+    </div>
+
+    <div class="modal__body">
+      <div class="logs-toolbar">
+        <span class="muted">Реальное время</span>
+        <span id="ms-status" class="pill pill-dot red">остановлено</span>
+      </div>
+      <pre id="stream-pre" class="logs"></pre>
+    </div>
+
+    <div class="modal__foot">
+      <button id="ms-stop" class="btn warn">Остановить стрим</button>
+      <button id="ms-clear" class="btn ghost">Очистить</button>
+      <button class="btn" data-close>Закрыть</button>
+    </div>
+  </div>
+</div>
