@@ -23,3 +23,8 @@ class IndicatorChartView(TemplateView):
 class IndicatorDataView(IndicatorBaseView):
     """Главная страница раздела Данные"""
     template_name = 'html/site/data/main.html'
+
+
+class GPTAnalizView(IndicatorBaseView):
+    """Главная страница раздела Данные"""
+    template_name = 'html/site/GPT/gpt.html'

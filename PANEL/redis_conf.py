@@ -9,6 +9,8 @@ class RedisDB:
     cache: int = 2
     extremums: int = 3
 
+    gpt: int = 5
+
 class RedisServer:
     def __init__(self):
         self._connections = {}
@@ -39,3 +41,7 @@ class RedisServer:
     def delete(self, key: str, db: int = 0):
         conn = self._get_connection(db)
         return conn.delete(key)
+
+    def scan(self, cursor, match, count, db: int = 0):
+        conn = self._get_connection(db)
+        return conn.scan(cursor=cursor, match=match, count=count)

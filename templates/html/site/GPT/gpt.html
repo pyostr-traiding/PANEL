@@ -1,0 +1,60 @@
+{% extends 'html/site/base_app.html' %}
+{% load static %}
+
+{% block title %}GPT Чаты{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/GPT/gpt.css' %}">
+{% endblock %}
+
+{% block content %}
+
+  <!-- Верхняя панель -->
+  <div class="gpt-header">
+    <div class="gpt-title">GPT чаты</div>
+    <div class="ws-status-container">
+      <div id="ws-dot" class="ws-dot red"></div>
+      <div id="ws-status-text" class="ws-status-text">Нет соединения</div>
+    </div>
+  </div>
+
+  <!-- Основной лейаут -->
+  <div class="gpt-layout">
+    <!-- Список чатов -->
+    <aside class="chat-sidebar">
+
+        <div class="chat-sidebar-header">
+  <div class="chat-sidebar-title">Чаты</div>
+  <button id="chat-new-btn" class="chat-new-btn">+ Новый чат</button>
+</div>
+      <div id="chat-list" class="chat-list"></div>
+
+      <div id="chat-list-footer" class="chat-list-footer">
+        <span id="chat-list-loader" class="loader hidden"></span>
+        <span id="chat-list-end" class="muted hidden">Больше чатов нет</span>
+        <span id="chat-list-error" class="error hidden">Ошибка загрузки</span>
+      </div>
+    </aside>
+
+    <!-- Окно чата -->
+    <main class="chat-main">
+      <div class="chat-window" id="chat-window">
+        <div class="empty-state" id="empty-state">Выберите чат слева, чтобы посмотреть диалог.</div>
+      </div>
+
+      <!-- Панель ввода -->
+      <form id="chat-input-form" class="chat-input-form">
+        <input
+          type="text"
+          id="chat-input"
+          class="chat-input"
+          placeholder="Введите сообщение..."
+          autocomplete="off"
+        />
+        <button type="submit" id="chat-send-btn" class="chat-send-btn">➤</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="{% static 'js/site/GPT/gpt.js' %}"></script>
+{% endblock %}

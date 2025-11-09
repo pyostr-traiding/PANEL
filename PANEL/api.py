@@ -20,6 +20,11 @@ from app.users.api import router as router_users
 # Настройки
 from app.setting.routes.prompt import router as router_settings_prompt
 
+# Настройки
+from app.frontend.routes.gpt import router as router_chats_gpt
+
+
+
 # Создание API с уникальным namespace
 api_route = NinjaExtraAPI(
     title='API',
@@ -47,5 +52,10 @@ api_route.add_router('/order/', router_order_status)
 api_route.add_router('/order/', router_order_crediting)
 api_route.add_router('/order/', router_order_extremum)
 
-
+#####
+# Настройки
 api_route.add_router('/settings/', router_settings_prompt)
+
+#####
+# Настройки
+api_route.add_router('/chats/', router_chats_gpt)

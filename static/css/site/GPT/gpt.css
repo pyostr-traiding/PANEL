@@ -1,0 +1,378 @@
+/* ============================================================
+   💬 GPT Чаты — полная стилизация (в той же теме, что сайт)
+   ============================================================ */
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.gpt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-soft);
+}
+
+.gpt-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.ws-status-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ws-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #666;
+  transition: background-color var(--transition-fast);
+}
+.ws-dot.green { background: #35c76f; }
+.ws-dot.yellow { background: #f0c94a; }
+.ws-dot.red { background: #f35a5a; }
+
+.ws-status-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   🧱 Основная сетка
+   ============================================================ */
+
+.gpt-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+}
+
+/* ============================================================
+   📋 Сайдбар со списком чатов
+   ============================================================ */
+
+.chat-sidebar {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  width: 360px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-color);
+}
+
+.chat-sidebar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: .2px;
+}
+
+.chat-new-btn {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  transition: opacity .2s ease;
+}
+
+.chat-new-btn:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================
+   💬 Основная область чата
+   ============================================================ */
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-window {
+  flex: 1;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  padding: 12px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* ============================================================
+   📥 Панель ввода
+   ============================================================ */
+
+.chat-input-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin-top: 8px;
+  background: var(--panel-bg);
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.chat-send-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity .2s ease;
+}
+
+.chat-send-btn:hover {
+  opacity: 0.85;
+}
+
+/* ============================================================
+   📜 Сообщения
+   ============================================================ */
+
+.msg {
+  max-width: 72%;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-color);
+  animation: fadeIn 0.2s ease;
+}
+
+.msg small {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted-color);
+}
+
+.msg.assistant {
+  background: color-mix(in srgb, var(--accent-soft) 30%, var(--panel-bg));
+  border-top-left-radius: 6px;
+  margin-right: auto;
+}
+
+.msg.user {
+  background: rgba(36,156,255,0.08);
+  border-top-right-radius: 6px;
+  margin-left: auto;
+}
+
+.msg img {
+  max-width: 100%;
+  border-radius: 10px;
+  display: block;
+  border: 1px solid var(--border-color);
+}
+
+/* ============================================================
+   🧱 Элементы списка чатов
+   ============================================================ */
+
+.chat-item {
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform .05s ease;
+  box-shadow: var(--shadow-soft);
+}
+
+.chat-item:hover { background-color: var(--accent-soft); }
+.chat-item:active { transform: scale(0.995); }
+
+.chat-item.active {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-soft) inset;
+}
+
+.chat-item .chat-key {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--muted-color);
+  display: block;
+  word-break: break-all;
+}
+
+.chat-item .chat-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-color);
+  margin-bottom: 4px;
+}
+
+/* ============================================================
+   ♻️ Лоадеры, статусы
+   ============================================================ */
+
+.loader {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+.hidden { display: none; }
+.muted  { color: var(--muted-color); font-size: 12px; }
+.error  { color: #ff5c5c; font-size: 12px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ============================================================
+   📱 Адаптив
+   ============================================================ */
+@media (max-width: 1100px) {
+  .gpt-layout { flex-direction: column; height: auto; }
+  .chat-sidebar { width: 100%; height: 300px; }
+  .msg { max-width: 86%; }
+}
+
+
+.msg-status {
+  font-size: 13px;
+  margin-left: 4px;
+}
+
+.msg-status.pending {
+  color: var(--muted-color);
+}
+
+.msg-status.delivered {
+  color: #36c36c;
+}
+
+.chat-new-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  float: right;
+  transition: opacity .2s ease;
+}
+
+.chat-new-btn:hover {
+  opacity: 0.85;
+}
+
+/* ============================================================
+   ⋯ Меню удаления чата
+   ============================================================ */
+.chat-item {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.chat-menu {
+  position: relative;
+}
+
+.chat-menu-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted-color);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.chat-menu-btn:hover {
+  background-color: var(--accent-soft);
+  color: var(--text-color);
+}
+
+.chat-menu-popup {
+  position: absolute;
+  top: 22px;
+  right: 0;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  padding: 4px 0;
+  display: none;
+  z-index: 20;
+  min-width: 110px;
+}
+
+.chat-menu-popup button {
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-color);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+
+.chat-menu-popup button:hover {
+  background: rgba(255,0,0,0.08);
+  color: #ff4444;
+}
+
+.chat-menu.open .chat-menu-popup {
+  display: block;
+}

@@ -21,6 +21,12 @@
       <i data-lucide="database" class="nav-icon"></i>
       <span class="nav-label">Данные</span>
     </a>
+  <a href="{% url 'gpt_analiz' %}"
+       class="nav-item {% if '/gpt/' in path %}active{% endif %}"
+       title="Анализ">
+      <i data-lucide="database" class="nav-icon"></i>
+      <span class="nav-label">Анализ</span>
+    </a>
   </nav>
 
   <div class="sidebar__bottom">
