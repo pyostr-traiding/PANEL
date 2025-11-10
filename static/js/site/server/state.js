@@ -13,7 +13,7 @@
   }
 
   // ---- WS URL ----
-  const proto = location.protocol === 'https:' ? 'ws' : 'ws';
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   const WS_URL = `${proto}://147.45.224.250:8014/ws?token=${encodeURIComponent(token || '')}`;
 
   // ---- State ----
