@@ -13,8 +13,7 @@
   }
 
   // ---- WS URL ----
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  const WS_URL = `${proto}://147.45.224.250:8014/ws?token=${encodeURIComponent(token || '')}`;
+  const WS_URL = `wss://docker.24trade.online/ws?token=${encodeURIComponent(token || '')}`;
 
   // ---- State ----
   const state = {

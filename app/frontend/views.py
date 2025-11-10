@@ -1,6 +1,9 @@
+import os
+
 from django.views.generic import TemplateView
+from dotenv import load_dotenv
 
-
+load_dotenv()
 class IndicatorBaseView(TemplateView):
     """Базовый шаблон для вкладок с индикаторами"""
     template_name = 'html/site/base_app.html'
@@ -34,5 +37,5 @@ class ServerView(IndicatorBaseView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['path'] = self.request.path
-        ctx["access_token"] = 'MY_STATIC_ACCESS_TOKEN_123'
+        ctx["access_token"] = os.getenv('WS_DOCKER_TOKEN')
         return ctx
