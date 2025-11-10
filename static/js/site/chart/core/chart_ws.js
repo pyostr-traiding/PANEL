@@ -98,7 +98,9 @@ export async function initSocket(ctx) {
           high: parseFloat(data.h),
           low: parseFloat(data.l),
           close: parseFloat(data.c),
+          volume: parseFloat(data.v ?? data.volume ?? 0),
         };
+
         if (Object.values(incoming).some((v) => !isFinite(v))) return;
 
         // === первая свеча — загружаем историю ===
@@ -126,15 +128,17 @@ export async function initSocket(ctx) {
 
         // 🔧 если свеча почти та же (допуск ±2 сек)
         if (Math.abs(diff) < 2) {
-          const merged = {
-            ...last,
-            high: Math.max(last.high, incoming.high),
-            low: Math.min(last.low, incoming.low),
-            close: incoming.close,
-          };
-          ctx.allCandles[ctx.allCandles.length - 1] = merged;
-          candleSeries.update(merged);
-        }
+        const merged = {
+          ...last,
+          high: Math.max(last.high, incoming.high),
+          low: Math.min(last.low, incoming.low),
+          close: incoming.close,
+          volume: incoming.volume,
+        };
+        ctx.allCandles[ctx.allCandles.length - 1] = merged;
+        candleSeries.update(merged);
+      }
+
         // 🔧 если новая свеча
         else if (diff > 0) {
           ctx.allCandles.push(incoming);

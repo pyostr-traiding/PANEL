@@ -36,10 +36,7 @@ export function initInfoPanel(ctx) {
     transition: 'background-color 0.3s, color 0.3s, opacity 0.3s, border-color 0.3s',
   });
 
-  // применяем цвета из текущей темы
   applyThemeStyles();
-
-  // === слушаем смену темы ===
   window.addEventListener('themeChanged', applyThemeStyles);
 
   // === обновление содержимого ===
@@ -74,7 +71,6 @@ export function initInfoPanel(ctx) {
       }
     }
 
-    // 🔥 фон с подсветкой, но адаптируем под тему
     const baseBg = getVar('--panel-bg', 'rgba(0,0,0,0.45)');
     infoPanel.style.background = highlight || baseBg;
     infoPanel.style.color = getVar('--text-color', '#e0e0e0');
@@ -110,10 +106,14 @@ export function initInfoPanel(ctx) {
 
     isCrosshairActive = true;
     const data = param.seriesData.get(candleSeries);
-    if (data) updateInfoPanel(data);
+    if (!data) return;
+
+    // ✅ ищем полную свечу (с volume)
+    const full = ctx.allCandles.find(c => c.time === data.time);
+    updateInfoPanel(full || data);
   });
 
-  // === при инициализации (первый рендер) ===
+  // === при инициализации ===
   if (ctx.allCandles?.length) {
     lastCandle = ctx.allCandles[ctx.allCandles.length - 1];
     updateInfoPanel(lastCandle);

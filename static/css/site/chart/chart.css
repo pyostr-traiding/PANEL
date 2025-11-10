@@ -2,7 +2,6 @@
    📊 CHARTS & DATA — PREMIUM EXCHANGE STYLE
    ============================================================ */
 
-
 /* ============================================================
    🧩 ОСНОВНОЙ КОНТЕЙНЕР ГРАФИКА
    ============================================================ */
@@ -25,7 +24,6 @@
   box-sizing: border-box;
   box-shadow: var(--shadow-soft);
 }
-
 
 /* ============================================================
    🧠 ЗАГОЛОВОК ГРАФИКА И WS-СТАТУС
@@ -73,10 +71,9 @@
   transition: background-color 0.3s;
 }
 
-.ws-dot.green { background: #35c76f; }
+.ws-dot.green  { background: #35c76f; }
 .ws-dot.yellow { background: #f0c94a; }
-.ws-dot.red { background: #f35a5a; }
-
+.ws-dot.red    { background: #f35a5a; }
 
 /* ============================================================
    🧩 КОНТРОЛЫ ГРАФИКА
@@ -120,7 +117,6 @@
   display: block;
 }
 
-
 /* ============================================================
    ♻️ КНОПКА "СБРОСИТЬ НАСТРОЙКИ"
    ============================================================ */
@@ -149,7 +145,6 @@
     transform 0.1s ease;
 }
 
-/* Hover: красный акцент */
 #reset-settings:hover {
   background-color: rgba(255, 60, 60, 0.15);
   border-color: rgba(255, 60, 60, 0.6);
@@ -165,11 +160,8 @@
 /* --- Анимация появления --- */
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateX(10px); }
-  to { opacity: 1; transform: translateX(0); }
+  to   { opacity: 1; transform: translateX(0); }
 }
-
-
-
 
 /* ============================================================
    🧩 DROPDOWN CHECKBOXES (Индикаторы)
@@ -212,7 +204,6 @@
   border-bottom: 2px solid #fff;
   transform: rotate(45deg);
 }
-
 
 /* ============================================================
    ⚙️ МОДАЛЬНОЕ ОКНО НАСТРОЕК
@@ -283,8 +274,13 @@
   overflow-y: auto;
 }
 
-.section { display: none; }
-.section.active { display: block; }
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
 
 .section h3 {
   color: var(--accent-color);
@@ -364,9 +360,8 @@
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  to   { opacity: 1; transform: scale(1); }
 }
-
 
 /* ============================================================
    🧩 ЛЕЙАУТ: ГРАФИК + ВКЛАДКИ (левая и правая часть)
@@ -377,11 +372,24 @@
   align-items: stretch;
   gap: 16px;
   width: 100%;
-  height: calc(100vh - 420px);
   box-sizing: border-box;
+  margin-bottom: 20px; /* чтобы добавить отступ перед ордерами */
 }
 
-/* --- Левая часть --- */
+.chart-layout .chart-wrapper {
+  flex: 1;
+  min-height: 420px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.market-tabs {
+  align-self: flex-start; /* гарантирует ровное выравнивание слева */
+  margin-top: 0;
+}
+
+
 .chart-layout .market-tabs {
   flex: 0 0 440px;
   height: 100%;
@@ -394,7 +402,6 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* --- Контент вкладок --- */
 .market-tabs .tab-content {
   flex: 1;
   overflow-y: auto;
@@ -402,11 +409,15 @@
   box-sizing: border-box;
 }
 
-/* --- Правая часть (график) --- */
 .chart-layout .chart-wrapper {
   flex: 1;
   height: 100%;
   min-height: 420px;
   display: flex;
   flex-direction: column;
+}
+.chart-layout,
+.chart-wrapper,
+.chart-container {
+  overflow-x: hidden;
 }

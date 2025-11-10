@@ -2,6 +2,10 @@
    ⚡ TRADE MODULE — STRICT EXCHANGE STYLE
    ============================================================ */
 
+/* ============================================================
+   🧱 ОСНОВНОЙ БЛОК
+   ============================================================ */
+
 .trade-block {
   margin-top: 20px;
   background: var(--panel-bg);
@@ -10,7 +14,10 @@
   box-shadow: none;
 }
 
-/* ---------------- Header ---------------- */
+/* ============================================================
+   🧭 HEADER
+   ============================================================ */
+
 .trade-header {
   display: flex;
   justify-content: space-between;
@@ -28,6 +35,7 @@
   color: var(--text-color);
 }
 
+/* --- WS статус --- */
 .ws-status-container {
   display: flex;
   align-items: center;
@@ -49,11 +57,25 @@
   border-radius: 50%;
   background: #666;
 }
-.ws-dot.green { background: #2ec77f; }
-.ws-dot.yellow { background: #f0c94a; }
-.ws-dot.red { background: #ff5c5c; }
 
-/* ---------------- Topbar ---------------- */
+.ws-dot.green  { background: #2ec77f; }
+.ws-dot.yellow { background: #f0c94a; }
+.ws-dot.red    { background: #ff5c5c; }
+
+.ws-dot.yellow {
+  background: #f0c94a;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============================================================
+   🔝 TOPBAR
+   ============================================================ */
+
 .trade-topbar {
   display: flex;
   flex-wrap: wrap;
@@ -76,7 +98,10 @@
   color: var(--text-color);
 }
 
-/* ---------------- Filter ---------------- */
+/* ============================================================
+   🔍 FILTERS
+   ============================================================ */
+
 .search-filter {
   display: flex;
   align-items: center;
@@ -98,7 +123,10 @@
   color: var(--text-secondary);
 }
 
-/* ---------------- Buttons ---------------- */
+/* ============================================================
+   🔘 BUTTONS
+   ============================================================ */
+
 .btn {
   padding: 6px 12px;
   border: 1px solid var(--border-strong);
@@ -121,6 +149,7 @@
   border-color: var(--accent-color);
   color: #fff;
 }
+
 .btn-primary:hover:not([disabled]) {
   background: var(--accent-hover);
 }
@@ -139,7 +168,10 @@
   cursor: default;
 }
 
-/* ---------------- Tabs ---------------- */
+/* ============================================================
+   🗂️ TABS
+   ============================================================ */
+
 .trade-tabs .tab-buttons {
   display: flex;
   border-bottom: 2px solid var(--border-strong);
@@ -147,6 +179,7 @@
 }
 
 .trade-tabs .trade-tab-btn {
+  display: block;
   flex: 1;
   padding: 10px 14px;
   border: none;
@@ -165,14 +198,34 @@
   border-bottom-color: var(--accent-color);
 }
 
-/* ---------------- Content ---------------- */
 .trade-tab-content {
   padding: 10px 16px;
 }
 
 /* ============================================================
-   📊 TABLE STRUCTURE (ROWS)
+   📊 TABLE STRUCTURE
    ============================================================ */
+
+.items-head {
+  display: grid;
+  grid-template-columns:
+    120px   /* кнопка */
+    180px   /* объём / сумма */
+    90px    /* сторона */
+    120px   /* PnL */
+    260px   /* UUID и дата */
+    110px;  /* статус */
+  align-items: center;
+  column-gap: 16px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--panel-bg);
+}
+
 .items-list {
   display: flex;
   flex-direction: column;
@@ -180,7 +233,6 @@
   margin-top: 10px;
 }
 
-/* строгая выровненная таблица */
 .item-row {
   display: grid;
   grid-template-columns:
@@ -228,11 +280,12 @@
   text-overflow: ellipsis;
 }
 
-/* выравнивание по сторонам */
+/* --- выравнивание колонок --- */
 .item-row .col:nth-child(1),
 .item-row .col:nth-child(2) {
   text-align: left;
 }
+
 .item-row .col:nth-child(3),
 .item-row .col:nth-child(4),
 .item-row .col:nth-child(5),
@@ -240,7 +293,10 @@
   text-align: center;
 }
 
-/* ---------------- Side Badge ---------------- */
+/* ============================================================
+   🟢🔴 SIDE BADGE
+   ============================================================ */
+
 .side-badge {
   display: inline-flex;
   align-items: center;
@@ -264,20 +320,28 @@
   color: #ff5c5c;
 }
 
-/* ---------------- PnL ---------------- */
+/* ============================================================
+   💹 PNL
+   ============================================================ */
+
 .pnl {
   font-weight: 700;
   text-align: right;
   min-width: 80px;
 }
+
 .pnl.positive {
   color: #2ec77f;
 }
+
 .pnl.negative {
   color: #ff5c5c;
 }
 
-/* ---------------- Pager ---------------- */
+/* ============================================================
+   ⏩ PAGER
+   ============================================================ */
+
 .pager {
   display: flex;
   justify-content: center;
@@ -289,7 +353,10 @@
   text-transform: uppercase;
 }
 
-/* ---------------- Modal ---------------- */
+/* ============================================================
+   💬 MODAL
+   ============================================================ */
+
 .modal {
   display: none;
   position: fixed;
@@ -297,6 +364,7 @@
   background: rgba(0, 0, 0, 0.7);
   z-index: 999;
 }
+
 .modal.show {
   display: flex;
   align-items: center;
@@ -339,13 +407,17 @@
   border-radius: var(--radius-sm);
 }
 
-/* ---------------- Responsive ---------------- */
+/* ============================================================
+   📱 ADAPTIVE
+   ============================================================ */
+
 @media (max-width: 1000px) {
   .item-row {
     grid-template-columns: 1fr 1fr 1fr;
     row-gap: 6px;
   }
 }
+
 .trade-panel {
   display: none;
 }
@@ -353,32 +425,162 @@
 .trade-panel.active {
   display: block;
 }
-/* ---------------- Table Header ---------------- */
-.items-head {
-  display: grid;
-  grid-template-columns:
-    120px   /* кнопка */
-    180px   /* объём / сумма */
-    90px    /* сторона */
-    120px   /* PnL */
-    260px   /* UUID и дата */
-    110px;  /* статус */
-  align-items: center;
-  column-gap: 16px;
-  padding: 8px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-color);
-  background: var(--panel-bg);
-}
-.ws-dot.yellow {
-  background: #f0c94a;
-  animation: blink 1s infinite;
+/* ============================================================
+   💬 MODAL (устойчивая к длинным значениям + JSON highlight)
+   ============================================================ */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 999;
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+/* Диалоговое окно */
+.modal-dialog {
+  width: min(820px, 94vw);
+  background: var(--panel-bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: slideUp 0.3s ease forwards;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок */
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-color);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+.modal-head .close {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.modal-head .close:hover {
+  color: var(--accent-color);
+}
+
+/* Тело */
+.modal-body {
+  padding: 18px;
+  color: var(--text-color);
+  overflow-y: auto;
+}
+
+/* KV — таблица ключ/значение */
+.kv {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  row-gap: 10px;
+  column-gap: 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+
+.kv span {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.kv b {
+  color: var(--text-color);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* JSON-блок с подсветкой */
+.json-view {
+  padding: 12px 14px;
+  font-family: monospace;
+  font-size: 12px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  max-height: 360px;
+  overflow-y: auto;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+/* Подсветка JSON */
+.json-view .key {
+  color: #58a6ff;
+}
+
+.json-view .string {
+  color: #8ae234;
+}
+
+.json-view .number {
+  color: #f0c94a;
+}
+
+.json-view .boolean {
+  color: #ff8b60;
+}
+
+.json-view .null {
+  color: #999;
+  font-style: italic;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 600px) {
+  .modal-dialog {
+    width: 94vw;
+    max-height: 92vh;
+  }
+
+  .kv {
+    grid-template-columns: 1fr;
+  }
+
+  .kv span {
+    white-space: normal;
+  }
 }

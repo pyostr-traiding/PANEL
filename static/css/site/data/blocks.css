@@ -157,3 +157,74 @@
   border-radius: 4px;
   user-select: none;
 }
+
+
+/* ============================================================
+   🧭 ТАБЫ — PREMIUM EXCHANGE STYLE
+   ============================================================ */
+
+.tabs {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  box-shadow: var(--shadow-soft);
+  margin: 20px 0 30px;
+  overflow-x: auto;
+  scrollbar-width: none; /* скрыть скролл на мобилках */
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.tabs a:hover {
+  color: var(--text-color);
+  background: var(--accent-soft);
+}
+
+/* Активная вкладка */
+.tabs a.active {
+  color: #fff;
+  background: var(--accent-color);
+  box-shadow: 0 2px 6px rgba(36, 156, 255, 0.3);
+}
+
+.tabs a.active:hover {
+  background: var(--accent-hover);
+}
+
+/* Для адаптивности */
+@media (max-width: 600px) {
+  .tabs {
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .tabs a {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
