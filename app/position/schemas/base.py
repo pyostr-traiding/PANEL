@@ -50,5 +50,10 @@ class PositionSchema(BaseModel):
     price: str
     is_test: bool
 
+    status_title: Optional[str] = None
+
     created_at: Any
 
+class PositionFilterResponseSchema(BaseModel):
+    positions: list[PositionSchema]
+    count_db: int

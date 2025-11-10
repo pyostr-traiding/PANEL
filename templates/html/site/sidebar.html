@@ -21,19 +21,24 @@
       <i data-lucide="database" class="nav-icon"></i>
       <span class="nav-label">Данные</span>
     </a>
+
     <a href="{% url 'gpt_analiz' %}"
        class="nav-item {% if '/gpt/' in path %}active{% endif %}"
        title="Анализ">
       <i data-lucide="message-square-text" class="nav-icon"></i>
       <span class="nav-label">Анализ</span>
     </a>
-      <a href="{% url 'server' %}"
+  </nav>
+
+  <!-- 👇 Отдельный блок под сервер -->
+  <div class="sidebar__server">
+    <a href="{% url 'server' %}"
        class="nav-item {% if '/server/' in path %}active{% endif %}"
-       title="Анализ">
+       title="Сервер">
       <i data-lucide="router" class="nav-icon"></i>
       <span class="nav-label">Сервер</span>
     </a>
-  </nav>
+  </div>
 
   <div class="sidebar__bottom">
     <button id="theme-toggle" class="nav-item" title="Тема">
@@ -47,6 +52,7 @@
     </a>
   </div>
 </aside>
+
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>

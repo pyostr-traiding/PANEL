@@ -1,6 +1,6 @@
 import json
 from decimal import Decimal
-from typing import List, Union
+from typing import List, Union, Literal
 
 import django
 from django.db import transaction
@@ -9,7 +9,7 @@ import pika
 
 from app.order.models import OrderModel, OrderStatus
 from app.position.models import PositionModel, PositionStatus
-from app.position.schemas.base import CreatePositionSchema, PositionSchema
+from app.position.schemas.base import CreatePositionSchema, PositionSchema, PositionFilterResponseSchema
 from app.setting.models import SymbolModel
 from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
@@ -92,3 +92,41 @@ def get_list_open_position() -> Union[List[PositionSchema], response.BaseRespons
     if not positions_models:
         return response.NotFoundResponse(msg='Позиций не найдено')
     return [PositionSchema.model_validate(i) for i in positions_models]
+
+
+
+def filter_positions(
+        status: str = None,
+        side: Literal['buy', 'sell'] = None,
+        uuid: str = None,
+        limit: int = 1,
+        offset: int = 0,
+) -> Union[PositionFilterResponseSchema, response.BaseResponse]:
+    """"""
+
+    filters = {}
+    if status is not None:
+        filters["status"] = status
+    if side is not None:
+        filters["side"] = side
+    if uuid is not None:
+        filters["uuid"] = uuid
+
+    result = PositionModel.objects.filter(**filters)
+    count_positions = PositionModel.objects.count()
+
+    result = result[offset:offset + limit]
+    if not result:
+        return response.NotFoundResponse(
+            msg='Нечего не найдено'
+        )
+
+    positions = []
+    for i in result:
+        schema = PositionSchema.model_validate(i)
+        schema.status_title = i.get_status_display().upper()
+        positions.append(schema)
+    return PositionFilterResponseSchema(
+        positions=positions,
+        count_db=count_positions,
+    )

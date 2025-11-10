@@ -1,0 +1,33 @@
+/* == 2) Cards grid & common == */
+.card {
+  background:var(--panel-bg);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  padding:12px;
+  box-shadow:var(--shadow-soft);
+  transition:transform .08s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.card:hover { box-shadow:var(--shadow-strong); }
+
+.card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.card-val { font-size:22px; font-weight:800; margin:2px 0 8px; }
+.card-foot { color:var(--text-secondary); font-size:12px; }
+.card-bar { height:7px; background:var(--accent-soft); border-radius:999px; overflow:hidden; border:1px solid var(--border-color); }
+.card-bar>span { display:block; height:100%; width:0; background:var(--accent-color); transition:width .3s ease; }
+
+.pill { font-size:11px; padding:3px 6px; border-radius:999px; border:1px solid var(--border-color); background:var(--bg-color); }
+.pill-dot { display:inline-flex; align-items:center; gap:6px; }
+.pill-dot::before { content:""; display:inline-block; width:8px; height:8px; border-radius:50%; background:#999; }
+.pill-dot.green::before { background:#35c76f; }
+.pill-dot.yellow::before { background:#f0c94a; }
+.pill-dot.red::before { background:#f35a5a; }
+.pill.warn { background:rgba(255,197,59,.08); }
+.pill.ok { background:rgba(60,198,110,.08); }
+
+/* == 3) Container-card specifics == */
+.card .ct-name { font-weight:700; }
+.card .ct-image { font-family:monospace; color:var(--muted-color); font-size:12px; }
+.card .ct-status { margin-left:auto; }
+.card .ct-ports, .card .ct-id { font-family:monospace; font-size:12px; color:var(--muted-color); }
+.card .ct-row { display:flex; gap:8px; align-items:center; justify-content:space-between; margin-top:6px; }
+.card .ct-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }

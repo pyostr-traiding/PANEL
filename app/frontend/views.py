@@ -30,3 +30,9 @@ class GPTAnalizView(IndicatorBaseView):
 
 class ServerView(IndicatorBaseView):
     template_name = 'html/site/server/server.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['path'] = self.request.path
+        ctx["access_token"] = 'MY_STATIC_ACCESS_TOKEN_123'
+        return ctx

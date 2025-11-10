@@ -19,8 +19,9 @@ from app.users.api import router as router_users
 
 # Настройки
 from app.setting.routes.prompt import router as router_settings_prompt
+from app.setting.routes.exchange import router as router_settings_exchange
 
-# Настройки
+# Фронт
 from app.frontend.routes.gpt import router as router_chats_gpt
 
 
@@ -55,7 +56,8 @@ api_route.add_router('/order/', router_order_extremum)
 #####
 # Настройки
 api_route.add_router('/settings/', router_settings_prompt)
+api_route.add_router('/settings/', router_settings_exchange)
 
 #####
-# Настройки
+# Фронт
 api_route.add_router('/chats/', router_chats_gpt)

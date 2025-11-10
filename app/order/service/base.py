@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Literal
 
 import django
 from django.db import transaction
 
 from app.order.models import OrderModel, OrderStatus
-from app.order.schemas.base import CloseOrderSchema, OrderSchema
+from app.order.schemas.base import CloseOrderSchema, OrderSchema, OrderFilterResponseSchema
 from app.position.models import PositionModel, PositionStatus
 from app.position.schemas.status import ChangeStatusSchema
 from app.utils import response
@@ -137,3 +137,40 @@ def close_order(data: CloseOrderSchema) -> Union[OrderSchema, response.BaseRespo
     order_model.save(update_fields=['status', 'close_rate', 'close_at'])
 
     return OrderSchema.model_validate(order_model)
+
+
+def filter_order(
+        status: str = None,
+        side: Literal['buy', 'sell'] = None,
+        uuid: str = None,
+        limit: int = 1,
+        offset: int = 0,
+) -> Union[OrderFilterResponseSchema, response.BaseResponse]:
+    """"""
+
+    filters = {}
+    if status is not None:
+        filters["status"] = status
+    if side is not None:
+        filters["side"] = side
+    if uuid is not None:
+        filters["uuid"] = uuid
+
+    result = OrderModel.objects.filter(**filters)
+    count_orders = OrderModel.objects.count()
+    result = result[offset:offset + limit]
+    if not result:
+        return response.NotFoundResponse(
+            msg='Нечего не найдено'
+        )
+
+    orders = []
+    for i in result:
+        schema = OrderSchema.model_validate(i)
+        schema.status_title = i.get_status_display().upper()
+        orders.append(schema)
+
+    return OrderFilterResponseSchema(
+        orders=orders,
+        count_db=count_orders,
+    )

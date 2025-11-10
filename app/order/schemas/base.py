@@ -14,7 +14,7 @@ class OrderSchema(BaseModel):
     symbol_name: str = 'BTCUSDT'
     status: str
 
-    uuid: uuid.UUID
+    uuid: str
     category: Literal['spot', 'option']
     side: Literal['buy', 'sell']
     qty_tokens: str
@@ -27,6 +27,10 @@ class OrderSchema(BaseModel):
 
     created_at: Any  # обычно datetime, но сохраняем гибкость
 
+
+class OrderFilterResponseSchema(BaseModel):
+    orders: list[OrderSchema]
+    count_db: int
 
 # Значение экстремума — хранит само значение и время
 class OrderExtremumValueSchema(BaseModel):

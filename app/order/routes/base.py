@@ -1,11 +1,11 @@
-from typing import Union
+from typing import Union, Literal
 
 from django.http import HttpRequest
 
 from ninja import Router
 
 from app.order.schemas.base import CloseOrderSchema, OrderSchema
-from app.order.service.base import close_order, get_list_open_orders, get_order
+from app.order.service.base import close_order, get_list_open_orders, get_order, filter_order
 from app.utils import response
 
 # Роутер для эндпоинтов ордеров
@@ -62,6 +62,35 @@ def api_close_orders(
     * 404 — Ордер не найден
     """
     result = close_order(data=data)
+    if isinstance(result, response.BaseResponse):
+        return response.return_response(result)
+    return result
+
+
+@router.get(path='/filter')
+def api_filter_orders(
+        request: HttpRequest,
+        status: str = None,
+        side: Literal['buy', 'sell'] = None,
+        uuid: str = None,
+        limit: int = 1,
+        offset: int = 0,
+):
+    """
+    Отфильтровать ордера.
+
+    Статусы:
+    * 200 — Успешно
+    * 409 — Ордер уже закрыт
+    * 404 — Ордер не найден
+    """
+    result = filter_order(
+        status=status,
+        side=side,
+        uuid=uuid,
+        limit=limit,
+        offset=offset,
+    )
     if isinstance(result, response.BaseResponse):
         return response.return_response(result)
     return result

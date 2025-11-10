@@ -277,3 +277,21 @@
   fill: var(--icon-color);
   transition: color 0.25s ease, fill 0.25s ease, filter 0.25s ease;
 }
+
+/* ===== SERVER BUTTON (ниже меню, но выше темы) ===== */
+
+.sidebar__server {
+  padding: 6px;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.sidebar__server .nav-item {
+  justify-content: center;
+  padding: 8px;
+}

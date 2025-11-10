@@ -1,0 +1,15 @@
+/* == 4) Buttons / helpers == */
+.btn { border:1px solid var(--border-color); background:var(--panel-bg); padding:6px 10px; border-radius:8px; cursor:pointer; }
+.btn:hover { box-shadow:var(--shadow-soft); }
+.btn.primary { background:var(--accent-color); color:#fff; border-color:transparent; }
+.btn.warn { background:rgba(255,197,59,.15); }
+.btn.danger { background:rgba(255,90,90,.15); border-color:#f35a5a; }
+.btn.ghost { background:transparent; }
+.icon-btn { border:none; background:transparent; cursor:pointer; font-size:16px; color:var(--text-secondary); }
+
+.muted { color:var(--muted-color); font-size:12px; }
+.mono { font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+.empty { padding:14px; text-align:center; border:1px dashed var(--border-color); border-radius:10px; background:var(--panel-bg); }
+
+.srv-grid-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.grid-title { font-weight:700; }

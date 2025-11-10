@@ -1,0 +1,4 @@
+/* == 7) Skeletons == */
+.skeleton { position:relative; overflow:hidden; }
+.skeleton::after { content:""; position:absolute; inset:0; background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.06) 40%,transparent 80%); animation:sh 1.3s infinite; }
+@keyframes sh { to { transform:translateX(100%); } }

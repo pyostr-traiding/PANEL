@@ -1,7 +1,7 @@
 """
 Базовые методы GET/POST
 """
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 from django.db.models import BigIntegerField
 from django.db.models.functions import Cast
@@ -15,7 +15,7 @@ from app.position.schemas.base import CreatePositionSchema
 from app.position.service.base import (
     create_position,
     get_list_open_position,
-    get_position,
+    get_position, filter_positions,
 )
 from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
@@ -168,3 +168,33 @@ def api_get_positions(
         for p in qs.order_by('-kline_ms_int')[:5000]  # safety-cap
     ]
     return {"results": data}
+
+
+
+@router.get(path='/filter')
+def api_filter_positions(
+        request: HttpRequest,
+        status: str = None,
+        side: Literal['buy', 'sell'] = None,
+        uuid: str = None,
+        limit: int = 1,
+        offset: int = 0,
+):
+    """
+    Отфильтровать позиции.
+
+    Статусы:
+    * 200 — Успешно
+    * 409 — Ордер уже закрыт
+    * 404 — Ордер не найден
+    """
+    result = filter_positions(
+        status=status,
+        side=side,
+        uuid=uuid,
+        limit=limit,
+        offset=offset,
+    )
+    if isinstance(result, response.BaseResponse):
+        return response.return_response(result)
+    return result

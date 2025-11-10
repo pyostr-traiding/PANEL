@@ -1,0 +1,111 @@
+{% load static %}
+
+<div class="trade-block">
+  <div class="trade-header">
+    <div class="trade-title">Сделки и история</div>
+
+    <div class="ws-status-container">
+      <div class="ws-status-item">
+        <span class="ws-dot" id="ws-status-trade"></span>
+        <span id="ws-status-trade-text">Отключено</span>
+      </div>
+      <div class="ws-status-item">
+        <span class="ws-dot" id="ws-status-kline"></span>
+        <span>ChartUpdate</span>
+        <small id="ws-kline-last-update" class="ws-time">—</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="trade-topbar">
+    <div class="live-price">
+      <span class="label">Текущая цена</span>
+      <span id="live-price" class="value">—</span>
+    </div>
+
+    <div class="fees">
+      <span class="label">Комиссии Bybit</span>
+      <span id="fees-value" class="value">—</span>
+    </div>
+
+    <div class="search-filter">
+      <input id="filter-uuid" type="text" placeholder="UUID..." />
+      <select id="filter-side">
+        <option value="">Сторона: все</option>
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+      <select id="filter-status">
+        <option value="">Статус: все</option>
+        <option value="created">created</option>
+        <option value="completed">completed</option>
+        <option value="canceled">canceled</option>
+      </select>
+      <button id="apply-filter" class="btn btn-primary">Применить</button>
+      <button id="reset-filter" class="btn">Сброс</button>
+    </div>
+  </div>
+
+  <div class="trade-tabs">
+    <div class="tab-buttons">
+      <button class="trade-tab-btn" data-tab="positions">Позиции</button>
+      <button class="trade-tab-btn active" data-tab="orders">Ордеры</button>
+    </div>
+
+    <div id="new-flag" class="new-flag" hidden>
+      <div id="new-flag-text">Появились новые записи</div>
+      <button id="new-flag-show" class="btn-link">Перейти к первым</button>
+    </div>
+
+    <div class="trade-tab-content">
+      <div class="trade-panel" id="tab-positions">
+        <div id="positions-list" class="items-list skeleton"></div>
+        <div class="pager">
+          <button class="btn" id="pos-prev" disabled>« Назад</button>
+          <div class="pager-info">
+            <span id="pos-page">1</span> / <span id="pos-pages">1</span>
+            <span class="muted">(<span id="pos-total">0</span>)</span>
+          </div>
+          <button class="btn" id="pos-next" disabled>Вперёд »</button>
+        </div>
+      </div>
+
+      <div class="trade-panel active" id="tab-orders">
+        <div id="orders-list" class="items-list skeleton"></div>
+        <div class="pager">
+          <button class="btn" id="ord-prev" disabled>« Назад</button>
+          <div class="pager-info">
+            <span id="ord-page">1</span> / <span id="ord-pages">1</span>
+            <span class="muted">(<span id="ord-total">0</span>)</span>
+          </div>
+          <button class="btn" id="ord-next" disabled>Вперёд »</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка деталей -->
+<div id="trade-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-head">
+      <div class="modal-title">Детали</div>
+      <button class="close" id="modal-close" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="kv">
+        <div><span>UUID:</span> <b id="md-uuid">—</b></div>
+        <div><span>Тип:</span> <b id="md-type">—</b></div>
+        <div><span>Символ:</span> <b id="md-symbol">—</b></div>
+        <div><span>Сторона:</span> <b id="md-side">—</b></div>
+        <div><span>Статус:</span> <b id="md-status">—</b></div>
+        <div><span>Кол-во:</span> <b id="md-qty">—</b></div>
+        <div><span>Цена:</span> <b id="md-price">—</b></div>
+        <div><span>Создано:</span> <b id="md-created">—</b></div>
+      </div>
+      <pre id="md-json" class="json-view"></pre>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="{% static 'js/site/chart/trade.js' %}"></script>

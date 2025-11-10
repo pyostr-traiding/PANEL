@@ -8,8 +8,9 @@
 {% endblock %}
 
 {% block content %}
+<div id="toast-container" class="toast-container"></div>
 
-  <!-- Верхняя панель -->
+  <!-- ░░░ Верхняя панель: заголовок + индикатор сокета ░░░ -->
   <div class="srv-header">
     <div class="srv-title">
       <span class="srv-title-text">Рабочие сервисы</span>
@@ -21,10 +22,10 @@
     </div>
   </div>
 
-  <!-- Плитки ресурсов системы -->
+  <!-- ░░░ Карточки системных ресурсов ░░░ -->
   <section class="srv-section">
     <div class="srv-cards" id="system-cards">
-      <!-- Рендерится из JS -->
+      <!-- Заполняется из JS -->
       <div class="card skeleton">
         <div class="card-top">
           <span>CPU</span>
@@ -57,7 +58,7 @@
     </div>
   </section>
 
-  <!-- Плитки контейнеров -->
+  <!-- ░░░ Плитки контейнеров ░░░ -->
   <section class="srv-section">
     <div class="srv-grid-head">
       <div class="grid-title">Контейнеры</div>
@@ -67,12 +68,32 @@
       </div>
     </div>
     <div id="containers-grid" class="srv-cards srv-cards--containers">
-      <!-- Рендерится из JS -->
+      <!-- Заполняется из JS -->
       <div class="empty muted">Загрузка списка контейнеров…</div>
     </div>
   </section>
 
   {% include 'html/site/server/modals.html' %}
 
-  <script src="{% static 'js/site/server/server.js' %}"></script>
+<script>
+  (function() {
+    const token = "{{ access_token|escapejs }}";
+    const saved = localStorage.getItem('access_token');
+
+    // если токен изменился — обновляем
+    if (token && token !== saved) {
+      localStorage.setItem('access_token', token);
+      console.log("🔑 Access token обновлён в localStorage");
+    }
+  })();
+</script>
+  <!-- ░░░ Скрипты (модули) ░░░ -->
+  <script src="{% static 'js/site/server/utils.js' %}"></script>
+  <script src="{% static 'js/site/server/state.js' %}"></script>
+  <script src="{% static 'js/site/server/ui.js' %}"></script>
+  <script src="{% static 'js/site/server/render.js' %}"></script>
+  <script src="{% static 'js/site/server/api.js' %}"></script>
+  <script src="{% static 'js/site/server/main.js' %}"></script>
+    <script src="{% static 'js/site/server/toast.js' %}"></script>
+
 {% endblock %}
