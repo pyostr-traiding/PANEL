@@ -7,19 +7,15 @@ import { initPredictIndicators } from "./indicators/indicator_predict.js";
 
 (async () => {
   const ctx = await initBaseChart();
+  window.chartCtx = ctx;                      // 💾 делаем глобально доступным
+  window.dispatchEvent(new CustomEvent('chartReady', { detail: ctx })); // 📢 сигнал
 
   ctx.connectSocket = () => initSocket(ctx);
   ctx.ws = null;
 
-  // UI можно инициализировать до сокета
   initUIControls(ctx);
   initPositionsModule(ctx);
-
-  // 💡 подключаем сокет ДО info panel
   await initSocket(ctx);
-
-  // теперь можно безопасно обращаться к subscribeToCandle
   initInfoPanel(ctx);
   await initPredictIndicators(ctx);
-
 })();

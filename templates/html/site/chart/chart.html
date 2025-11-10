@@ -32,12 +32,5 @@
   {% include 'html/site/chart/blocks/modal_settings.html' %}
   {% include 'html/site/chart/blocks/scripts.html' %}
 
-    <!-- Подключаем все нужные модули ядра графика -->
-<script type="module">
-  import { initBaseChart } from '{% static "js/site/chart/core/chart_base.js" %}';
-  import { initSocket as initChartWS } from '{% static "js/site/chart/core/chart_ws.js" %}';
-  import '{% static "js/site/chart/core/chart_utils.js" %}';
-  import '{% static "js/site/chart/trade.js" %}';
-</script>
 
 {% endblock %}

@@ -135,6 +135,13 @@ function switchTab(tab) {
   const panels = qsa('.trade-panel');
   btns.forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
   panels.forEach((p) => p.classList.toggle('active', p.id === `tab-${tab}`));
+
+  // перерисовываем содержимое при каждом переключении
+  if (tab === 'orders') {
+    renderList('orders', state.ord.list);
+  } else if (tab === 'positions') {
+    renderList('positions', state.pos.list);
+  }
 }
 
 function bindTabs() {
@@ -166,20 +173,41 @@ function bindModal() {
   qs('#trade-modal').onclick = (e) => { if (e.target === qs('#trade-modal')) qs('#trade-modal').classList.remove('show'); };
 }
 
-function connectTradeWS() {
+function connectTradeWS(retryCount = 0) {
+  const RETRY_DELAY = Math.min(5000, 1000 * (retryCount + 1)); // плавное увеличение
   setTradeWSStatus('yellow', 'Подключение...');
   const ws = new WebSocket(WS_TRADE_URL);
-  ws.onopen = () => setTradeWSStatus('green', 'Подключено');
-  ws.onclose = ws.onerror = () => setTradeWSStatus('red', 'Отключено');
+
+  ws.onopen = () => {
+    setTradeWSStatus('green', 'Подключено');
+    state.wsTrade = ws;
+    console.log('[WS] Подключено');
+  };
+
+  ws.onclose = () => {
+    setTradeWSStatus('red', 'Отключено');
+    console.warn('[WS] Соединение закрыто, пробуем переподключиться...');
+    setTimeout(() => connectTradeWS(retryCount + 1), RETRY_DELAY);
+  };
+
+  ws.onerror = (e) => {
+    console.error('[WS] Ошибка сокета:', e);
+    ws.close(); // принудительно вызвать onclose
+  };
+
   ws.onmessage = (e) => {
     try {
       const msg = JSON.parse(e.data);
       if (msg.method === 'order_update' && msg.data) handleIncoming('orders', msg.data);
       if (msg.method === 'position_update' && msg.data) handleIncoming('positions', msg.data);
-    } catch (err) { console.error('WS parse error:', err); }
+    } catch (err) {
+      console.error('WS parse error:', err);
+    }
   };
+
   state.wsTrade = ws;
 }
+
 
 function handleIncoming(kind, item) {
   const list = kind === 'orders' ? state.ord.list : state.pos.list;
@@ -190,31 +218,58 @@ function handleIncoming(kind, item) {
 }
 
 async function attachChartPrice() {
-  const ctx = await initBaseChart();
-  await initChartWS(ctx);
+  // Берём существующий контекст графика, созданный в chart.js
+  const ctx = window.chartCtx;
+  if (!ctx) {
+    console.warn('[TRADE] chartCtx не найден, ждём загрузки графика...');
+    // немного подождём, если график создаётся чуть позже
+    await new Promise(r => setTimeout(r, 1000));
+    if (!window.chartCtx) {
+      console.error('[TRADE] Не удалось получить контекст графика');
+      return;
+    }
+  }
+
+  const chartCtx = window.chartCtx;
+
   const setLive = (close) => {
     state.price = Number(close);
     qs('#live-price').textContent = fmtUSDT(state.price, 2);
     if (state.activeTab === 'orders') renderList('orders', state.ord.list);
     if (state.activeTab === 'positions') renderList('positions', state.pos.list);
   };
-  if (ctx?.allCandles?.length) {
-    const last = ctx.allCandles.at(-1);
+
+  // Если есть свечи — сразу показываем последнюю цену
+  if (chartCtx?.allCandles?.length) {
+    const last = chartCtx.allCandles.at(-1);
     if (last?.close) setLive(last.close);
   }
-  if (ctx.subscribeToCandle) ctx.subscribeToCandle((c) => c?.close && setLive(c.close));
+
+  // Подписываемся на обновления свечей
+  if (chartCtx.subscribeToCandle) {
+    chartCtx.subscribeToCandle((c) => c?.close && setLive(c.close));
+  }
 }
+
+
 
 async function bootstrap() {
   bindTabs();
   bindModal();
-  bindPager(); // ✅ вот это
+  bindPager();
+  bindFilters(); // 👈 вот сюда
   await loadExchangeSettings();
   await loadOrders();
   switchTab('orders');
   connectTradeWS();
-  attachChartPrice();
+
+  if (window.chartCtx) {
+    attachChartPrice();
+  } else {
+    window.addEventListener('chartReady', () => attachChartPrice(), { once: true });
+  }
 }
+
 function updatePager(kind) {
   const obj = kind === 'orders' ? state.ord : state.pos;
   const page = Math.floor(obj.offset / obj.limit) + 1;
@@ -246,6 +301,39 @@ function bindPager() {
   // позиции
   qs('#pos-prev').onclick = () => goPage('positions', -1);
   qs('#pos-next').onclick = () => goPage('positions', 1);
+}
+function bindFilters() {
+  const uuidInput = qs('#filter-uuid');
+  const sideSelect = qs('#filter-side');
+  const statusSelect = qs('#filter-status');
+  const applyBtn = qs('#apply-filter');
+  const resetBtn = qs('#reset-filter');
+
+  applyBtn.onclick = async () => {
+    state.filters.uuid = uuidInput.value.trim();
+    state.filters.side = sideSelect.value;
+    state.filters.status = statusSelect.value;
+
+    // сбрасываем пагинацию
+    state.pos.offset = 0;
+    state.ord.offset = 0;
+
+    if (state.activeTab === 'orders') await loadOrders();
+    if (state.activeTab === 'positions') await loadPositions();
+  };
+
+  resetBtn.onclick = async () => {
+    uuidInput.value = '';
+    sideSelect.value = '';
+    statusSelect.value = '';
+
+    state.filters = { status: '', side: '', uuid: '' };
+    state.pos.offset = 0;
+    state.ord.offset = 0;
+
+    if (state.activeTab === 'orders') await loadOrders();
+    if (state.activeTab === 'positions') await loadPositions();
+  };
 }
 
 window.addEventListener('load', bootstrap);

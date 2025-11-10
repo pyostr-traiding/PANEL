@@ -9,11 +9,7 @@
         <span class="ws-dot" id="ws-status-trade"></span>
         <span id="ws-status-trade-text">Отключено</span>
       </div>
-      <div class="ws-status-item">
-        <span class="ws-dot" id="ws-status-kline"></span>
-        <span>ChartUpdate</span>
-        <small id="ws-kline-last-update" class="ws-time">—</small>
-      </div>
+
     </div>
   </div>
 
@@ -24,22 +20,23 @@
     </div>
 
     <div class="fees">
-      <span class="label">Комиссии Bybit</span>
+      <span class="label">Комиссии</span>
       <span id="fees-value" class="value">—</span>
     </div>
 
     <div class="search-filter">
-      <input id="filter-uuid" type="text" placeholder="UUID..." />
+      <input id="filter-uuid" type="text" placeholder="UUID" />
       <select id="filter-side">
         <option value="">Сторона: все</option>
-        <option value="buy">Buy</option>
-        <option value="sell">Sell</option>
+        <option value="buy">Лонг</option>
+        <option value="sell">Шорт</option>
       </select>
       <select id="filter-status">
         <option value="">Статус: все</option>
-        <option value="created">created</option>
-        <option value="completed">completed</option>
-        <option value="canceled">canceled</option>
+        <option value="created">Создано</option>
+        <option value="monitoring">Мониторинг</option>
+        <option value="completed">Завершено</option>
+        <option value="canceled">Отменено</option>
       </select>
       <button id="apply-filter" class="btn btn-primary">Применить</button>
       <button id="reset-filter" class="btn">Сброс</button>
@@ -52,14 +49,17 @@
       <button class="trade-tab-btn active" data-tab="orders">Ордеры</button>
     </div>
 
-    <div id="new-flag" class="new-flag" hidden>
-      <div id="new-flag-text">Появились новые записи</div>
-      <button id="new-flag-show" class="btn-link">Перейти к первым</button>
-    </div>
-
     <div class="trade-tab-content">
       <div class="trade-panel" id="tab-positions">
-        <div id="positions-list" class="items-list skeleton"></div>
+          <div class="items-head">
+            <div class="col">Подробнее</div>
+            <div class="col">Объём / Сумма</div>
+            <div class="col">Сторона</div>
+            <div class="col">PnL</div>
+            <div class="col">UUID / Дата</div>
+            <div class="col">Статус</div>
+          </div>
+        <div id="positions-list" class="items-list"></div>
         <div class="pager">
           <button class="btn" id="pos-prev" disabled>« Назад</button>
           <div class="pager-info">
@@ -71,7 +71,15 @@
       </div>
 
       <div class="trade-panel active" id="tab-orders">
-        <div id="orders-list" class="items-list skeleton"></div>
+          <div class="items-head">
+            <div class="col">Подробнее</div>
+            <div class="col">Объём / Сумма</div>
+            <div class="col">Сторона</div>
+            <div class="col">PnL</div>
+            <div class="col">UUID / Дата</div>
+            <div class="col">Статус</div>
+          </div>
+        <div id="orders-list" class="items-list"></div>
         <div class="pager">
           <button class="btn" id="ord-prev" disabled>« Назад</button>
           <div class="pager-info">
@@ -84,6 +92,7 @@
     </div>
   </div>
 </div>
+
 <!-- Модалка деталей -->
 <div id="trade-modal" class="modal">
   <div class="modal-dialog">

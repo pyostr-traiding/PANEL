@@ -22,7 +22,7 @@ class OrderSchema(BaseModel):
     status_title: Optional[str] = None
 
     accumulated_funding: Decimal
-    target_rate: Decimal
+    target_rate: Optional[Decimal] = None
     close_rate: Optional[Decimal] = None
 
     created_at: Any  # обычно datetime, но сохраняем гибкость

@@ -2,14 +2,14 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from app.order.models import OrderModel
 from app.order.schemas.base import OrderSchema
 
 
-@receiver(pre_save, sender=OrderModel)
+@receiver(post_save, sender=OrderModel)
 def change_order_push_socket(sender, instance: OrderModel, **kwargs):
     """
     Отправка уведомления всем клиентам, когда ордер изменяется.

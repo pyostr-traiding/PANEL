@@ -139,6 +139,8 @@ def close_order(data: CloseOrderSchema) -> Union[OrderSchema, response.BaseRespo
     return OrderSchema.model_validate(order_model)
 
 
+from django.db.models import Case, When, Value, IntegerField
+
 def filter_order(
         status: str = None,
         side: Literal['buy', 'sell'] = None,
@@ -146,8 +148,6 @@ def filter_order(
         limit: int = 1,
         offset: int = 0,
 ) -> Union[OrderFilterResponseSchema, response.BaseResponse]:
-    """"""
-
     filters = {}
     if status is not None:
         filters["status"] = status
@@ -156,13 +156,23 @@ def filter_order(
     if uuid is not None:
         filters["uuid"] = uuid
 
+    # Фильтруем базовый queryset
     result = OrderModel.objects.filter(**filters)
+
+    # Сортировка: сначала created/monitoring, потом остальные, внутри — по убыванию даты создания
+    result = result.annotate(
+        status_order=Case(
+            When(status__in=['created', 'monitoring'], then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order', '-created_at')  # предполагается, что есть поле created_at
+
     count_orders = OrderModel.objects.count()
     result = result[offset:offset + limit]
+
     if not result:
-        return response.NotFoundResponse(
-            msg='Нечего не найдено'
-        )
+        return response.NotFoundResponse(msg='Нечего не найдено')
 
     orders = []
     for i in result:
