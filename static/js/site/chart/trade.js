@@ -173,41 +173,20 @@ function bindModal() {
   qs('#trade-modal').onclick = (e) => { if (e.target === qs('#trade-modal')) qs('#trade-modal').classList.remove('show'); };
 }
 
-function connectTradeWS(retryCount = 0) {
-  const RETRY_DELAY = Math.min(5000, 1000 * (retryCount + 1)); // плавное увеличение
+function connectTradeWS() {
   setTradeWSStatus('yellow', 'Подключение...');
   const ws = new WebSocket(WS_TRADE_URL);
-
-  ws.onopen = () => {
-    setTradeWSStatus('green', 'Подключено');
-    state.wsTrade = ws;
-    console.log('[WS] Подключено');
-  };
-
-  ws.onclose = () => {
-    setTradeWSStatus('red', 'Отключено');
-    console.warn('[WS] Соединение закрыто, пробуем переподключиться...');
-    setTimeout(() => connectTradeWS(retryCount + 1), RETRY_DELAY);
-  };
-
-  ws.onerror = (e) => {
-    console.error('[WS] Ошибка сокета:', e);
-    ws.close(); // принудительно вызвать onclose
-  };
-
+  ws.onopen = () => setTradeWSStatus('green', 'Подключено');
+  ws.onclose = ws.onerror = () => setTradeWSStatus('red', 'Отключено');
   ws.onmessage = (e) => {
     try {
       const msg = JSON.parse(e.data);
       if (msg.method === 'order_update' && msg.data) handleIncoming('orders', msg.data);
       if (msg.method === 'position_update' && msg.data) handleIncoming('positions', msg.data);
-    } catch (err) {
-      console.error('WS parse error:', err);
-    }
+    } catch (err) { console.error('WS parse error:', err); }
   };
-
   state.wsTrade = ws;
 }
-
 
 function handleIncoming(kind, item) {
   const list = kind === 'orders' ? state.ord.list : state.pos.list;
@@ -257,19 +236,18 @@ async function bootstrap() {
   bindTabs();
   bindModal();
   bindPager();
-  bindFilters(); // 👈 вот сюда
   await loadExchangeSettings();
   await loadOrders();
   switchTab('orders');
   connectTradeWS();
 
+  // ⏳ ждём, пока график будет готов
   if (window.chartCtx) {
     attachChartPrice();
   } else {
     window.addEventListener('chartReady', () => attachChartPrice(), { once: true });
   }
 }
-
 function updatePager(kind) {
   const obj = kind === 'orders' ? state.ord : state.pos;
   const page = Math.floor(obj.offset / obj.limit) + 1;
@@ -301,39 +279,6 @@ function bindPager() {
   // позиции
   qs('#pos-prev').onclick = () => goPage('positions', -1);
   qs('#pos-next').onclick = () => goPage('positions', 1);
-}
-function bindFilters() {
-  const uuidInput = qs('#filter-uuid');
-  const sideSelect = qs('#filter-side');
-  const statusSelect = qs('#filter-status');
-  const applyBtn = qs('#apply-filter');
-  const resetBtn = qs('#reset-filter');
-
-  applyBtn.onclick = async () => {
-    state.filters.uuid = uuidInput.value.trim();
-    state.filters.side = sideSelect.value;
-    state.filters.status = statusSelect.value;
-
-    // сбрасываем пагинацию
-    state.pos.offset = 0;
-    state.ord.offset = 0;
-
-    if (state.activeTab === 'orders') await loadOrders();
-    if (state.activeTab === 'positions') await loadPositions();
-  };
-
-  resetBtn.onclick = async () => {
-    uuidInput.value = '';
-    sideSelect.value = '';
-    statusSelect.value = '';
-
-    state.filters = { status: '', side: '', uuid: '' };
-    state.pos.offset = 0;
-    state.ord.offset = 0;
-
-    if (state.activeTab === 'orders') await loadOrders();
-    if (state.activeTab === 'positions') await loadPositions();
-  };
 }
 
 window.addEventListener('load', bootstrap);

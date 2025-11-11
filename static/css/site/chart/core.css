@@ -63,6 +63,7 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
   font-size: 14px;
   letter-spacing: 0.1px;
+
 }
 
 button,
@@ -95,4 +96,45 @@ a:hover {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+/* ============================================================
+   ⚙️ ФИКС ДЛЯ SCROLLBAR SHIFT
+   ============================================================ */
+
+/* 1. Резервируем место под скроллбар */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* 2. Отступ от правого края */
+body {
+  margin-right: 5px;
+}
+
+/* 3. Минимальный кастомный скроллбар */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast);
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-color);
+  opacity: 0.9;
+}
+
+/* Для Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
 }

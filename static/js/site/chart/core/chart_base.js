@@ -3,13 +3,11 @@ import { intervalToMs } from './chart_utils.js';
 export async function initBaseChart() {
   const chartEl = document.getElementById('chart-container');
 
-  // 🔥 Берём цвета из CSS-переменных
   const getColor = (name, fallback) =>
     getComputedStyle(document.documentElement)
       .getPropertyValue(name)
       .trim() || fallback;
 
-  // === Инициализация графика ===
   const chart = LightweightCharts.createChart(chartEl, {
     layout: {
       background: { color: getColor('--panel-bg', '#ffffff') },
@@ -31,7 +29,6 @@ export async function initBaseChart() {
 
   chart.timeScale().scrollToRealTime();
 
-  // === Создаём серию свечей ===
   const candleSeries = chart.addCandlestickSeries({
     upColor: '#26a69a',
     borderUpColor: '#26a69a',
@@ -41,7 +38,15 @@ export async function initBaseChart() {
     wickDownColor: '#ef5350',
   });
 
-  // === Реакция на смену темы ===
+  // 🔥 Добавляем адаптивность
+  const resizeChart = () => {
+    const { width, height } = chartEl.getBoundingClientRect();
+    chart.resize(width, height);
+  };
+
+  window.addEventListener('resize', resizeChart);
+  resizeChart(); // сразу вызвать при инициализации
+
   window.addEventListener('themeChanged', () => {
     chart.applyOptions({
       layout: {
@@ -57,7 +62,6 @@ export async function initBaseChart() {
     });
   });
 
-  // === Состояние ===
   let currentSymbol = 'BTCUSDT';
   let currentInterval = '1';
   let earliestTime = null;
@@ -65,7 +69,6 @@ export async function initBaseChart() {
   let noMoreHistory = false;
   let isLoadingMore = false;
 
-  // === Индикатор загрузки ===
   const spinner = document.createElement('div');
   spinner.textContent = 'Загрузка...';
   Object.assign(spinner.style, {
@@ -85,7 +88,6 @@ export async function initBaseChart() {
 
   const showSpinner = (v) => (spinner.style.display = v ? 'block' : 'none');
 
-  // === Загрузка начальной истории ===
   async function loadHistory(symbol = currentSymbol, interval = currentInterval) {
     showSpinner(true);
     const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=1000`;
@@ -116,7 +118,6 @@ export async function initBaseChart() {
     return candles;
   }
 
-  // === Подгрузка более старой истории ===
   async function loadMoreHistory() {
     if (isLoadingMore || noMoreHistory || !earliestTime) return;
     isLoadingMore = true;
@@ -156,7 +157,6 @@ export async function initBaseChart() {
     showSpinner(false);
   }
 
-  // === Получение диапазона видимых свечей ===
   function getVisibleRange(range) {
     if (!range) return { startMs: 0, endMs: 0 };
     const vis = candleSeries.barsInLogicalRange(range);
@@ -167,24 +167,20 @@ export async function initBaseChart() {
     };
   }
 
-  // === Автоматическая подгрузка истории при прокрутке ===
   chart.timeScale().subscribeVisibleTimeRangeChange(async (range) => {
     if (!range || !allCandles.length) return;
 
     const firstVisibleTime = range.from;
     const firstCandleTime = allCandles[0].time;
 
-    // если пользователь дошёл почти до начала истории
     if (firstVisibleTime <= firstCandleTime + 1) {
       console.log('[CHART] Догружаем старую историю...');
       await loadMoreHistory();
     }
   });
 
-  // === Первая загрузка ===
   await loadHistory();
 
-  // === Возврат контекста ===
   return {
     chart,
     candleSeries,
