@@ -23,16 +23,17 @@
     streamLogs: (id) => wsSend({ action: 'stream_logs', data: { id } }),
     stopStream: () => wsSend({ action: 'stop_stream' }),
     subscribe: (interval=1) => wsSend({ action: 'subscribe', data: { interval } }),
+    restartAll: () => wsSend({ action: 'restart_sequence' }),
   };
 
   function connect() {
     clearTimeout(state.reconnectTimer);
-    setWs('yellow','Подключение…');
+    setWs('yellow', 'Подключение…');
     try { state.ws?.close(); } catch {}
     state.ws = new WebSocket(WS_URL);
 
     state.ws.onopen = () => {
-      setWs('green','Подключено');
+      setWs('green', 'Подключено');
       api.list();
       api.system();
     };
@@ -81,15 +82,29 @@
         if (errId) setLoading(errId, false);
         setModalLoading(false);
       }
+
+      if (pkt.type === 'seq_step') {
+        els.seqPre.textContent += pkt.data + "\n";
+        els.seqPre.scrollTop = els.seqPre.scrollHeight;
+        return;
+      }
+
+      if (pkt.type === 'seq_done') {
+        toast('Перезагрузка завершена');
+        els.seqPre.textContent += "\n=== Готово ===\n";
+        els.seqRun.disabled = false;
+        api.list();
+        return;
+      }
     };
 
     state.ws.onclose = () => {
-      setWs('red','Нет соединения');
+      setWs('red', 'Нет соединения');
       state.reconnectTimer = setTimeout(connect, state.RECONNECT_MS);
     };
 
     state.ws.onerror = () => {
-      setWs('red','Ошибка');
+      setWs('red', 'Ошибка');
       try { state.ws.close(); } catch {}
     };
   }

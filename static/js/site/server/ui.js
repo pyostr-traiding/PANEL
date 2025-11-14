@@ -12,10 +12,12 @@
     grid: $('#containers-grid'),
     btnRefresh: $('#btn-refresh'),
     cntLabel: $('#containers-count'),
+    btnRestartAll: $('#btn-restart-all'),
 
     modalContainer: $('#modal-container'),
     modalLogs: $('#modal-logs'),
     modalStream: $('#modal-stream'),
+    modalSeq: $('#modal-seq'),
 
     mc: {
       name: $('#mc-name'),
@@ -34,6 +36,7 @@
         stream: $('#act-stream'),
       }
     },
+
     ml: {
       title: $('#modal-logs-title'),
       containerPill: $('#ml-container'),
@@ -42,6 +45,7 @@
       status: $('#ml-status'),
       pre: $('#logs-pre'),
     },
+
     ms: {
       title: $('#modal-stream-title'),
       containerPill: $('#ms-container'),
@@ -50,6 +54,9 @@
       stop: $('#ms-stop'),
       clear: $('#ms-clear'),
     },
+
+    seqPre: $('#seq-pre'),
+    seqRun: $('#seq-run'),
   };
 
   function setWs(color, text) {

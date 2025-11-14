@@ -1,24 +1,35 @@
-import { debounce, alignClientMsToIntervalBarStart } from '../core/chart_utils.js';
+import { debounce, intervalToMs } from '../core/chart_utils.js';
 
 export function initPositionsModule(ctx) {
-  const { chart, candleSeries, currentSymbol, currentInterval, getVisibleRange } = ctx;
+  const { chart, candleSeries } = ctx;
   const checkbox = document.getElementById('show-positions');
+
   let markers = [];
   let markersByBarTime = new Map();
 
-  // === создаем всплывающее окно ===
+  // === Tooltip ===
   const tooltip = document.createElement('div');
-  tooltip.style.position = 'absolute';
-  tooltip.style.display = 'none';
-  tooltip.style.background = 'rgba(25, 25, 25, 0.95)';
-  tooltip.style.color = '#fff';
-  tooltip.style.padding = '8px 10px';
-  tooltip.style.borderRadius = '8px';
-  tooltip.style.fontSize = '12px';
-  tooltip.style.pointerEvents = 'none';
-  tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.5)';
-  tooltip.style.zIndex = 1000;
+  Object.assign(tooltip.style, {
+    position: 'absolute',
+    display: 'none',
+    background: 'rgba(25,25,25,0.95)',
+    color: '#fff',
+    padding: '8px 10px',
+    borderRadius: '8px',
+    fontSize: '12px',
+    pointerEvents: 'none',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+    zIndex: 1000,
+  });
   document.body.appendChild(tooltip);
+
+  // Находим существующую свечу для позиции
+  function findCandleForPosition(klineMs) {
+    const tf = intervalToMs(ctx.currentInterval);
+    const candleStart = klineMs - (klineMs % tf);
+    const barSec = Math.floor(candleStart / 1000);
+    return ctx.allCandles.find(c => c.time === barSec) || null;
+  }
 
   async function loadPositions(startMs, endMs) {
     if (!checkbox.checked) {
@@ -26,43 +37,53 @@ export function initPositionsModule(ctx) {
       return;
     }
 
-    const url = `/api/position/search?range.start_ms=${startMs}&range.end_ms=${endMs}&range.symbol=${currentSymbol}`;
+    const url = `/api/position/search?range.start_ms=${startMs}&range.end_ms=${endMs}&range.symbol=${ctx.currentSymbol}`;
     const res = await fetch(url);
     const json = await res.json();
     const data = json.results || [];
 
     markersByBarTime.clear();
+    markers = [];
 
-    markers = data.map((p) => {
-      const barMs = alignClientMsToIntervalBarStart(Number(p.kline_ms), currentInterval);
-      const barSec = Math.floor(barMs / 1000);
+    for (const p of data) {
+      const candle = findCandleForPosition(Number(p.kline_ms));
+      if (!candle) continue;
+
+      const barSec = candle.time;
+
       if (!markersByBarTime.has(barSec)) markersByBarTime.set(barSec, []);
       markersByBarTime.get(barSec).push(p);
-      return {
+
+      markers.push({
         time: barSec,
         position: 'aboveBar',
         color: p.side === 'buy' ? '#4CAF50' : '#F44336',
         shape: p.side === 'buy' ? 'arrowUp' : 'arrowDown',
         text: p.side === 'buy' ? 'BUY' : 'SELL',
-      };
-    });
+      });
+    }
 
     candleSeries.setMarkers(markers);
   }
 
   const debouncedLoad = debounce(loadPositions, 250);
 
-  chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
-    const vis = getVisibleRange(range);
-    debouncedLoad(vis.startMs, vis.endMs);
+  // === ГЛАВНОЕ ИСПРАВЛЕНИЕ ===
+  // НЕ logicalRange — он ломает отображение маркеров.
+  chart.timeScale().subscribeVisibleTimeRangeChange((range) => {
+    if (!range) return;
+    const startMs = range.from * 1000;
+    const endMs = range.to * 1000;
+    debouncedLoad(startMs, endMs);
   });
 
   checkbox.addEventListener('change', async () => {
-    const vis = getVisibleRange(chart.timeScale().getVisibleLogicalRange());
-    await loadPositions(vis.startMs, vis.endMs);
+    const range = chart.timeScale().getVisibleRange();
+    if (!range) return;
+    await loadPositions(range.from * 1000, range.to * 1000);
   });
 
-  // === Обработка наведения курсора ===
+  // Tooltip
   chart.subscribeCrosshairMove((param) => {
     if (!param.point || !param.time) {
       tooltip.style.display = 'none';
@@ -77,7 +98,6 @@ export function initPositionsModule(ctx) {
       return;
     }
 
-    // Формируем красивый HTML
     const html = posData
       .map(
         (p) => `
@@ -98,4 +118,7 @@ export function initPositionsModule(ctx) {
     tooltip.style.left = `${param.point.x + 15}px`;
     tooltip.style.top = `${param.point.y + 15}px`;
   });
+
+  // Делаем доступным в ctx
+  ctx.loadPositions = loadPositions;
 }

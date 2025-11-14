@@ -92,3 +92,40 @@
     </div>
   </div>
 </div>
+
+<!-- ░░░ Модалка последовательной перезагрузки ░░░ -->
+<div id="modal-seq" class="modal hidden">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog modal__dialog--wide">
+    <div class="modal__head">
+      <div class="modal__title">Перезагрузка сервисов</div>
+      <button class="btn ghost" data-close>×</button>
+    </div>
+
+    <div class="modal__body">
+      <p class="muted" style="margin-bottom:8px;">Порядок выполнения:</p>
+      <ul class="mono" style="margin:0 0 12px 18px;">
+        <li>bybit-stream</li>
+        <li>streaming-candle-bybit</li>
+        <li>admin-panel</li>
+        <li>panel-celery-tasks</li>
+        <li>panel-beat</li>
+        <li>signals-btc-1</li>
+        <li>monitoring</li>
+        <li>combinator</li>
+      </ul>
+
+      <pre id="seq-pre" class="logs"></pre>
+    </div>
+
+    <div class="modal__foot">
+      <div class="modal-actions-left">
+        <button id="seq-run" class="btn primary">Запустить</button>
+      </div>
+      <div class="modal-actions-right">
+        <button class="btn ghost" data-close>Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -197,19 +197,8 @@ function handleIncoming(kind, item) {
 }
 
 async function attachChartPrice() {
-  // Берём существующий контекст графика, созданный в chart.js
-  const ctx = window.chartCtx;
-  if (!ctx) {
-    console.warn('[TRADE] chartCtx не найден, ждём загрузки графика...');
-    // немного подождём, если график создаётся чуть позже
-    await new Promise(r => setTimeout(r, 1000));
-    if (!window.chartCtx) {
-      console.error('[TRADE] Не удалось получить контекст графика');
-      return;
-    }
-  }
-
   const chartCtx = window.chartCtx;
+  if (!chartCtx) return console.warn('[TRADE] chartCtx отсутствует');
 
   const setLive = (close) => {
     state.price = Number(close);
@@ -218,17 +207,30 @@ async function attachChartPrice() {
     if (state.activeTab === 'positions') renderList('positions', state.pos.list);
   };
 
-  // Если есть свечи — сразу показываем последнюю цену
+  // Первичная цена
   if (chartCtx?.allCandles?.length) {
     const last = chartCtx.allCandles.at(-1);
     if (last?.close) setLive(last.close);
   }
 
-  // Подписываемся на обновления свечей
-  if (chartCtx.subscribeToCandle) {
-    chartCtx.subscribeToCandle((c) => c?.close && setLive(c.close));
+  // Подписка (повторно, если свечи появятся чуть позже)
+  const trySub = () => {
+    if (chartCtx.subscribeToCandle) {
+      chartCtx.subscribeToCandle((c) => c?.close && setLive(c.close));
+      console.log('[TRADE] Подписка на свечи активна');
+      return true;
+    }
+    return false;
+  };
+
+  if (!trySub()) {
+    let attempts = 0;
+    const timer = setInterval(() => {
+      if (trySub() || ++attempts > 10) clearInterval(timer);
+    }, 1000);
   }
 }
+
 
 
 
@@ -236,18 +238,19 @@ async function bootstrap() {
   bindTabs();
   bindModal();
   bindPager();
+  bindFilters(); // вот здесь
   await loadExchangeSettings();
   await loadOrders();
   switchTab('orders');
   connectTradeWS();
 
-  // ⏳ ждём, пока график будет готов
   if (window.chartCtx) {
     attachChartPrice();
   } else {
     window.addEventListener('chartReady', () => attachChartPrice(), { once: true });
   }
 }
+
 function updatePager(kind) {
   const obj = kind === 'orders' ? state.ord : state.pos;
   const page = Math.floor(obj.offset / obj.limit) + 1;
@@ -280,5 +283,40 @@ function bindPager() {
   qs('#pos-prev').onclick = () => goPage('positions', -1);
   qs('#pos-next').onclick = () => goPage('positions', 1);
 }
+function bindFilters() {
+  const applyBtn = qs('#apply-filter');
+  const resetBtn = qs('#reset-filter');
+  const fUuid = qs('#filter-uuid');
+  const fSide = qs('#filter-side');
+  const fStatus = qs('#filter-status');
 
+  applyBtn.onclick = async () => {
+    state.filters.uuid = fUuid.value.trim();
+    state.filters.side = fSide.value;
+    state.filters.status = fStatus.value;
+    state.ord.offset = 0;
+    state.pos.offset = 0;
+
+    if (state.activeTab === 'orders') {
+      await loadOrders();
+    } else {
+      await loadPositions();
+    }
+  };
+
+  resetBtn.onclick = async () => {
+    fUuid.value = '';
+    fSide.value = '';
+    fStatus.value = '';
+    state.filters = { uuid: '', side: '', status: '' };
+    state.ord.offset = 0;
+    state.pos.offset = 0;
+
+    if (state.activeTab === 'orders') {
+      await loadOrders();
+    } else {
+      await loadPositions();
+    }
+  };
+}
 window.addEventListener('load', bootstrap);
