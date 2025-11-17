@@ -45,22 +45,39 @@ function fmtDate(iso) {
   try { return new Date(iso).toLocaleString(); } catch { return iso; }
 }
 
-function calcPnlUSD(side, qty, entryPrice) {
-  if (state.price == null || entryPrice == null || qty == null) return null;
+function calcPnlUSD(kind, item) {
+  const side = (item.side || '').toLowerCase();
+  const qty = Number(item.qty_tokens || 0);
+  const entryPrice = Number(item.price || 0);
+  const closeRate = Number(item.close_rate || 0);
+  const accumulatedFunding = Number(item.accumulated_funding || 0);
+  const fees = entryPrice * qty * (state.makerFee + state.takerFee);
+
+  // если это ордер и он завершён, считаем по закрытию
+  if (kind === 'orders' && item.status === 'completed') {
+    if (!qty || !entryPrice || !closeRate) return null;
+    const gross = side === 'sell'
+      ? (entryPrice - closeRate) * qty
+      : (closeRate - entryPrice) * qty;
+    return gross - accumulatedFunding - fees;
+  }
+
+  // для всех остальных случаев — по текущей цене
+  if (state.price == null || !entryPrice || !qty) return null;
   const px = Number(state.price);
-  const ent = Number(entryPrice);
-  const q = Number(qty);
-  const gross = side === 'sell' ? (ent - px) * q : (px - ent) * q;
-  const fees = px * q * (state.makerFee + state.takerFee);
+  const gross = side === 'sell'
+    ? (entryPrice - px) * qty
+    : (px - entryPrice) * qty;
   return gross - fees;
 }
+
 const pnlClass = (v) => (v == null ? '' : v >= 0 ? 'positive' : 'negative');
 
 function makeRow(kind, item) {
   const qty = item.qty_tokens ? Number(item.qty_tokens) : null;
   const price = item.price ? Number(item.price) : null;
   const side = (item.side || '').toLowerCase();
-  const pnl = calcPnlUSD(side, qty, price);
+  const pnl = calcPnlUSD(kind, item);
 
   const row = document.createElement('div');
   row.className = 'item-row';
