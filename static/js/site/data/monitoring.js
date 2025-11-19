@@ -148,6 +148,7 @@ function renderItem(type, id, data) {
     block.innerHTML = `
         <div class="symbol">${data.symbol}</div>
         <div class="side ${sideCls}">${data.side.toUpperCase()}</div>
+        <div><b>UUID:</b> ${data.uuid}</div>
         <div><b>Курс входа:</b> ${data.price_entry}</div>
         <div><b>Макс:</b> ${data.max_price}</div>
         <div><b>Мин:</b> ${data.min_price}</div>
@@ -184,9 +185,16 @@ function openModal(type, id) {
 
     currentModal = { type, id };
 
-    modalBody.innerHTML = block.innerHTML.replace(/<button.+<\/button>/, "");
+    let html = "";
+
+    block.querySelectorAll("div").forEach(row => {
+        html += `<div>${row.innerHTML}</div>`;
+    });
+
+    modalBody.innerHTML = html;
     modal.style.display = "flex";
 }
+
 
 /* ============================================================
    Переключение вкладок
@@ -201,6 +209,9 @@ document.querySelectorAll(".monitoring-tabs a").forEach(btn => {
 
         const tab = btn.dataset.tab;
 
+        // сохраняем вкладку
+        localStorage.setItem("monitoringTab", tab);
+
         document.querySelectorAll(".tab-block")
             .forEach(t => t.classList.remove("active"));
 
@@ -210,6 +221,7 @@ document.querySelectorAll(".monitoring-tabs a").forEach(btn => {
         else loadInitial("order", ordersEl);
     });
 });
+
 
 /* ============================================================
    Закрытие модалки по фону
@@ -246,8 +258,29 @@ document.getElementById("modal-delete").onclick = async () => {
 ============================================================ */
 
 window.addEventListener("load", () => {
-    loadInitial("position", positionsEl);
+    const savedTab = localStorage.getItem("monitoringTab") || "positions";
+
+    // 1. Сбрасываем активные вкладки
+    document.querySelectorAll(".monitoring-tabs a")
+        .forEach(a => a.classList.remove("active"));
+
+    // 2. Сбрасываем активные контейнеры табов
+    document.querySelectorAll(".tab-block")
+        .forEach(block => block.classList.remove("active"));
+
+    // 3. Активируем сохранённую вкладку
+    document.querySelector(`.monitoring-tabs a[data-tab="${savedTab}"]`)
+        .classList.add("active");
+
+    // 4. Показываем нужный контейнер
+    document.getElementById(savedTab).classList.add("active");
+
+    // 5. Загружаем данные
+    if (savedTab === "positions") loadInitial("position", positionsEl);
+    else loadInitial("order", ordersEl);
+
     connectWS();
 });
+
 
 window.addEventListener("beforeunload", () => ws && ws.close());

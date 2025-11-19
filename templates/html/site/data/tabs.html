@@ -1,11 +1,39 @@
-<nav class="tabs">
-  <a href="{% url 'indicator_rsi' %}" class="{% if '/rsi/' in path %}active{% endif %}">
-    RSI / Stoch RSI
-  </a>
-  <a href="{% url 'indicator_candles' %}" class="{% if '/candles/' in path %}active{% endif %}">
-    Свечи
-  </a>
-    <a href="{% url 'indicator_monitoring' %}" class="{% if '/monitoring/' in path %}active{% endif %}">
-    Мониторинг
-  </a>
+<nav class="tabs" id="main-tabs">
+  <a href="{% url 'indicator_rsi' %}" data-tab="rsi">RSI / Stoch RSI</a>
+  <a href="{% url 'indicator_candles' %}" data-tab="candles">Свечи</a>
+  <a href="{% url 'indicator_monitoring' %}" data-tab="monitoring">Мониторинг</a>
 </nav>
+<script>
+   // сохраняем выбранную вкладку
+document.querySelectorAll("#main-tabs a").forEach(link => {
+    link.addEventListener("click", () => {
+        localStorage.setItem("mainTab", link.dataset.tab);
+    });
+});
+
+// подсветка активной вкладки
+window.addEventListener("load", () => {
+    const saved = localStorage.getItem("mainTab");
+
+    // снимаем active
+    document.querySelectorAll("#main-tabs a")
+        .forEach(a => a.classList.remove("active"));
+
+    if (saved) {
+        const target = document.querySelector(`#main-tabs a[data-tab="${saved}"]`);
+        if (target) {
+            target.classList.add("active");
+            return;
+        }
+    }
+
+    // fallback — если вкладка не найдена, подсветим по URL
+    document.querySelectorAll("#main-tabs a").forEach(a => {
+        if (location.pathname.includes(a.dataset.tab)) {
+            a.classList.add("active");
+        }
+    });
+});
+
+
+</script>

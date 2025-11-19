@@ -91,7 +91,6 @@
     border-radius: 6px;
     border: 1px solid var(--accent-color);
     background: var(--accent-soft);
-    color: var(--accent-color);
     cursor: pointer;
     transition: 0.15s;
 }
@@ -102,53 +101,86 @@
 }
 
 /* ============================================================
-   Модальное окно
+   Улучшенная модалка
 ============================================================ */
 .modal {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    inset: 0;
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 300;
 
-    /* Размытие фона */
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-
-    /* затемнение поверх размытия */
-    background: rgba(0,0,0,0.35);
+    background: rgba(0, 0, 0, 0.35);
 }
 
 .modal-content {
-    width: 350px;
+    width: 400px;
+    max-width: 90%;
     background: var(--panel-bg);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 22px;
     border: 1px solid var(--border-color);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
 }
 
+/* Крестик */
 #modal-close {
-    float: right;
+    position: absolute;
+    top: 12px;
+    right: 14px;
     cursor: pointer;
     font-size: 22px;
-    color: var(--text-secondary);
+    opacity: 0.65;
+    transition: 0.2s;
 }
 
-#modal-body {
-    margin-top: 15px;
-    line-height: 1.4;
+#modal-close:hover {
+    opacity: 1;
+    transform: scale(1.15);
 }
+
+/* Заголовок */
+.modal-content h3 {
+    margin: 0;
+    padding-bottom: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Тело */
+#modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#modal-body div {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#modal-body div:last-child {
+    border-bottom: none;
+}
+
+/* Кнопка удалить */
 .delete-btn {
-    margin-top: 18px;
-    padding: 8px 12px;
+    margin-left: auto;
+    padding: 8px 16px;
     background: #f44336;
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    width: 30%;
     font-size: 14px;
     transition: 0.2s;
 }
@@ -156,6 +188,7 @@
 .delete-btn:hover {
     background: #d32f2f;
 }
+
 
 .no-data {
     width: 100%;

@@ -373,7 +373,6 @@
   gap: 16px;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 20px; /* чтобы добавить отступ перед ордерами */
 }
 
 .chart-layout .chart-wrapper {
@@ -420,4 +419,11 @@
 .chart-wrapper,
 .chart-container {
   overflow-x: hidden;
+}
+
+.chart-right,
+.chart-wrapper,
+.chart-container {
+  height: 521px;
+  width: 99.9%;
 }

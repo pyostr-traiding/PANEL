@@ -3,21 +3,43 @@
    ============================================================ */
 
 /* ============================================================
+   📐 КОНТРОЛЬ ШИРИН КОЛОНОК
+   ============================================================ */
+:root {
+  --col-details: 12%;
+  --col-amount: 18%;
+  --col-side: 10%;
+  --col-pnl: 14%;
+  --col-uuid: 30%;
+  --col-status: 16%;
+
+  --panel-bg: #23272f;
+  --bg-color: #181c24;
+  --text-color: #fff;
+  --text-secondary: #a9adc1;
+  --border-strong: #303440;
+  --border-color: #23272f;
+  --accent-color: #2ec77f;
+  --accent-hover: #18d47b;
+  --accent-soft: #2ec77f20;
+  --radius-sm: 8px;
+  --transition-fast: 0.14s;
+}
+
+/* ============================================================
    🧱 ОСНОВНОЙ БЛОК
    ============================================================ */
-
 .trade-block {
-  margin-top: 20px;
+  margin-top: 12px;
   background: var(--panel-bg);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   box-shadow: none;
 }
 
 /* ============================================================
-   🧭 HEADER
+   🧭 HEADER / Хедер + статус WS
    ============================================================ */
-
 .trade-header {
   display: flex;
   justify-content: space-between;
@@ -35,7 +57,6 @@
   color: var(--text-color);
 }
 
-/* --- WS статус --- */
 .ws-status-container {
   display: flex;
   align-items: center;
@@ -57,25 +78,14 @@
   border-radius: 50%;
   background: #666;
 }
-
 .ws-dot.green  { background: #2ec77f; }
-.ws-dot.yellow { background: #f0c94a; }
+.ws-dot.yellow { background: #f0c94a; animation: blink 1s infinite; }
 .ws-dot.red    { background: #ff5c5c; }
-
-.ws-dot.yellow {
-  background: #f0c94a;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
+@keyframes blink { 0%,100% {opacity:1;} 50% {opacity:0.4;} }
 
 /* ============================================================
-   🔝 TOPBAR
+   🔝 TOPBAR / Инфо-панель и фильтры
    ============================================================ */
-
 .trade-topbar {
   display: flex;
   flex-wrap: wrap;
@@ -85,14 +95,12 @@
   border-bottom: 1px solid var(--border-color);
   background: var(--panel-bg);
 }
-
 .trade-topbar .label {
   margin-right: 6px;
   font-size: 12px;
   text-transform: uppercase;
   color: var(--text-secondary);
 }
-
 .trade-topbar .value {
   font-weight: 600;
   color: var(--text-color);
@@ -101,14 +109,12 @@
 /* ============================================================
    🔍 FILTERS
    ============================================================ */
-
 .search-filter {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-left: auto;
 }
-
 .search-filter input,
 .search-filter select {
   padding: 6px 8px;
@@ -118,7 +124,6 @@
   background: var(--bg-color);
   color: var(--text-color);
 }
-
 .search-filter input::placeholder {
   color: var(--text-secondary);
 }
@@ -126,7 +131,6 @@
 /* ============================================================
    🔘 BUTTONS
    ============================================================ */
-
 .btn {
   padding: 6px 12px;
   border: 1px solid var(--border-strong);
@@ -139,21 +143,17 @@
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-
 .btn:hover:not([disabled]) {
   background: var(--accent-soft);
 }
-
 .btn-primary {
   background: var(--accent-color);
   border-color: var(--accent-color);
   color: #fff;
 }
-
 .btn-primary:hover:not([disabled]) {
   background: var(--accent-hover);
 }
-
 .btn-link {
   background: transparent;
   border: none;
@@ -162,24 +162,42 @@
   font-size: 12px;
   text-transform: uppercase;
 }
-
 .btn[disabled] {
   opacity: 0.5;
   cursor: default;
+}
+/* Крупная кнопка */
+.btn.big {
+  padding: 13px 0;
+  font-size: 15px;
+  border-radius: 10px;
+  width: 200px;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px 0 rgba(46,199,127,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.btn.big:hover:not([disabled]) { color: #fff; }
+.btn.big[disabled] {
+  background: #444;
+  color: #bbb;
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 /* ============================================================
    🗂️ TABS
    ============================================================ */
-
 .trade-tabs .tab-buttons {
   display: flex;
   border-bottom: 2px solid var(--border-strong);
   background: var(--panel-bg);
 }
-
 .trade-tabs .trade-tab-btn {
-  display: block;
   flex: 1;
   padding: 10px 14px;
   border: none;
@@ -192,12 +210,10 @@
   cursor: pointer;
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
-
 .trade-tabs .trade-tab-btn.active {
   color: var(--accent-color);
   border-bottom-color: var(--accent-color);
 }
-
 .trade-tab-content {
   padding: 10px 16px;
 }
@@ -205,18 +221,26 @@
 /* ============================================================
    📊 TABLE STRUCTURE
    ============================================================ */
-
-.items-head {
+.table-grid {
   display: grid;
   grid-template-columns:
-    120px   /* кнопка */
-    180px   /* объём / сумма */
-    90px    /* сторона */
-    120px   /* PnL */
-    260px   /* UUID и дата */
-    110px;  /* статус */
+    var(--col-details)
+    var(--col-amount)
+    var(--col-side)
+    var(--col-pnl)
+    var(--col-uuid)
+    var(--col-status);
   align-items: center;
-  column-gap: 16px;
+  text-align: center;
+}
+@media (max-width: 1000px) {
+  .table-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    row-gap: 6px;
+  }
+}
+
+.items-head {
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 600;
@@ -225,123 +249,89 @@
   border-bottom: 1px solid var(--border-color);
   background: var(--panel-bg);
 }
-
 .items-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin-top: 10px;
 }
-
 .item-row {
-  display: grid;
-  grid-template-columns:
-    120px   /* кнопка */
-    180px   /* объём / сумма */
-    90px    /* сторона */
-    120px   /* PnL */
-    260px   /* UUID и дата */
-    110px;  /* статус */
-  align-items: center;
-  column-gap: 16px;
   padding: 10px 16px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--panel-bg);
-  transition: background var(--transition-fast);
   font-size: 13px;
+  transition: background var(--transition-fast);
 }
-
 .item-row:hover {
   background: var(--accent-soft);
 }
-
 .item-row .col {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   gap: 3px;
-  min-width: 0;
+  text-align: center;
 }
-
 .item-row .top {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-
 .item-row .bottom {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* --- выравнивание колонок --- */
-.item-row .col:nth-child(1),
-.item-row .col:nth-child(2) {
-  text-align: left;
-}
-
-.item-row .col:nth-child(3),
-.item-row .col:nth-child(4),
-.item-row .col:nth-child(5),
-.item-row .col:nth-child(6) {
-  text-align: center;
+  opacity: 0.8;
 }
 
 /* ============================================================
    🟢🔴 SIDE BADGE
    ============================================================ */
-
 .side-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 70px;
-  height: 26px;
-  border-radius: 3px;
-  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 10px;
   font-size: 12px;
-  text-transform: uppercase;
-  border: 1px solid transparent;
+  font-weight: 700;
+  letter-spacing: 0.4px;
 }
-
 .side-buy {
-  border-color: #2ec77f;
+  border-color: rgba(46, 199, 127, 0.5);
   color: #2ec77f;
+  background: rgba(46, 199, 127, 0.08);
 }
-
 .side-sell {
-  border-color: #ff5c5c;
+  border-color: rgba(255, 92, 92, 0.5);
   color: #ff5c5c;
+  background: rgba(255, 92, 92, 0.08);
 }
 
 /* ============================================================
    💹 PNL
    ============================================================ */
-
 .pnl {
   font-weight: 700;
-  text-align: right;
-  min-width: 80px;
+  font-size: 14px;
 }
-
 .pnl.positive {
-  color: #2ec77f;
+  color: #18d47b;
+  text-shadow: 0 0 6px rgba(0,255,140,0.2);
 }
-
 .pnl.negative {
-  color: #ff5c5c;
+  color: #ff4d4d;
+  text-shadow: 0 0 6px rgba(255,0,0,0.2);
 }
+#md-pnl {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+#md-pnl.positive { color: #0ecb81; }
+#md-pnl.negative { color: #ff4d4f; }
 
 /* ============================================================
    ⏩ PAGER
    ============================================================ */
-
 .pager {
   display: flex;
   justify-content: center;
@@ -356,79 +346,6 @@
 /* ============================================================
    💬 MODAL
    ============================================================ */
-
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 999;
-}
-
-.modal.show {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-dialog {
-  width: min(820px, 92vw);
-  background: var(--panel-bg);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-}
-
-.modal-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-color);
-}
-
-.modal-title {
-  font-weight: 700;
-  font-size: 14px;
-  text-transform: uppercase;
-}
-
-.modal-body {
-  padding: 16px;
-}
-
-.json-view {
-  padding: 10px;
-  font-family: monospace;
-  font-size: 12px;
-  white-space: pre-wrap;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-}
-
-/* ============================================================
-   📱 ADAPTIVE
-   ============================================================ */
-
-@media (max-width: 1000px) {
-  .item-row {
-    grid-template-columns: 1fr 1fr 1fr;
-    row-gap: 6px;
-  }
-}
-
-.trade-panel {
-  display: none;
-}
-
-.trade-panel.active {
-  display: block;
-}
-/* ============================================================
-   💬 MODAL (устойчивая к длинным значениям + JSON highlight)
-   ============================================================ */
-
 .modal {
   display: none;
   position: fixed;
@@ -437,7 +354,6 @@
   backdrop-filter: blur(4px);
   z-index: 999;
 }
-
 .modal.show {
   display: flex;
   align-items: center;
@@ -445,142 +361,256 @@
   animation: fadeIn 0.25s ease forwards;
 }
 
-/* Диалоговое окно */
-.modal-dialog {
-  width: min(820px, 94vw);
-  background: var(--panel-bg);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  animation: slideUp 0.3s ease forwards;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Заголовок */
-.modal-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-color);
-  flex-shrink: 0;
-}
-
-.modal-title {
-  font-weight: 700;
-  font-size: 14px;
-  text-transform: uppercase;
-  color: var(--text-color);
-}
-
-.modal-head .close {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.modal-head .close:hover {
-  color: var(--accent-color);
-}
-
-/* Тело */
-.modal-body {
-  padding: 18px;
-  color: var(--text-color);
-  overflow-y: auto;
-}
-
-/* KV — таблица ключ/значение */
-.kv {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  row-gap: 10px;
-  column-gap: 14px;
-  font-size: 13px;
-  margin-bottom: 16px;
-  word-break: break-all;
-}
-
-.kv span {
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.kv b {
-  color: var(--text-color);
-  font-weight: 600;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  white-space: normal;
-}
-
-/* JSON-блок с подсветкой */
-.json-view {
-  padding: 12px 14px;
-  font-family: monospace;
-  font-size: 12px;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  max-height: 360px;
-  overflow-y: auto;
-  color: var(--text-secondary);
-  white-space: pre-wrap;
-  line-height: 1.4;
-}
-
-/* Подсветка JSON */
-.json-view .key {
-  color: #58a6ff;
-}
-
-.json-view .string {
-  color: #8ae234;
-}
-
-.json-view .number {
-  color: #f0c94a;
-}
-
-.json-view .boolean {
-  color: #ff8b60;
-}
-
-.json-view .null {
-  color: #999;
-  font-style: italic;
-}
-
-/* Анимации */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes slideUp {
   from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Мобильная адаптация */
+/* ================================
+   🎨 МОДАЛКА КАК НА БИРЖАХ
+   ================================ */
+.modal-dialog {
+  box-shadow: 0 10px 40px 0 rgba(0,0,0,0.35);
+  border-radius: 18px;
+  border: none;
+  overflow: hidden;
+  background: var(--panel-bg, #23272f);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 800px) {
+  .modal-dialog { width: 97vw; }
+}
+
+.modal-body {
+  width: 100%;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px 20px 28px;
+  position: relative;
+  border-bottom: 1px solid var(--border-strong, #23272f);
+}
+@media (max-width: 800px) {
+  .modal-head {
+    padding: 10px 8px 8px 8px;
+  }
+  .modal-title { font-size: 15px; }
+  .modal-price { font-size: 13px; padding: 5px 8px; }
+  .modal-head .close { font-size: 20px; }
+}
+
+.modal-title {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 120px;
+}
+.modal-price-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.modal-price {
+  background: #181c24;
+  color: var(--text-color);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 7px 22px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  gap: 6px;
+}
+.modal-head .close {
+  font-size: 22px;
+  transition: color 0.18s;
+  margin-left: 18px;
+  background: none;
+  border: none;
+}
+.modal-head .close:hover {
+  color: #ff5c5c;
+  opacity: 1;
+}
+
+#md-close-order-btn {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+#md-close-order-btn[disabled] {
+  opacity: 0.4;
+  cursor: default;
+  background: #444;
+  border-color: #444;
+}
+
+.json-dialog {
+  width: 70vw;
+  max-height: 80vh;
+}
+@media (max-width: 800px) {
+  .json-dialog { width: 95vw; }
+}
 @media (max-width: 600px) {
   .modal-dialog {
     width: 94vw;
     max-height: 92vh;
   }
+}
 
+.modal-section {
+  margin-bottom: 18px;
+  text-align: right;
+}
+.modal-section:last-child {
+  margin-bottom: 0;
+}
+#md-show-json {
+  display: inline-flex;
+  margin-top: 6px;
+}
+/* ============================================================
+   🗝️ KV BLOCK (ключ-значение)
+   ============================================================ */
+.kv {
+  display: grid;
+    position: relative;
+gap: 14px 32px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(90,90,120,0.09);
+  padding: 24px 28px;
+  font-size: 14px;
+  background: rgba(255,255,255,0.02);
+  margin-bottom: 18px;
+}
+.json-dot {
+  position: absolute;
+  top: 13px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+  background: #389cff;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px #fff2, 0 1px 6px #389cff22;
+  transition: box-shadow .15s, background .15s;
+  outline: none;
+  padding: 0;
+  z-index: 1;
+}
+.kv b.side-buy {
+  color: #2ec77f;
+}
+.kv b.side-sell {
+  color: #ff5c5c;
+}
+.json-dot:hover, .json-dot:focus {
+  background: #2076d6;
+  box-shadow: 0 0 0 3px #389cff44, 0 2px 8px #389cff33;
+}
+/* Ставим выравнивание по левому краю для строк */
+.kv div {
+  display: flex;
+  align-items: center;
+  /* Вот это важно */
+  justify-content: flex-start;
+  min-height: 34px;
+  border-bottom: 1px solid rgba(200,200,200,0.07);
+  text-align: left;
+}
+
+/* И сам текст подписи — тоже слева */
+.kv span {
+  color: #a9adc1;
+  min-width: 80px;
+  margin-right: 8px;
+  font-size: 13px;
+  opacity: 0.7;
+  text-align: left; /* добавляем! */
+}
+.kv b {
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  word-break: break-all;
+  text-align: left;  /* если вдруг потребуется */
+}
+
+@media (max-width: 900px) {
   .kv {
     grid-template-columns: 1fr;
+    gap: 9px 0;
+    padding: 13px 10px;
   }
-
-  .kv span {
-    white-space: normal;
+  .kv div {
+    border-bottom: none;
+    padding-bottom: 3px;
+    margin-bottom: 2px;
   }
 }
+
+/* ============================================================
+   🧩 JSON VIEW
+   ============================================================ */
+.json-title {
+  font-size: 13px;
+  color: #a0a5bc;
+  margin-bottom: 4px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+.json-view {
+  background: #181c24;
+  border-radius: 8px;
+  border: 1.5px solid rgba(140, 170, 210, 0.07);
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px 0 rgba(36,43,52,0.07);
+  padding: 15px 18px;
+  white-space: pre-wrap;
+  margin-bottom: 0;
+  border-left: 3px solid #2ec77f70;
+}
+
+/* ============================================================
+   📱 ADAPTIVE / Мобильная адаптация
+   ============================================================ */
+@media (max-width: 800px) {
+  .json-dialog { width: 95vw; }
+  .modal-dialog { width: 97vw; }
+  .kv { grid-template-columns: 1fr; padding: 13px 10px; }
+  .modal-head { padding: 16px 10px; }
+}
+@media (max-width: 600px) {
+  .modal-dialog {
+    width: 94vw;
+    max-height: 92vh;
+  }
+  .kv { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   СЛУЖЕБНЫЕ
+   ============================================================ */
+.trade-panel { display: none; }
+.trade-panel.active { display: block; }
