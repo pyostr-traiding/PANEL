@@ -1,0 +1,136 @@
+.indicator-block {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.01);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.indicator-block-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.indicator-block-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.indicator-block-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Сетка интервалов */
+.indicator-intervals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+}
+
+@media (max-width: 900px) {
+  .indicator-intervals-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.interval-card {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+.interval-card-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.interval-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.interval-card-body {
+  padding: 8px 10px 10px 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.field-row-inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.field-input {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  padding: 5px 8px;
+  background: rgba(0,0,0,0.02);
+  color: var(--text-color);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+}
+
+.field-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+  background: rgba(0,0,0,0.04);
+}
+
+.field-input-with-suffix {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  background: rgba(0,0,0,0.02);
+}
+
+.field-input-with-suffix .field-input {
+  border: none;
+  border-radius: 0;
+}
+
+.field-input-with-suffix .field-suffix {
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-left: 1px solid var(--border-color);
+}
+
+/* Отключённый интервал */
+.interval-card.interval-disabled {
+  opacity: 0.5;
+}
+
+.interval-card.interval-disabled .field-input,
+.interval-card.interval-disabled .field-status-toggle {
+  pointer-events: none;
+}

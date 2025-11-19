@@ -104,3 +104,18 @@ class PromptModel(AbstractModel):
     description = models.TextField(
         verbose_name='Описание'
     )
+
+class IndicatorSettingsModel(AbstractModel):
+    class Meta:
+        verbose_name = 'Индикаторы'
+        verbose_name_plural = 'Индикаторы'
+
+    name = models.CharField(
+        verbose_name='Индикатор',
+        max_length=40,
+    )
+    json = models.JSONField(
+        verbose_name='Данные',
+    )
+    def __str__(self):
+        return self.name

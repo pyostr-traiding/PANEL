@@ -20,6 +20,7 @@ from app.users.api import router as router_users
 # Настройки
 from app.setting.routes.prompt import router as router_settings_prompt
 from app.setting.routes.exchange import router as router_settings_exchange
+from app.setting.routes.indicator import router as router_settings_indicator
 
 # Фронт
 from app.frontend.routes.gpt import router as router_front_gpt
@@ -58,6 +59,7 @@ api_route.add_router('/order/', router_order_extremum)
 # Настройки
 api_route.add_router('/settings/', router_settings_prompt)
 api_route.add_router('/settings/', router_settings_exchange)
+api_route.add_router('/settings/', router_settings_indicator)
 
 #####
 # Фронт

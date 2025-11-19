@@ -1,0 +1,87 @@
+{% extends 'html/site/base_app.html' %}
+{% load static %}
+
+{% block title %}Настройки индикаторов{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/settings_indicator/settings_indicator.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site/settings_indicator/blocks/settings_rsi.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site/settings_indicator/blocks/settings_intervals.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-layout">
+  <!-- Левая колонка с разделами -->
+  <aside class="settings-sidebar">
+    <div class="settings-sidebar-header">
+      <div class="settings-sidebar-title">Разделы</div>
+    </div>
+    <ul class="settings-menu" id="settings-menu">
+      <li class="settings-menu-item active" data-indicator="RSI">
+        <span class="settings-menu-name">RSI</span>
+      </li>
+      <li class="settings-menu-item" data-indicator="MACD">
+        <span class="settings-menu-name">MACD</span>
+        <span class="settings-menu-tag">скоро</span>
+      </li>
+      <li class="settings-menu-item" data-indicator="ADX">
+        <span class="settings-menu-name">ADX</span>
+        <span class="settings-menu-tag">скоро</span>
+      </li>
+      <li class="settings-menu-item" data-indicator="INTERVALS">
+            <span class="settings-menu-name">Интервалы</span>
+        </li>
+    </ul>
+  </aside>
+
+  <!-- Правая часть — контент выбранного раздела -->
+  <main class="settings-main">
+    <div class="settings-main-header">
+      <div class="settings-main-title-wrap">
+        <h1 class="settings-main-title" id="settings-current-title">RSI</h1>
+        <div class="settings-main-subtitle" id="settings-current-subtitle">
+          Настройки индикатора Relative Strength Index
+        </div>
+      </div>
+
+      <!-- Глобальный тумблер включения раздела -->
+      <label class="toggle-switch toggle-lg settings-global-toggle">
+        <input type="checkbox" id="indicator-active">
+        <span class="toggle-track"></span>
+        <span class="toggle-label">Раздел активен</span>
+      </label>
+    </div>
+
+    <div class="settings-main-body" id="settings-content">
+
+      <div id="settings-rsi-block">
+          {% include "html/site/settings_indicator/blocks/settings_rsi.html" %}
+      </div>
+
+      <div id="settings-intervals-block" class="hidden">
+          {% include "html/site/settings_indicator/blocks/settings_intervals.html" %}
+      </div>
+
+    </div>
+
+
+    <div class="settings-footer">
+      <div class="settings-footer-left">
+        <span id="settings-save-status" class="settings-save-status"></span>
+      </div>
+      <div class="settings-footer-right">
+        <button type="button" class="btn" id="settings-reset-btn">
+          Сбросить
+        </button>
+        <button type="button" class="btn btn-primary" id="settings-save-btn">
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="{% static 'js/site/settings_indicator/settings_indicator.js' %}"></script>
+<script src="{% static 'js/site/settings_indicator/blocks/settings_intervals.js' %}"></script>
+<script src="{% static 'js/site/settings_indicator/blocks/settings_rsi.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,53 @@
+.intervals-block {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 14px;
+}
+
+.intervals-block-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.intervals-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.intervals-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.intervals-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.interval-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.02);
+  transition: background .2s;
+}
+
+.interval-row:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.interval-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Тумблеры те же */

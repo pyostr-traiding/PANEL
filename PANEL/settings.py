@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'channels',
+    'django_json_widget',
 
     # --- Local apps ---
     'app.abstractions',

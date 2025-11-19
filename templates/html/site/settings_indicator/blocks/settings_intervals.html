@@ -1,0 +1,29 @@
+<div class="intervals-section" id="intervals-root">
+
+  <section class="intervals-block">
+    <header class="intervals-block-header">
+      <h2 class="intervals-title">Интервалы</h2>
+      <div class="intervals-description">
+        Включите только те интервалы, которые должны участвовать в стратегиях
+      </div>
+    </header>
+
+    <div class="intervals-list">
+
+      {% for itv in intervals %}
+      <div class="interval-row" data-interval="{{ itv }}">
+        <div class="interval-name">
+          {{ itv }} мин
+        </div>
+
+        <label class="toggle-switch interval-toggle">
+          <input type="checkbox" class="interval-switch" data-interval="{{ itv }}">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      {% endfor %}
+
+    </div>
+  </section>
+
+</div>

@@ -24,6 +24,16 @@ class MonitoringView(IndicatorBaseView):
 class IndicatorCandlesView(IndicatorBaseView):
     template_name = 'html/site/data/klines.html'
 
+
+class SettingsIndicatorView(IndicatorBaseView):
+    """Вкладка с RSI и Stoch RSI"""
+    template_name = 'html/site/settings_indicator/main.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["intervals"] = ["1", "5", "15", "30", "60"]
+        return ctx
+
 class IndicatorChartView(IndicatorBaseView):
     template_name = 'html/site/chart/chart.html'
 

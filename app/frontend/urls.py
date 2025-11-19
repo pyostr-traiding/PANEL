@@ -5,7 +5,7 @@ from app.frontend.views import (
     IndicatorChartView,
     IndicatorDataView,
     IndicatorRSIView,
-    GPTAnalizView, ServerView, MonitoringView,
+    GPTAnalizView, ServerView, MonitoringView, SettingsIndicatorView,
 )
 
 urlpatterns = [
@@ -20,5 +20,6 @@ urlpatterns = [
     path('candles/', IndicatorCandlesView.as_view(), name='indicator_candles'),
     path('rsi/', IndicatorRSIView.as_view(), name='indicator_rsi'),
     path('monitoring/', MonitoringView.as_view(), name='indicator_monitoring'),
+    path('settings_indicator/', SettingsIndicatorView.as_view(), name='settings_indicator'),
 
 ]

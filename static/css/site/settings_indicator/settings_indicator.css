@@ -1,0 +1,213 @@
+/* Лейаут страницы настроек индикаторов */
+.settings-layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px 10px 20px 10px;
+}
+
+/* Левая колонка */
+.settings-sidebar {
+  flex: 0 0 260px;
+  background: var(--panel-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-sidebar-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-sidebar-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.settings-menu {
+  list-style: none;
+  margin: 0;
+  padding: 6px 6px 10px 6px;
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  margin: 3px 2px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform 0.05s ease;
+  font-size: 13px;
+}
+
+.settings-menu-item:hover {
+  background: var(--accent-soft);
+  color: var(--text-color);
+}
+
+.settings-menu-item.active {
+  background: var(--accent-color);
+  color: #fff;
+  box-shadow: var(--shadow-soft);
+}
+
+.settings-menu-name {
+  font-weight: 500;
+}
+
+.settings-menu-tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* Правая часть */
+.settings-main {
+  flex: 1 1 auto;
+  background: var(--panel-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+.settings-main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-main-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-main-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.settings-main-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.settings-main-body {
+  padding: 16px 18px 10px 18px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+/* Футер */
+.settings-footer {
+  padding: 10px 18px 12px 18px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-footer-right {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-save-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Тумблеры */
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-track {
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--border-color);
+  border: 1px solid var(--border-color);
+  position: relative;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  transition: transform var(--transition-fast);
+}
+
+.toggle-switch input:checked + .toggle-track {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.toggle-switch input:checked + .toggle-track::after {
+  transform: translateX(12px);
+}
+
+.toggle-label {
+  margin-left: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.toggle-lg .toggle-track {
+  width: 40px;
+  height: 22px;
+}
+
+.toggle-lg .toggle-track::after {
+  width: 16px;
+  height: 16px;
+}
+
+/* Состояние неактивного раздела */
+.indicator-section.is-inactive {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Адаптив */
+@media (max-width: 960px) {
+  .settings-layout {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    flex: 0 0 auto;
+  }
+}

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import TabularInline
 
 from app.abstractions.admin import AbstractAdmin
-from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel, PromptModel
+from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel, PromptModel, IndicatorSettingsModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
 
@@ -63,5 +63,13 @@ class PromptModelAdmin(AbstractAdmin):
     list_display = (
         'title',
         'code',
+        'id',
+    )
+
+
+@admin.register(IndicatorSettingsModel)
+class IndicatorSettingsModelAdmin(AbstractAdmin):
+    list_display = (
+        'name',
         'id',
     )
