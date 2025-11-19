@@ -1,0 +1,429 @@
+<div class="indicator-section" id="indicator-stoch-rsi-root" data-indicator="StochRSI">
+  <!-- Блок BUY -->
+  <section class="indicator-block">
+    <header class="indicator-block-header">
+      <h2 class="indicator-block-title">Buy</h2>
+      <div class="indicator-block-description">
+        Условия для открытия длинных позиций по StochRSI
+      </div>
+    </header>
+
+    <div class="indicator-intervals-grid">
+      {# 1 мин #}
+      <article class="interval-card" data-side="buy" data-interval="1">
+        <header class="interval-card-header">
+          <span class="interval-title">1 мин</span>
+          <label class="toggle-switch interval-toggle">
+            <input
+              type="checkbox"
+              class="interval-enabled"
+              data-interval-header="1"
+            />
+            <span class="toggle-track"></span>
+          </label>
+        </header>
+
+        <div class="interval-card-body">
+          <div class="field-row">
+            <label class="field-label" for="buy-1-from">От</label>
+            <input
+              id="buy-1-from"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="1"
+              data-field="from"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-1-to">До</label>
+            <input
+              id="buy-1-to"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="1"
+              data-field="to"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-1-predict">Предикт</label>
+            <div class="field-input-with-suffix">
+              <input
+                id="buy-1-predict"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                class="field-input"
+                data-side="buy"
+                data-interval="1"
+                data-field="predict"
+              />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+
+
+        </div>
+      </article>
+
+      {# 5 мин #}
+      <article class="interval-card" data-side="buy" data-interval="5">
+        <header class="interval-card-header">
+          <span class="interval-title">5 мин</span>
+          <label class="toggle-switch interval-toggle">
+            <input
+              type="checkbox"
+              class="interval-enabled"
+              data-interval-header="5"
+            />
+            <span class="toggle-track"></span>
+          </label>
+        </header>
+
+        <div class="interval-card-body">
+          <div class="field-row">
+            <label class="field-label" for="buy-5-from">От</label>
+            <input
+              id="buy-5-from"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="5"
+              data-field="from"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-5-to">До</label>
+            <input
+              id="buy-5-to"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="5"
+              data-field="to"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-5-predict">Предикт</label>
+            <div class="field-input-with-suffix">
+              <input
+                id="buy-5-predict"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                class="field-input"
+                data-side="buy"
+                data-interval="5"
+                data-field="predict"
+              />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+
+        </div>
+      </article>
+
+      {# 15 мин #}
+      <article class="interval-card" data-side="buy" data-interval="15">
+        <header class="interval-card-header">
+          <span class="interval-title">15 мин</span>
+          <label class="toggle-switch interval-toggle">
+            <input
+              type="checkbox"
+              class="interval-enabled"
+              data-interval-header="15"
+            />
+            <span class="toggle-track"></span>
+          </label>
+        </header>
+
+        <div class="interval-card-body">
+          <div class="field-row">
+            <label class="field-label" for="buy-15-from">От</label>
+            <input
+              id="buy-15-from"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="15"
+              data-field="from"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-15-to">До</label>
+            <input
+              id="buy-15-to"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="15"
+              data-field="to"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-15-predict">Предикт</label>
+            <div class="field-input-with-suffix">
+              <input
+                id="buy-15-predict"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                class="field-input"
+                data-side="buy"
+                data-interval="15"
+                data-field="predict"
+              />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+
+
+        </div>
+      </article>
+
+      {# 30 мин #}
+      <article class="interval-card" data-side="buy" data-interval="30">
+        <header class="interval-card-header">
+          <span class="interval-title">30 мин</span>
+          <label class="toggle-switch interval-toggle">
+            <input
+              type="checkbox"
+              class="interval-enabled"
+              data-interval-header="30"
+            />
+            <span class="toggle-track"></span>
+          </label>
+        </header>
+
+        <div class="interval-card-body">
+          <div class="field-row">
+            <label class="field-label" for="buy-30-from">От</label>
+            <input
+              id="buy-30-from"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="30"
+              data-field="from"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-30-to">До</label>
+            <input
+              id="buy-30-to"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="30"
+              data-field="to"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-30-predict">Предикт</label>
+            <div class="field-input-with-suffix">
+              <input
+                id="buy-30-predict"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                class="field-input"
+                data-side="buy"
+                data-interval="30"
+                data-field="predict"
+              />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+
+
+        </div>
+      </article>
+
+      {# 60 мин #}
+      <article class="interval-card" data-side="buy" data-interval="60">
+        <header class="interval-card-header">
+          <span class="interval-title">60 мин</span>
+          <label class="toggle-switch interval-toggle">
+            <input
+              type="checkbox"
+              class="interval-enabled"
+              data-interval-header="60"
+            />
+            <span class="toggle-track"></span>
+          </label>
+        </header>
+
+        <div class="interval-card-body">
+          <div class="field-row">
+            <label class="field-label" for="buy-60-from">От</label>
+            <input
+              id="buy-60-from"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="60"
+              data-field="from"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-60-to">До</label>
+            <input
+              id="buy-60-to"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="buy"
+              data-interval="60"
+              data-field="to"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="buy-60-predict">Предикт</label>
+            <div class="field-input-with-suffix">
+              <input
+                id="buy-60-predict"
+                type="number"
+                min="0"
+              max="100"
+              step="0.01"
+              class="field-input"
+              data-side="buy"
+              data-interval="60"
+              data-field="predict"
+              />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+
+
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Блок SELL -->
+  <section class="indicator-block">
+    <header class="indicator-block-header">
+      <h2 class="indicator-block-title">Sell</h2>
+      <div class="indicator-block-description">
+        Условия для открытия коротких позиций по StochRSI
+      </div>
+    </header>
+
+    <div class="indicator-intervals-grid">
+    {% for itv in intervals %}
+        <article class="interval-card" data-side="sell" data-interval="{{ itv }}">
+        <header class="interval-card-header">
+          <span class="interval-title">
+            {% if itv == "1" %}1 мин{% elif itv == "5" %}5 мин{% elif itv == "15" %}15 мин{% elif itv == "30" %}30 мин{% else %}60 мин{% endif %}
+          </span>
+          <label class="toggle-switch interval-toggle">
+            <input
+              type="checkbox"
+              class="interval-enabled"
+              data-interval-header="{{ itv }}"
+            />
+            <span class="toggle-track"></span>
+          </label>
+        </header>
+
+        <div class="interval-card-body">
+          <div class="field-row">
+            <label class="field-label" for="sell-{{ itv }}-from">От</label>
+            <input
+              id="sell-{{ itv }}-from"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="sell"
+              data-interval="{{ itv }}"
+              data-field="from"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="sell-{{ itv }}-to">До</label>
+            <input
+              id="sell-{{ itv }}-to"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              class="field-input"
+              data-side="sell"
+              data-interval="{{ itv }}"
+              data-field="to"
+            />
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="sell-{{ itv }}-predict">Предикт</label>
+            <div class="field-input-with-suffix">
+              <input
+                id="sell-{{ itv }}-predict"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                class="field-input"
+                data-side="sell"
+                data-interval="{{ itv }}"
+                data-field="predict"
+              />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+
+
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+</div>

@@ -20,6 +20,9 @@
       <li class="settings-menu-item active" data-indicator="RSI">
         <span class="settings-menu-name">RSI</span>
       </li>
+      <li class="settings-menu-item" data-indicator="STOCH_RSI">
+        <span class="settings-menu-name">Stoch RSI</span>
+      </li>
       <li class="settings-menu-item" data-indicator="MACD">
         <span class="settings-menu-name">MACD</span>
         <span class="settings-menu-tag">скоро</span>
@@ -58,6 +61,10 @@
           {% include "html/site/settings_indicator/blocks/settings_rsi.html" %}
       </div>
 
+      <div id="settings-stoch-rsi-block" class="hidden">
+          {% include "html/site/settings_indicator/blocks/settings_stoch_rsi.html" %}
+      </div>
+
       <div id="settings-intervals-block" class="hidden">
           {% include "html/site/settings_indicator/blocks/settings_intervals.html" %}
       </div>
@@ -84,4 +91,5 @@
 <script src="{% static 'js/site/settings_indicator/settings_indicator.js' %}"></script>
 <script src="{% static 'js/site/settings_indicator/blocks/settings_intervals.js' %}"></script>
 <script src="{% static 'js/site/settings_indicator/blocks/settings_rsi.js' %}"></script>
+<script src="{% static 'js/site/settings_indicator/blocks/settings_stoch_rsi.js' %}"></script>
 {% endblock %}

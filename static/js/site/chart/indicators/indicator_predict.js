@@ -39,7 +39,7 @@ export async function initPredictIndicators(ctx) {
         ? isRSI ? '#00cc66' : '#00bcd4'
         : isRSI ? '#ff3333' : '#ff9900';
 
-    const labelBase = isRSI ? 'RSI' : 'StochRSI';
+    const labelBase = isRSI ? 'RSI' : 'STOCH_RSI';
     const title = `${labelBase} ${side.toUpperCase()} (${intervals
       .sort((a, b) => a - b)
       .map((i) => `${i}m`)
