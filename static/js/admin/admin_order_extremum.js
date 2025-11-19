@@ -1,61 +1,86 @@
-// Fix for missing Grappelli grp object
-if (typeof window.grp === "undefined") {
-  window.grp = {};
-}
-(function () {
-  const REFRESH_INTERVAL = 5; // секунд
-  let blocks = [];
+// static/js/admin/admin_order_extremum.js
 
-  function collectBlocks() {
-    blocks = Array.from(document.querySelectorAll(".js-extremum-block"));
+(function () {
+  const REFRESH_INTERVAL = 5;
+
+  let allBlocks = [];
+  let activeBlocks = [];
+  let allUuids = [];
+  let activeUuids = [];
+
+  let globalCounter = REFRESH_INTERVAL;
+  let counterEl = null;
+
+  function collectAllBlocks() {
+    allBlocks = Array.from(document.querySelectorAll(".js-extremum-block"));
+    allUuids = allBlocks.map(block => block.id.replace("extremum-", ""));
   }
 
-  async function fetchExtremums(block) {
-    const url = block.dataset.url;
-    if (!url) return;
+  function collectActiveBlocks() {
+    activeBlocks = Array.from(document.querySelectorAll(".js-extremum-block"))
+      .filter(block => {
+        const status = block.dataset.status?.toUpperCase() || "";
+        return !(status === "ИСПОЛНЕНО" || status === "COMPLETED");
+      });
+
+    activeUuids = activeBlocks.map(block => block.id.replace("extremum-", ""));
+  }
+
+  async function fetchBatch(uuids, blocks) {
+    if (uuids.length === 0) return;
 
     try {
-      const resp = await fetch(url);
+      const resp = await fetch(`/api/order/extremum/batch?uuids=${uuids.join(",")}`);
       if (!resp.ok) throw new Error("HTTP " + resp.status);
+
       const data = await resp.json();
 
-      const maxValue = data[0]?.value ?? "—";
-      const maxDt = data[0]?.dt ?? "—";
-      const minValue = data[1]?.value ?? "—";
-      const minDt = data[1]?.dt ?? "—";
+      for (const block of blocks) {
+        const uuid = block.id.replace("extremum-", "");
+        const ext = data[uuid];
+        if (!ext) continue;
 
-      block.querySelector(".js-ext-max").textContent = maxValue;
-      block.querySelector(".js-ext-max-dt").textContent = maxDt;
-      block.querySelector(".js-ext-min").textContent = minValue;
-      block.querySelector(".js-ext-min-dt").textContent = minDt;
-
-      block.style.transition = "background-color 0.3s";
-      block.style.backgroundColor = "rgba(0,255,0,0.05)";
-      setTimeout(() => (block.style.backgroundColor = ""), 400);
+        block.querySelector(".js-ext-max").textContent = ext.max?.value ?? "—";
+        block.querySelector(".js-ext-max-dt").textContent = ext.max?.dt ?? "—";
+        block.querySelector(".js-ext-min").textContent = ext.min?.value ?? "—";
+        block.querySelector(".js-ext-min-dt").textContent = ext.min?.dt ?? "—";
+      }
     } catch (err) {
-      console.warn("Ошибка обновления экстремумов:", err);
+      console.warn("Ошибка batch экстремумов:", err);
     }
   }
 
-  function startCountdown(block) {
-    let counterEl = block.querySelector(".js-ext-counter");
-    let value = REFRESH_INTERVAL;
-
+  function startGlobalTimer() {
     const tick = async () => {
-      value -= 1;
-      if (value <= 0) {
-        value = REFRESH_INTERVAL;
-        await fetchExtremums(block);
+      globalCounter -= 1;
+
+      if (globalCounter <= 0) {
+        globalCounter = REFRESH_INTERVAL;
+        collectActiveBlocks();
+        await fetchBatch(activeUuids, activeBlocks);
       }
-      counterEl.textContent = value;
+
+      if (counterEl) {
+        counterEl.textContent = `${globalCounter}с`;
+      }
     };
 
-    fetchExtremums(block);
+    collectAllBlocks();
+    fetchBatch(allUuids, allBlocks);
+
     setInterval(tick, 1000);
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    collectBlocks();
-    blocks.forEach(startCountdown);
-  });
+  // --- ВОТ ЭТО ИСПРАВЛЕНИЕ ---
+  // ждем появления индикатора перед запуском
+  function waitForIndicator() {
+    counterEl = document.getElementById("extremum-update-counter");
+    if (counterEl) {
+      startGlobalTimer();
+    } else {
+      setTimeout(waitForIndicator, 200); // пробуем снова через 200мс
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", waitForIndicator);
 })();

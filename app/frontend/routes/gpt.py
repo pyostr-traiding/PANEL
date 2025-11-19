@@ -12,12 +12,12 @@ from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
 
 router = Router(
-    tags=['GPT и чаты'],
+    tags=['Фронтенд'],
 )
 
 
 @router.get(
-    path='/filter',
+    path='/gpt/filter',
 )
 def api_filter_gpt_chats(
         request: HttpRequest,
@@ -49,7 +49,7 @@ def api_filter_gpt_chats(
 
 
 @router.get(
-    path='/',
+    path='/gpt/',
 )
 def api_get_gpt_chat(
         request: HttpRequest,
@@ -71,7 +71,7 @@ def api_get_gpt_chat(
 
 
 @router.post(
-    path='/send',
+    path='/gpt/send',
 )
 def api_send_to_gpt_chat(
         request: HttpRequest,
@@ -101,7 +101,7 @@ def api_send_to_gpt_chat(
 
 
 @router.delete(
-    path='/delete',
+    path='/gpt/delete',
 )
 def api_delete_gpt_chat(
         request: HttpRequest,

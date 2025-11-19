@@ -4,9 +4,9 @@
 
 (function () {
   // --- API ---
-  const LIST_API = '/api/chats/filter';
-  const CHAT_API = '/api/chats/?key=';
-  const SEND_API = '/api/chats/send';
+  const LIST_API = '/api/front/gpt/filter';
+  const CHAT_API = '/api/front/gpt/?key=';
+  const SEND_API = '/api/front/gpt/send';
 
   // --- WS URL ---
   const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -140,7 +140,7 @@
 async function deleteChat(key, element) {
   if (!confirm('Удалить этот чат?')) return;
   try {
-    const res = await fetch('/api/chats/delete', {
+    const res = await fetch('/api/front/gpt/delete', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ uuid: key })

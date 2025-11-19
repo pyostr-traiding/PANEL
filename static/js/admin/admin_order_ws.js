@@ -6,13 +6,14 @@
   let currentPrice = null;
   let priceNodes = [];
   let pnlNodes = [];
+  let fundingNodes = [];
   let reconnectTimer = null;
   let reconnectCountdownTimer = null;
   const RECONNECT_DELAY = 5; // сек
   const INACTIVE_TIMEOUT = 5000; // мс
   let lastMessageTime = 0;
 
-  // ==== Элементы UI ====
+  // ==== UI индикатор ====
   function setIndicator(state, countdown = null) {
     const el = document.getElementById("global-socket-indicator");
     const textEl = document.getElementById("global-socket-status");
@@ -35,7 +36,7 @@
           textEl.style.color = "orange";
         }
         break;
-      default: // "red"
+      default:
         el.style.backgroundColor = "red";
         if (textEl) {
           textEl.textContent = "Нет соединения";
@@ -48,17 +49,16 @@
   function collectNodes() {
     const allPrice = Array.from(document.querySelectorAll(".js-current-price"));
     const allPnl = Array.from(document.querySelectorAll(".js-pnl"));
+    fundingNodes = Array.from(document.querySelectorAll(".js-funding"));
 
     priceNodes = allPrice.filter((el) => {
       const block = el.closest(".js-live-block");
-      const isClosed = block?.dataset.closed === "true"; // <-- ключевое
-      return !isClosed;
+      return block?.dataset.closed !== "true";
     });
 
     pnlNodes = allPnl.filter((el) => {
       const block = el.closest(".js-live-block");
-      const isClosed = block?.dataset.closed === "true";
-      return !isClosed;
+      return block?.dataset.closed !== "true";
     });
   }
 
@@ -88,7 +88,7 @@
           }
         }
       } catch {
-        // ignore malformed messages
+        // ignore malformed
       }
     };
 
@@ -129,11 +129,23 @@
     }
   }
 
+  // Округление
+  function round11(val) {
+    return Number(val).toFixed(11);
+  }
+
+  function round2(val) {
+    return Number(val).toFixed(2);
+  }
+
+  // ==== обновление данных ====
   function updateAll() {
     if (currentPrice == null) return;
 
-    for (const node of priceNodes) node.textContent = currentPrice;
+    // --- price ---
+    for (const node of priceNodes) node.textContent = round11(currentPrice);
 
+    // --- pnl ---
     for (const node of pnlNodes) {
       const entry = parseFloat(node.dataset.entryPrice);
       const qty = parseFloat(node.dataset.qty);
@@ -146,10 +158,18 @@
           ? (currentPrice - entry) * qty - funding
           : (entry - currentPrice) * qty - funding;
 
-      const rounded = Math.round(pnl * 1000) / 1000;
+      const rounded = parseFloat(round11(pnl));
+
       node.style.color =
         rounded > 0 ? "green" : rounded < 0 ? "red" : "gray";
-      node.textContent = rounded.toFixed(3);
+
+      node.textContent = round11(rounded);
+    }
+
+    // funding только до 2 знаков
+    for (const f of fundingNodes) {
+      const v = parseFloat(f.textContent);
+      if (!Number.isNaN(v)) f.textContent = round2(v);
     }
   }
 

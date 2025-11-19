@@ -23,7 +23,7 @@ class OrderHistoryModelAdmin(TabularInline):
     extra = 0
     readonly_fields = ('formatted_update_data', 'action_name', 'comment')
     fields = ('action_name', 'formatted_update_data', 'comment')
-    ordering = ('-created_at', )
+    ordering = ('-created_at',)
 
     def has_add_permission(self, request, obj):
         return False
@@ -32,15 +32,17 @@ class OrderHistoryModelAdmin(TabularInline):
     def formatted_update_data(self, obj):
         if not obj.update_data:
             return "-"
+        # Если JSON огромный, это место может быть тяжёлым, но пока оставляем как есть.
         pretty_json = json.dumps(obj.update_data, indent=4, ensure_ascii=False)
         return mark_safe(f"<pre>{pretty_json}</pre>")
+
 
 class OrderCreditingModelAdmin(admin.TabularInline):
     model = OrderCreditingModel
     extra = 0
     readonly_fields = ('type', 'count_display', 'comment')
     fields = readonly_fields
-    ordering = ('-created_at', )
+    ordering = ('-created_at',)
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -77,24 +79,30 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         css = {
             'all': ('css/admin/admin_order.css',)
         }
+
     change_list_template = "html/admin/change_list.html"
 
-    search_fields = (
-        'uuid',
-    )
-    list_filter = (
-        'status',
-    )
+    search_fields = ('uuid',)
+    list_filter = ('status',)
+
     list_display = (
         'open_block',
         'position_info',
         'position_live_data',
         'redis_value',
     )
+
     inlines = [
         OrderCreditingModelAdmin,
         OrderHistoryModelAdmin,
     ]
+
+    # Оптимизация N+1 по position / symbol
+    list_select_related = ('position', 'position__symbol')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('position', 'position__symbol')
 
     @admin.display(description='')
     def open_block(self, obj):
@@ -111,7 +119,6 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         rounded_usdt = value.quantize(Decimal('0.01'))
         side = 'ЛОНГ' if obj.side == 'buy' else 'ШОРТ'
 
-        # форматирование даты
         def fmt(dt):
             return dt.strftime("%d.%m.%Y %H:%M:%S") if dt else "—"
 
@@ -120,7 +127,6 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         created_display = fmt(obj.created_at)
         closed_display = fmt(obj.close_at)
 
-        # строка "Создано" + подпись "Закрыт"
         created_html = f"""
             <td>
                 {created_display}
@@ -140,11 +146,11 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
             </tr>
             <tr>
                 <td style="text-align:left; padding-right:10px;">Кол-во:</td>
-                <td>{qty}</td>
+                <td>{round(qty, 6)}</td>
             </tr>
             <tr>
                 <td style="text-align:left; padding-right:10px;">USDT:</td>
-                <td>{rounded_usdt}</td>
+                <td>{round(rounded_usdt, 2)}</td>
             </tr>
             <tr>
                 <td style="text-align:left; padding-right:10px;">Создано:</td>
@@ -174,22 +180,24 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         symbol = obj.position.symbol.name
         url = f"/api/order/?uuid={obj.uuid}"
 
-        # Проверяем, исполнен ли ордер
+        # Исполненный ордер — статичный блок
         if obj.status == OrderStatus.COMPLETED:
             close_rate = obj.close_rate or Decimal('0')
-            pnl = (close_rate - entry_price) * qty - funding if side == 'buy' else (
-                                                                                   entry_price - close_rate) * qty - funding
+            if side == 'buy':
+                pnl = (close_rate - entry_price) * qty - funding
+            else:
+                pnl = (entry_price - close_rate) * qty - funding
             pnl = pnl.quantize(Decimal('0.001'))
 
             html = f"""
                <table style="border-collapse: collapse; width: 100%; border: none;">
                    <tr>
                        <td style="text-align: left; padding-right: 10px;">Сборы USDT:</td>
-                       <td>{funding.quantize(Decimal('0.001'))}</td>
+                       <td>{round(funding.quantize(Decimal('0.001')), 2)}</td>
                    </tr>
                    <tr>
                        <td style="text-align: left; padding-right: 10px;">Цель для 0.5$:</td>
-                       <td>{target_rate or '—'}</td>
+                       <td>{round(target_rate, 11) or '—'}</td>
                    </tr>
                    <tr>
                        <td style="text-align: left; padding-right: 10px;">Статус:</td>
@@ -204,7 +212,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                    </tr>
                    <tr>
                        <td style="text-align: left; padding-right: 10px;">Курс закрытия:</td>
-                       <td>{close_rate}</td>
+                       <td>{round(close_rate, 11)}</td>
                    </tr>
                    <tr>
                        <td style="text-align: left; padding-right: 10px;">P&L:</td>
@@ -214,7 +222,7 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                """
             return mark_safe(html)
 
-        # --- иначе обычная динамика ---
+        # --- иначе динамика через WS / REST ---
         funding = funding.quantize(Decimal('0.001'))
         price_span_id = f'curprice-{obj.pk}'
         pnl_span_id = f'pnl-{obj.pk}'
@@ -231,8 +239,8 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                    5с
                </div>
                <table style="border-collapse: collapse; width: 100%; border: none;">
-                   <tr><td>Сборы USDT:</td><td class="js-funding">{funding}</td></tr>
-                   <tr><td>Цель для 0.5$:</td><td>{target_rate or '—'}</td></tr>
+                   <tr><td>Сборы USDT:</td><td class="js-funding">{round(funding, 2)}</td></tr>
+                   <tr><td>Цель для 0.5$:</td><td>{round(target_rate, 11) or '—'}</td></tr>
                    <tr><td>Статус:</td><td class="js-status">{obj.get_status_display().upper()}</td></tr>
                    <tr><td>Курс:</td><td><span id="{price_span_id}" class="js-current-price" data-symbol="{symbol}">—</span></td></tr>
                    <tr><td>P&L:</td><td><span id="{pnl_span_id}" class="js-pnl"
@@ -247,22 +255,22 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
         return mark_safe(html)
 
     @admin.display(description='Макс/Мин экстремумы')
-    def redis_value(self, obj):
+    def redis_value(self, obj: OrderModel):
         if not obj.pk:
             return "-"
 
+        # URL сейчас для batch не обязателен, но оставим, если ещё где-то используется
         url = f"/api/order/extremum?uuid={obj.uuid}"
 
+        # ВАЖНО:
+        #  - нет локального таймера внутри блока
+        #  - добавили data-status для фильтрации в JS (мониторинг / исполнено)
         html = f"""
         <div class="js-extremum-block"
              data-url="{url}"
+             data-status="{obj.status}"
              id="extremum-{obj.uuid}"
              style="position:relative;">
-            <div style="position:absolute; top:0; right:0; font-size:10px; color:gray;">
-                <span class="js-ext-counter">5</span>с
-            </div>
-         
-
             <table style="border-collapse: collapse; width: 100%; border: none;">
                 <tr>
                     <td style="text-align: left; padding-right: 10px;">МАКС:</td>
@@ -274,7 +282,6 @@ class OrderModelAdmin(admin.ModelAdmin, FSMTransitionMixin):
                     <td class="js-ext-min">—</td>
                     <td class="js-ext-min-dt">—</td>
                 </tr>
-  
             </table>
         </div>
         """

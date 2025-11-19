@@ -25,6 +25,9 @@ class PositionAdmin(admin.ModelAdmin, FSMTransitionMixin):
         'is_test',
 
     )
+    search_fields = (
+        'uuid',
+    )
     autocomplete_fields = (
         'symbol',
     )

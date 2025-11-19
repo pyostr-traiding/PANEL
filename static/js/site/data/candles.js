@@ -55,6 +55,7 @@ function updateBlock(interval, data) {
   const time = new Date().toLocaleTimeString();
 
   block.innerHTML = `
+    <b>TS:</b> ${data.ts}<br>
     <b>Интервал:</b> ${interval} мин<br>
     <b>Цена:</b> ${price}<br>
     <b>Время:</b> ${time}<br>

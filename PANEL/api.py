@@ -22,7 +22,8 @@ from app.setting.routes.prompt import router as router_settings_prompt
 from app.setting.routes.exchange import router as router_settings_exchange
 
 # Фронт
-from app.frontend.routes.gpt import router as router_chats_gpt
+from app.frontend.routes.gpt import router as router_front_gpt
+from app.frontend.routes.monitoring import router as router_front_monitoring
 
 
 
@@ -60,4 +61,5 @@ api_route.add_router('/settings/', router_settings_exchange)
 
 #####
 # Фронт
-api_route.add_router('/chats/', router_chats_gpt)
+api_route.add_router('/front/', router_front_gpt)
+api_route.add_router('/front/', router_front_monitoring)

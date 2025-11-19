@@ -10,6 +10,7 @@ class RedisDB:
     extremums: int = 3
 
     gpt: int = 5
+    monitoring: int = 8
 
 class RedisServer:
     def __init__(self):

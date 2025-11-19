@@ -2,6 +2,7 @@ from django.urls import re_path
 
 from consumers.gpt import GPTConsumer
 from consumers.kline import KlineConsumer
+from consumers.monitoring import MonitoringConsumer
 from consumers.orderbook import OrderbookConsumer
 from consumers.signals.macd import MACDConsumer
 from consumers.signals.rsi import RSIConsumer
@@ -15,5 +16,6 @@ websocket_urlpatterns = [
     re_path(r'ws/gpt/$', GPTConsumer.as_asgi()),
 
     re_path(r'ws/trade_update/$', TradeConsumer.as_asgi()),
+    re_path(r'ws/monitoring/$', MonitoringConsumer.as_asgi()),
 
 ]

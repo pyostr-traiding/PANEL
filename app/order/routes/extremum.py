@@ -13,21 +13,37 @@ router = Router(
 
 
 @router.get(
-    path='/extremum',
+    path='/extremum/batch',
 )
 def api_change_status_order(
         request: HttpRequest,
-        uuid: str
+        uuids: str
 ):
     """
-    Получить экстремумы
+    Получить экстремумы пачкой:
+    /extremum/batch?uuids=uuid1,uuid2,uuid3
     """
+    id_list = uuids.split(",")
 
-    _max = f'extremum:order:{uuid}:MAX'
-    _min = f'extremum:order:{uuid}:MIN'
-    result = redis_server.mget([_max, _min], db=RedisDB.extremums)
-    if not result:
-        return []
+    keys = []
+    for uid in id_list:
+        keys.append(f'extremum:order:{uid}:MAX')
+        keys.append(f'extremum:order:{uid}:MIN')
 
-    result = [json.loads(i) if i else None for i in result]
-    return result
+    # mget одним пакетом
+    result = redis_server.mget(keys, db=RedisDB.extremums)
+    print(result)
+    # формируем ответ
+    response = {}
+    idx = 0
+    for uid in id_list:
+        max_raw = result[idx]
+        min_raw = result[idx + 1]
+        idx += 2
+
+        response[uid] = {
+            "max": json.loads(max_raw) if max_raw else None,
+            "min": json.loads(min_raw) if min_raw else None,
+        }
+
+    return response

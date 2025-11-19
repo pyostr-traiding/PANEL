@@ -17,6 +17,10 @@ class IndicatorRSIView(IndicatorBaseView):
     """Вкладка с RSI и Stoch RSI"""
     template_name = 'html/site/data/rsi.html'
 
+class MonitoringView(IndicatorBaseView):
+    """Вкладка с RSI и Stoch RSI"""
+    template_name = 'html/site/data/monitoring.html'
+
 class IndicatorCandlesView(IndicatorBaseView):
     template_name = 'html/site/data/klines.html'
 

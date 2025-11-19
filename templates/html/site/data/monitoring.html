@@ -1,0 +1,42 @@
+{% extends 'html/site/base_app.html' %}
+{% load static %}
+{% block content %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/data/blocks.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site/data/monitoring.css' %}">
+{% endblock %}
+{% include 'html/site/data/tabs.html' %}
+
+<div class="monitoring-status">
+    <span id="ws-status" class="status red"></span>
+    <span id="ws-status-text">Отключено</span>
+</div>
+
+<h2>Мониторинг позиций и ордеров</h2>
+
+<div class="monitoring-tabs">
+    <a href="#" data-tab="positions" class="active">Позиции</a>
+    <a href="#" data-tab="orders">Ордера</a>
+</div>
+
+<div id="monitoring-content">
+    <div id="positions" class="tab-block active"></div>
+    <div id="orders" class="tab-block"></div>
+</div>
+
+<!-- Модалка -->
+<div id="modal" class="modal">
+    <div class="modal-content" id="modal-content">
+        <span id="modal-close">&times;</span>
+        <h3>Подробности</h3>
+        <div id="modal-body"></div>
+
+        <button id="modal-delete" class="delete-btn">Удалить</button>
+    </div>
+</div>
+
+
+<script src="{% static 'js/site/data/monitoring.js' %}"></script>
+
+{% endblock %}
