@@ -93,8 +93,14 @@ class PositionModel(AbstractModel):
         blank=True,
     )
 
-
-    def save(self, *args, **kwargs):
+    def save(
+            self,
+            *args,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
+    ):
         if not self.close_at and self.status in [
             PositionStatus.CREATED,
             PositionStatus.ACCEPT_MONITORING
@@ -107,6 +113,9 @@ class PositionModel(AbstractModel):
             self.close_at = datetime.now(UTC)
 
         self.save_base(
-            *args, kwargs
+            using=using,
+            force_insert=force_insert,
+            force_update=force_update,
+            update_fields=update_fields,
         )
 
