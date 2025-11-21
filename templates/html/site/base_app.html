@@ -28,10 +28,107 @@
 
   {% block head_extra %}{% endblock %}
 </head>
+
 <body>
   {% include 'html/site/sidebar.html' %}
+    <div id="toast-box"></div>
+
+
   <main class="app-main">
     {% block content %}{% endblock %}
   </main>
 </body>
+<style>
+    #toast-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+}
+
+.toast {
+  position: relative;
+  color: #fff;
+  padding: 12px 18px 14px;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  font-size: 14px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all .3s ease;
+  overflow: hidden;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast-error {
+  background: var(--accent-hover-red);
+}
+
+.toast-info {
+  background: var(--accent-color);
+}
+
+.toast-warning {
+  background: var(--accent-hover-orange);
+}
+
+/* Линия снизу */
+.toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: rgba(255,255,255,0.9);
+  transform-origin: left;
+  transition: transform linear;
+}
+
+</style>
+<script>
+   function showToast(msg, type = "info") {
+  const box = document.querySelector('#toast-box');
+  const t = document.createElement('div');
+
+  const classMap = {
+    error: 'toast-error',
+    info: 'toast-info',
+    warning: 'toast-warning'
+  };
+
+  t.className = `toast ${classMap[type] || classMap.info}`;
+  t.textContent = msg;
+
+  // прогресс-линиия
+  const prog = document.createElement('div');
+  prog.className = 'toast-progress';
+  t.appendChild(prog);
+
+  box.appendChild(t);
+
+  // показать
+  setTimeout(() => {
+    t.classList.add('show');
+
+    // запустить анимацию полосы
+    prog.style.transform = 'scaleX(0)';
+    prog.style.transitionDuration = '3s';
+  }, 20);
+
+  // скрыть
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+
+</script>
 </html>

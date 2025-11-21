@@ -22,6 +22,7 @@ class RSIConsumer(AsyncWebsocketConsumer):
         # Подписка на канал
         self.pubsub = self.redis.pubsub()
         await self.pubsub.subscribe('signals:BTCUSDT')
+        await self.pubsub.subscribe('signals:BTCUSDT:INFO')
 
         # Запускаем отдельную задачу, которая будет слушать Redis
         self.task = asyncio.create_task(self.stream_from_redis())

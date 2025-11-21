@@ -68,7 +68,7 @@ function calcPnlUSD(kind, item) {
       side === 'sell'
         ? (entryPrice - closeRate) * qty
         : (closeRate - entryPrice) * qty;
-    return gross - accumulatedFunding - fees;
+    return gross - accumulatedFunding;
   }
 
   // иначе считаем по текущей цене
@@ -168,7 +168,18 @@ async function loadPositions() {
       })}`
     );
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (res.status === 404) {
+      const json = await res.json();
+      console.log(json.msg);
+
+      showToast(json.msg || 'Ошибка 404: данные не найдены');
+      return;
+    }
+
+    if (!res.ok) {
+      showToast(`Ошибка загрузки позиций: HTTP ${res.status}`);
+      throw new Error(`HTTP ${res.status}`);
+    }
 
     const json = await res.json();
     state.pos.list = json.positions || [];
@@ -178,8 +189,10 @@ async function loadPositions() {
     updatePager('positions');
   } catch (e) {
     console.error('Ошибка загрузки позиций:', e);
+    showToast('Ошибка при загрузке позиций');
   }
 }
+
 
 async function loadOrders() {
   try {
@@ -190,7 +203,18 @@ async function loadOrders() {
       })}`
     );
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (res.status === 404) {
+      const json = await res.json();
+      console.log(json.msg);
+
+      showToast(json.msg || 'Ошибка 404: данные не найдены');
+      return;
+    }
+
+    if (!res.ok) {
+      showToast(`Ошибка загрузки ордеров: HTTP ${res.status}`);
+      throw new Error(`HTTP ${res.status}`);
+    }
 
     const json = await res.json();
     state.ord.list = json.orders || [];
@@ -199,9 +223,11 @@ async function loadOrders() {
     renderList('orders', state.ord.list);
     updatePager('orders');
   } catch (e) {
-    console.error('Ошибка загрузки ордеров:', e);
+    console.error('loadOrders error:', e);
+    showToast('Ошибка при загрузке ордеров');
   }
 }
+
 
 async function loadExchangeSettings() {
   const res = await fetch(API_EXCH);
@@ -570,6 +596,7 @@ function bindFilters() {
   const fStatus = qs('#filter-status');
 
   btnApply.onclick = async () => {
+  try {
     state.filters.uuid = fUuid.value.trim();
     state.filters.side = fSide.value;
     state.filters.status = fStatus.value;
@@ -579,9 +606,14 @@ function bindFilters() {
 
     if (state.activeTab === 'orders') await loadOrders();
     else await loadPositions();
-  };
+  } catch {
+    showToast('Ошибка применения фильтра');
+  }
+};
+
 
   btnReset.onclick = async () => {
+  try {
     fUuid.value = '';
     fSide.value = '';
     fStatus.value = '';
@@ -592,7 +624,11 @@ function bindFilters() {
 
     if (state.activeTab === 'orders') await loadOrders();
     else await loadPositions();
-  };
+  } catch {
+    showToast('Ошибка сброса фильтра');
+  }
+};
+
 }
 
 /* ========================================

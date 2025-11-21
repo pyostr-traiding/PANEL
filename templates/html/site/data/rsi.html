@@ -6,36 +6,38 @@
   <link rel="stylesheet" href="{% static 'css/site/data/blocks.css' %}">
 {% endblock %}
 
-
 {% include 'html/site/data/tabs.html' %}
- <div class="indicator-status">
-    <span id="ws-status" class="status red"></span>
-    <span id="ws-status-text">Отключено</span>
+
+<div class="indicator-status">
+  <span id="ws-status" class="status red"></span>
+  <span id="ws-status-text">Отключено</span>
+</div>
+
+<h2>RSI и Stoch RSI</h2>
+
+<div id="rsi-layout" class="indicator-layout">
+  <div class="indicator-column">
+    <h3>RSI</h3>
+    <div class="indicator-grid" id="rsi-blocks">
+      <div class="interval-block" data-type="RSI" data-interval="1"></div>
+      <div class="interval-block" data-type="RSI" data-interval="5"></div>
+      <div class="interval-block" data-type="RSI" data-interval="15"></div>
+      <div class="interval-block" data-type="RSI" data-interval="30"></div>
+    </div>
+    <div class="indicator-info" id="rsi-info-block"></div>
   </div>
 
-  <h2>RSI и Stoch RSI</h2>
-
-  <div id="rsi-layout" class="indicator-layout">
-    <div class="indicator-column">
-      <h3>RSI</h3>
-      <div class="indicator-grid" id="rsi-blocks">
-        <div class="interval-block" data-type="RSI" data-interval="1"></div>
-        <div class="interval-block" data-type="RSI" data-interval="5"></div>
-        <div class="interval-block" data-type="RSI" data-interval="15"></div>
-        <div class="interval-block" data-type="RSI" data-interval="30"></div>
-      </div>
+  <div class="indicator-column">
+    <h3>Stoch RSI</h3>
+    <div class="indicator-grid" id="stoch-blocks">
+      <div class="interval-block" data-type="STOCH_RSI" data-interval="1"></div>
+      <div class="interval-block" data-type="STOCH_RSI" data-interval="5"></div>
+      <div class="interval-block" data-type="STOCH_RSI" data-interval="15"></div>
+      <div class="interval-block" data-type="STOCH_RSI" data-interval="30"></div>
     </div>
-
-    <div class="indicator-column">
-      <h3>Stoch RSI</h3>
-      <div class="indicator-grid" id="stoch-blocks">
-        <div class="interval-block" data-type="STOCH_RSI" data-interval="1"></div>
-        <div class="interval-block" data-type="STOCH_RSI" data-interval="5"></div>
-        <div class="interval-block" data-type="STOCH_RSI" data-interval="15"></div>
-        <div class="interval-block" data-type="STOCH_RSI" data-interval="30"></div>
-      </div>
-    </div>
+    <div class="indicator-info" id="stochrsi-info-block"></div>
   </div>
+</div>
 
-  <script src="{% static 'js/site/data/rsi.js' %}"></script>
+<script src="{% static 'js/site/data/rsi.js' %}"></script>
 {% endblock %}
