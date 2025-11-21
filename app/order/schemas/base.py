@@ -27,6 +27,9 @@ class OrderSchema(BaseModel):
 
     created_at: Any  # обычно datetime, но сохраняем гибкость
 
+    close_at: Optional[Any] = None
+    close_kline_ms: Optional[int] = None
+
 
 class OrderFilterResponseSchema(BaseModel):
     orders: list[OrderSchema]

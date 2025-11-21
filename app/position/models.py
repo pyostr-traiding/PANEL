@@ -1,3 +1,5 @@
+from datetime import datetime, UTC
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -85,4 +87,26 @@ class PositionModel(AbstractModel):
         verbose_name='Свеча сигнала',
         max_length=100,
     )
+    close_at = models.DateTimeField(
+        verbose_name='Время закрытия',
+        null=True,
+        blank=True,
+    )
+
+
+    def save(self, *args, **kwargs):
+        if not self.close_at and self.status in [
+            PositionStatus.CREATED,
+            PositionStatus.ACCEPT_MONITORING
+        ]:
+            self.close_at = None
+        elif not self.close_at and self.status in [
+            PositionStatus.COMPLETED,
+            PositionStatus.CANCEL
+        ]:
+            self.close_at = datetime.now(UTC)
+
+        self.save_base(
+            *args, kwargs
+        )
 

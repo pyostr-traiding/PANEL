@@ -13,7 +13,11 @@ const state = {
   takerFee: 0,
   price: null,
   symbol: 'BTCUSDT',
-  filters: { status: '', side: '', uuid: '' },
+  filters: {
+    orders:    { status: '', side: '', uuid: '' },
+    positions: { status: '', side: '', uuid: '' },
+  },
+
   pos: { limit: 20, offset: 0, total: 0, list: [] },
   ord: { limit: 20, offset: 0, total: 0, list: [] },
   activeTab: 'orders',
@@ -37,6 +41,36 @@ function setTradeWSStatus(color, text) {
   if (dot) dot.className = `ws-dot ${color}`;
   if (label) label.textContent = text;
 }
+
+
+function fmtLifetime(createdAt, closeAt) {
+  if (!createdAt || createdAt === 'null' || createdAt === 'undefined') {
+    return '—';
+  }
+
+  const start = new Date(createdAt);
+  if (isNaN(start.getTime())) return '—';  // защита
+
+  let end = null;
+
+  if (closeAt && closeAt !== 'null' && closeAt !== 'undefined') {
+    end = new Date(closeAt);
+    if (isNaN(end.getTime())) end = new Date();
+  } else {
+    end = new Date();
+  }
+
+  const diff = end - start;
+  if (isNaN(diff) || diff < 0) return '—'; // защита от NAN
+
+  const sec = Math.floor(diff / 1000) % 60;
+  const min = Math.floor(diff / 60000) % 60;
+  const hrs = Math.floor(diff / 3600000);
+
+  return `${hrs}ч ${min}м ${sec}с`;
+}
+
+
 
 function fmtNum(x, dp = 6) {
   if (x == null || isNaN(x)) return '—';
@@ -89,48 +123,106 @@ function makeRow(kind, item) {
   const qty = item.qty_tokens ? Number(item.qty_tokens) : null;
   const price = item.price ? Number(item.price) : null;
   const side = (item.side || '').toLowerCase();
-  const pnl = calcPnlUSD(kind, item);
 
   const row = document.createElement('div');
-  row.className = 'item-row table-grid';
+  row.className =
+  'item-row table-grid ' + (kind === 'orders'
+    ? 'table-grid-orders'
+    : 'table-grid-positions');
 
-  row.innerHTML = `
-    <div class="col">
-      <button class="btn btn-primary btn-more" data-id="${item.id}" data-kind="${kind}">
-        Подробнее
-      </button>
-    </div>
+  // ===============================
+  // 📌 ПОЗИЦИИ — без P&L
+  // ===============================
+  if (kind === 'positions') {
 
-    <div class="col">
-      <div class="top">${fmtNum(qty)} ${item.symbol_name || state.symbol}</div>
-      <div class="bottom">${fmtUSDT(qty * price)} USDT</div>
-    </div>
-
-    <div class="col">
-      <span class="side-badge ${side === 'buy' ? 'side-buy' : 'side-sell'}">
-        ${side.toUpperCase()}
-      </span>
-    </div>
-
-    <div class="col">
-      <div class="pnl ${pnlClass(pnl)}">
-        ${pnl == null ? '—' : (pnl >= 0 ? '+' : '') + fmtUSDT(pnl)}
+    row.innerHTML = `
+      <div class="col">
+        <button class="btn btn-primary btn-more" data-id="${item.id}" data-kind="${kind}">
+          Подробнее
+        </button>
       </div>
-    </div>
 
-    <div class="col">
-      <div class="top mono">${item.uuid || '—'}</div>
-      <div class="bottom">${fmtDate(item.created_at)}</div>
-    </div>
+      <div class="col">
+        <div class="top">${fmtNum(qty)} ${item.symbol_name || state.symbol}</div>
+        <div class="bottom">${fmtUSDT(qty * price)} USDT</div>
+      </div>
 
-    <div class="col actions">
-      <span class="bottom">${(item.status_title || '—').toUpperCase()}</span>
-    </div>
-  `;
+      <div class="col">
+        <span class="side-badge ${side === 'buy' ? 'side-buy' : 'side-sell'}">
+          ${side.toUpperCase()}
+        </span>
+      </div>
+
+      <div class="col">
+        <div class="top mono">${item.uuid || '—'}</div>
+        <div class="bottom">${fmtDate(item.created_at)}</div>
+      </div>
+
+      <div class="col">
+        <div class="top lifetime" data-created="${item.created_at}" data-close="${item.close_at}">
+          ${fmtLifetime(item.created_at, item.close_at)}
+        </div>
+      </div>
+
+      <div class="col actions">
+        <span class="bottom">${(item.status_title || '—').toUpperCase()}</span>
+      </div>
+    `;
+  }
+
+  // ===============================
+  // 📌 ОРДЕРА — со столбцом P&L
+  // ===============================
+  else {
+
+    const pnl = calcPnlUSD(kind, item);
+
+    row.innerHTML = `
+      <div class="col">
+        <button class="btn btn-primary btn-more" data-id="${item.id}" data-kind="${kind}">
+          Подробнее
+        </button>
+      </div>
+
+      <div class="col">
+        <div class="top">${fmtNum(qty)} ${item.symbol_name || state.symbol}</div>
+        <div class="bottom">${fmtUSDT(qty * price)} USDT</div>
+      </div>
+
+      <div class="col">
+        <span class="side-badge ${side === 'buy' ? 'side-buy' : 'side-sell'}">
+          ${side.toUpperCase()}
+        </span>
+      </div>
+
+      <div class="col">
+        <div class="pnl ${pnlClass(pnl)}">
+          ${pnl == null ? '—' : (pnl >= 0 ? '+' : '') + fmtUSDT(pnl)}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="top mono">${item.uuid || '—'}</div>
+        <div class="bottom">${fmtDate(item.created_at)}</div>
+      </div>
+
+      <div class="col">
+        <div class="top lifetime" data-created="${item.created_at}" data-close="${item.close_at}">
+          ${fmtLifetime(item.created_at, item.close_at)}
+        </div>
+      </div>
+
+      <div class="col actions">
+        <span class="bottom">${(item.status_title || '—').toUpperCase()}</span>
+      </div>
+    `;
+  }
 
   row.querySelector('.btn-more').onclick = () => openModal(kind, item);
   return row;
 }
+
+
 
 function renderList(kind, items) {
   const box = qs(kind === 'positions' ? '#positions-list' : '#orders-list');
@@ -146,27 +238,40 @@ function renderList(kind, items) {
   for (const i of items) box.appendChild(makeRow(kind, i));
 }
 
-function buildParams(extra = {}) {
-  const f = state.filters;
+function mapStatus(kind, status) {
+  if (!status) return '';
+
+  // Разный нейминг статусов
+  if (kind === 'positions') {
+    if (status === 'canceled') return 'cancel'; // вот здесь магия
+  }
+
+  return status;
+}
+
+function buildParams(kind, extra = {}) {
+  const f = state.filters[kind] || {};
   const p = new URLSearchParams();
 
-  if (f.status) p.set('status', f.status);
-  if (f.side) p.set('side', f.side);
-  if (f.uuid) p.set('uuid', f.uuid);
+  if (f.status) p.set('status', mapStatus(kind, f.status));
+  if (f.side)   p.set('side', f.side);
+  if (f.uuid)   p.set('uuid', f.uuid);
 
   for (const [k, v] of Object.entries(extra)) p.set(k, v);
 
   return p.toString();
 }
 
+
 async function loadPositions() {
   try {
     const res = await fetch(
-      `${API_POS}?${buildParams({
-        limit: state.pos.limit,
-        offset: state.pos.offset,
-      })}`
-    );
+    `${API_POS}?${buildParams('positions', {
+      limit: state.pos.limit,
+      offset: state.pos.offset,
+    })}`
+  );
+
 
     if (res.status === 404) {
       const json = await res.json();
@@ -197,11 +302,12 @@ async function loadPositions() {
 async function loadOrders() {
   try {
     const res = await fetch(
-      `${API_ORD}?${buildParams({
+      `${API_ORD}?${buildParams('orders', {
         limit: state.ord.limit,
         offset: state.ord.offset,
       })}`
     );
+
 
     if (res.status === 404) {
       const json = await res.json();
@@ -254,9 +360,20 @@ function switchTab(tab) {
     p.classList.toggle('active', p.id === `tab-${tab}`)
   );
 
+  // Подставляем сохранённые фильтры для этой вкладки
+  const f = state.filters[tab] || {};
+  const fUuid   = qs('#filter-uuid');
+  const fSide   = qs('#filter-side');
+  const fStatus = qs('#filter-status');
+
+  if (fUuid)   fUuid.value   = f.uuid   || '';
+  if (fSide)   fSide.value   = f.side   || '';
+  if (fStatus) fStatus.value = f.status || '';
+
   if (tab === 'orders') renderList('orders', state.ord.list);
   else renderList('positions', state.pos.list);
 }
+
 
 function bindTabs() {
   const root = qs('.trade-tabs');
@@ -279,11 +396,12 @@ function openModal(kind, item) {
   state.modal.open = true;
   state.modal.kind = kind;
   state.modal.id = item.id;
-  state.modal.item = JSON.parse(JSON.stringify(item)); // глубокая копия
+  state.modal.item = JSON.parse(JSON.stringify(item));
 
   qs('#md-type').textContent = kind === 'orders' ? 'Ордер' : 'Позиция';
   qs('#md-uuid').textContent = item.uuid || '—';
   qs('#md-symbol').textContent = item.symbol_name || '—';
+
   let sideLabel = '—';
   let sideClass = '';
   if (item.side) {
@@ -299,60 +417,45 @@ function openModal(kind, item) {
   mdSide.textContent = sideLabel;
   mdSide.classList.remove('side-buy', 'side-sell');
   if (sideClass) mdSide.classList.add(sideClass);
+
   qs('#md-status').textContent = item.status_title || '—';
   qs('#md-qty').textContent = item.qty_tokens || '—';
   qs('#md-price').textContent = item.price || '—';
   qs('#md-created').textContent = fmtDate(item.created_at);
-    qs('#md-close').textContent = item.close_rate || '—';
+  qs('#md-close').textContent = item.close_rate || '—';
 
+  const pnl = kind === 'positions' ? null : calcPnlUSD(kind, item);
 
-  const pnl = calcPnlUSD(kind, item);
   const mdPnl = qs('#md-pnl');
-  mdPnl.textContent =
-    pnl == null ? '—' : (pnl >= 0 ? '+' : '') + fmtUSDT(pnl);
-
+  mdPnl.textContent = pnl == null ? '—' : (pnl >= 0 ? '+' : '') + fmtUSDT(pnl);
   mdPnl.classList.remove('positive', 'negative');
-  if (pnl != null) {
-    mdPnl.classList.add(pnl >= 0 ? 'positive' : 'negative');
-  }
+  if (pnl != null) mdPnl.classList.add(pnl >= 0 ? 'positive' : 'negative');
 
-
+  // NEW: lifetime
+  qs('#md-lifetime').textContent = fmtLifetime(item.created_at, item.close_at);
 
   qs('#trade-modal').classList.add('show');
 
   const btn = qs('#md-close-order-btn');
 
-  // Кнопка показывается только для ордеров
   if (kind === 'orders') {
     btn.style.display = 'block';
-
-    // Активность по статусу
-    if (String(item.status).toLowerCase() === 'monitoring') {
-      btn.disabled = false;
-    } else {
-      btn.disabled = true;
-    }
+    btn.disabled = String(item.status).toLowerCase() !== 'monitoring';
   } else {
     btn.style.display = 'none';
   }
 
-  // обработчик
   btn.onclick = () => {
     if (btn.disabled) return;
     console.log(`[TRADE] Закрыть ордер: ${item.uuid}`);
   };
-  qs('#md-show-json').onclick = () => {
-  const json = JSON.stringify(item, null, 2);
-  qs('#json-modal-content').textContent = json;
-  qs('#json-modal').classList.add('show');
-};
-qs('#md-show-json').onclick = () => {
-  const json = JSON.stringify(item, null, 2);
-  qs('#json-modal-content').textContent = json;
-  qs('#json-modal').classList.add('show');
-};
 
+  qs('#md-show-json').onclick = () => {
+    qs('#json-modal-content').textContent = JSON.stringify(item, null, 2);
+    qs('#json-modal').classList.add('show');
+  };
 }
+
 
 function bindModal() {
   const tradeModal = qs('#trade-modal');
@@ -445,23 +548,21 @@ function updateModalLive() {
   qs('#md-price').textContent = item.price || '—';
   qs('#md-qty').textContent = item.qty_tokens || '—';
 
-  // LIVE цена
   qs('#md-live-price').textContent =
     state.price == null ? '—' : fmtUSDT(state.price, 2);
 
-  const pnl = calcPnlUSD(kind, item);
+  const pnl = kind === 'positions' ? null : calcPnlUSD(kind, item);
 
   const mdPnl = qs('#md-pnl');
   mdPnl.textContent =
     pnl == null ? '—' : (pnl >= 0 ? '+' : '') + fmtUSDT(pnl);
 
   mdPnl.classList.remove('positive', 'negative');
-  if (pnl != null) {
-    mdPnl.classList.add(pnl >= 0 ? 'positive' : 'negative');
-  }
+  if (pnl != null) mdPnl.classList.add(pnl >= 0 ? 'positive' : 'negative');
 
+  // NEW: lifetime live update
+  qs('#md-lifetime').textContent = fmtLifetime(item.created_at, item.close_at);
 
-  // Кнопка закрытия
   const btn = qs('#md-close-order-btn');
   if (kind === 'orders') {
     btn.style.display = 'block';
@@ -469,12 +570,13 @@ function updateModalLive() {
   } else {
     btn.style.display = 'none';
   }
+
   const jsonModal = qs('#json-modal');
-if (jsonModal.classList.contains('show')) {
-  qs('#json-modal-content').textContent = JSON.stringify(item, null, 2);
+  if (jsonModal.classList.contains('show')) {
+    qs('#json-modal-content').textContent = JSON.stringify(item, null, 2);
+  }
 }
 
-}
 
 
 /* ========================================
@@ -591,45 +693,73 @@ function bindFilters() {
   const btnApply = qs('#apply-filter');
   const btnReset = qs('#reset-filter');
 
-  const fUuid = qs('#filter-uuid');
-  const fSide = qs('#filter-side');
+  const fUuid   = qs('#filter-uuid');
+  const fSide   = qs('#filter-side');
   const fStatus = qs('#filter-status');
 
   btnApply.onclick = async () => {
-  try {
-    state.filters.uuid = fUuid.value.trim();
-    state.filters.side = fSide.value;
-    state.filters.status = fStatus.value;
+    try {
+      const kind = state.activeTab; // 'orders' или 'positions'
+      const f = state.filters[kind];
 
-    state.ord.offset = 0;
-    state.pos.offset = 0;
+      f.uuid   = fUuid.value.trim();
+      f.side   = fSide.value;
+      f.status = fStatus.value;
 
-    if (state.activeTab === 'orders') await loadOrders();
-    else await loadPositions();
-  } catch {
-    showToast('Ошибка применения фильтра');
-  }
-};
-
+      // сбрасываем пагинацию только для активного типа
+      if (kind === 'orders') {
+        state.ord.offset = 0;
+        await loadOrders();
+      } else {
+        state.pos.offset = 0;
+        await loadPositions();
+      }
+    } catch {
+      showToast('Ошибка применения фильтра');
+    }
+  };
 
   btnReset.onclick = async () => {
-  try {
-    fUuid.value = '';
-    fSide.value = '';
-    fStatus.value = '';
+    try {
+      const kind = state.activeTab;
+      const f = state.filters[kind];
 
-    state.filters = { uuid: '', side: '', status: '' };
-    state.ord.offset = 0;
-    state.pos.offset = 0;
+      f.uuid   = '';
+      f.side   = '';
+      f.status = '';
 
-    if (state.activeTab === 'orders') await loadOrders();
-    else await loadPositions();
-  } catch {
-    showToast('Ошибка сброса фильтра');
-  }
-};
+      fUuid.value = '';
+      fSide.value = '';
+      fStatus.value = '';
 
+      if (kind === 'orders') {
+        state.ord.offset = 0;
+        await loadOrders();
+      } else {
+        state.pos.offset = 0;
+        await loadPositions();
+      }
+    } catch {
+      showToast('Ошибка сброса фильтра');
+    }
+  };
 }
+
+
+
+/* ========================================
+        FINISH INIT
+======================================== */
+
+setInterval(() => {
+  const nodes = qsa('.lifetime');
+  nodes.forEach(node => {
+    const created = node.dataset.created;
+    const closed = node.dataset.close;
+if (created && created !== 'null' && created !== 'undefined') {
+  node.textContent = fmtLifetime(created, closed);
+}  });
+}, 1000);
 
 /* ========================================
         FINISH INIT

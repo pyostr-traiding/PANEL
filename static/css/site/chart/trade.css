@@ -6,12 +6,23 @@
    📐 КОНТРОЛЬ ШИРИН КОЛОНОК
    ============================================================ */
 :root {
-  --col-details: 12%;
-  --col-amount: 18%;
-  --col-side: 10%;
-  --col-pnl: 14%;
-  --col-uuid: 30%;
-  --col-status: 16%;
+  /* ордера */
+  --orders-col-details: 12%;
+  --orders-col-amount: 18%;
+  --orders-col-side: 10%;
+  --orders-col-pnl: 12%;
+  --orders-col-uuid: 23%;
+  --orders-col-lifetime: 13%;
+  --orders-col-status: 12%;
+
+  /* позиции */
+  --pos-col-details: 15%;
+  --pos-col-amount: 22%;
+  --pos-col-side: 10%;
+  --pos-col-uuid: 28%;
+  --pos-col-lifetime: 15%;
+  --pos-col-status: 10%;
+
 
   --panel-bg: #23272f;
   --bg-color: #181c24;
@@ -22,6 +33,7 @@
   --accent-color: #2ec77f;
   --accent-hover: #18d47b;
   --accent-soft: #2ec77f20;
+
   --radius-sm: 8px;
   --transition-fast: 0.14s;
 }
@@ -223,16 +235,38 @@
    ============================================================ */
 .table-grid {
   display: grid;
-  grid-template-columns:
-    var(--col-details)
-    var(--col-amount)
-    var(--col-side)
-    var(--col-pnl)
-    var(--col-uuid)
-    var(--col-status);
   align-items: center;
   text-align: center;
 }
+
+/* ============================
+   ОРДЕРА: 7 КОЛОНОК
+============================ */
+.table-grid-orders {
+  grid-template-columns:
+    var(--orders-col-details)
+    var(--orders-col-amount)
+    var(--orders-col-side)
+    var(--orders-col-pnl)
+    var(--orders-col-uuid)
+    var(--orders-col-lifetime)
+    var(--orders-col-status);
+}
+
+/* ============================
+   ПОЗИЦИИ: 6 КОЛОНОК
+============================ */
+.table-grid-positions {
+  grid-template-columns:
+    var(--pos-col-details)
+    var(--pos-col-amount)
+    var(--pos-col-side)
+    var(--pos-col-uuid)
+    var(--pos-col-lifetime)
+    var(--pos-col-status);
+}
+
+
 @media (max-width: 1000px) {
   .table-grid {
     grid-template-columns: 1fr 1fr 1fr;

@@ -20,6 +20,7 @@ class CreatePositionSchema(BaseModel):
     kline_ms: int
     is_test: bool
 
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -53,6 +54,7 @@ class PositionSchema(BaseModel):
     status_title: Optional[str] = None
 
     created_at: Any
+    close_at: Optional[Any]
 
 class PositionFilterResponseSchema(BaseModel):
     positions: list[PositionSchema]

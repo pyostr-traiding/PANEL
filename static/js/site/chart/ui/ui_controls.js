@@ -68,11 +68,15 @@ export function initUIControls(ctx) {
       symbol: ctx.currentSymbol,
       interval: ctx.currentInterval,
       showPositions: document.getElementById('show-positions')?.checked ?? false,
+      showOrders: document.getElementById('show-orders')?.checked ?? false,
+
     };
     localStorage.setItem('chartSettings', JSON.stringify(settings));
   }
 
+
   // === Загрузка пользовательских настроек ===
+    // === Загрузка пользовательских настроек ===
   async function loadUserSettings() {
     try {
       const saved = JSON.parse(localStorage.getItem('chartSettings'));
@@ -107,30 +111,47 @@ export function initUIControls(ctx) {
         showPositionsCheckbox.checked = !!saved.showPositions;
       }
 
-      // если нужно — перезагрузим график
+      const showOrdersCheckbox = document.getElementById('show-orders');
+      if (showOrdersCheckbox) {
+        showOrdersCheckbox.checked = !!saved.showOrders;
+      }
+
+      // перезагрузка графика при смене настроек
       if (needReload) {
         if (ctx.ws) ctx.ws.close();
         await ctx.loadHistory(ctx.currentSymbol, ctx.currentInterval);
         ctx.connectSocket();
+      }
 
-        const showPositions = document.getElementById('show-positions');
-        if (showPositions?.checked && ctx.loadPositions) {
-          const vis = ctx.chart.timeScale().getVisibleLogicalRange();
-          const range = ctx.candleSeries.barsInLogicalRange(vis);
-          if (range && range.from && range.to) {
-            ctx.loadPositions(Number(range.from.time) * 1000, Number(range.to.time) * 1000);
-          }
+      // подгрузка позиций
+      if (saved.showPositions && ctx.loadPositions) {
+        const vis = ctx.chart.timeScale().getVisibleLogicalRange();
+        const range = ctx.candleSeries.barsInLogicalRange(vis);
+        if (range && range.from && range.to) {
+          ctx.loadPositions(Number(range.from.time) * 1000, Number(range.to.time) * 1000);
         }
       }
+
+      // подгрузка ордеров
+      if (saved.showOrders && ctx.loadOrders) {
+        const vis = ctx.chart.timeScale().getVisibleLogicalRange();
+        const range = ctx.candleSeries.barsInLogicalRange(vis);
+        if (range && range.from && range.to) {
+          ctx.loadOrders(Number(range.from.time) * 1000, Number(range.to.time) * 1000);
+        }
+      }
+
     } catch (err) {
       console.warn('Ошибка загрузки настроек:', err);
     }
   }
 
+
   // === Полный сброс всех настроек ===
  function setupResetButton() {
   const resetBtn = document.getElementById('reset-settings');
   if (!resetBtn) return;
+  if (ctx.clearOrders) ctx.clearOrders();
 
   resetBtn.addEventListener('click', async () => {
     // 1️⃣ Очистка localStorage

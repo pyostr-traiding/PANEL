@@ -69,7 +69,7 @@ class OrderModel(AbstractModel):
         verbose_name='Позиция',
         to='position.PositionModel',
         on_delete=models.CASCADE,
-        related_name='order',
+        related_name='position',
     )
 
     # Уникальный идентификатор ордера (используется и в Redis, и во внешних API)
@@ -142,9 +142,23 @@ class OrderModel(AbstractModel):
         blank=True,
     )
 
+    open_kline_ms = models.CharField(
+        verbose_name='Свеча открытия',
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+
     # Время закрытия ордера
     close_at = models.DateTimeField(
         verbose_name='Время закрытия',
+        null=True,
+        blank=True,
+    )
+    # TS закрытия ордера
+    close_kline_ms = models.CharField(
+        verbose_name='Свеча закрытия',
+        max_length=100,
         null=True,
         blank=True,
     )
@@ -264,3 +278,4 @@ class OrderCreditingModel(AbstractModel):
     comment = models.TextField(
         verbose_name='Описание'
     )
+

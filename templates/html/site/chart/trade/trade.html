@@ -49,14 +49,17 @@
     </div>
 
     <div class="trade-tab-content">
-      <!-- POSITIONS -->
+
+      <!-- ===========================================
+           POSITIONS (6 колонок)
+      ============================================ -->
       <div class="trade-panel" id="tab-positions">
-        <div class="items-head table-grid">
+        <div class="items-head table-grid table-grid-positions">
           <div class="col">Подробнее</div>
           <div class="col">Объём / Сумма</div>
           <div class="col">Сторона</div>
-          <div class="col">P&L</div>
           <div class="col">UUID / Дата</div>
+          <div class="col">Живёт</div>
           <div class="col">Статус</div>
         </div>
 
@@ -72,14 +75,17 @@
         </div>
       </div>
 
-      <!-- ORDERS -->
+      <!-- ===========================================
+           ORDERS (7 колонок)
+      ============================================ -->
       <div class="trade-panel active" id="tab-orders">
-        <div class="items-head table-grid">
+        <div class="items-head table-grid table-grid-orders">
           <div class="col">Подробнее</div>
           <div class="col">Объём / Сумма</div>
           <div class="col">Сторона</div>
           <div class="col">P&L</div>
           <div class="col">UUID / Дата</div>
+          <div class="col">Живёт</div>
           <div class="col">Статус</div>
         </div>
 
@@ -94,11 +100,14 @@
           <button class="btn" id="ord-next" disabled>Вперёд »</button>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- Modal -->
+<!-- ===========================================
+     MODAL TRADE DETAILS
+=========================================== -->
 <div id="trade-modal" class="modal">
   <div class="modal-dialog">
     <div class="modal-head">
@@ -111,21 +120,22 @@
 
     <div class="modal-body">
       <div class="modal-section">
-          <div class="kv">
-            <button id="md-show-json" class="json-dot" title="Показать исходные данные"></button>
-            <div><span>Тип:</span> <b id="md-type">—</b></div>
-            <div><span>UUID:</span> <b id="md-uuid">—</b></div>
-            <div><span>Символ:</span> <b id="md-symbol">—</b></div>
-            <div><span>Сторона:</span> <b id="md-side">—</b></div>
-            <div><span>Статус:</span> <b id="md-status">—</b></div>
-            <div><span>Кол-во:</span> <b id="md-qty">—</b></div>
-            <div><span>Цена:</span> <b id="md-price">—</b></div>
-            <div><span>PnL:</span> <b id="md-pnl">—</b></div>
-            <div><span>Курс закрытия:</span> <b id="md-close">—</b></div>
-            <div><span>Создано:</span> <b id="md-created">—</b></div>
-          </div>
-      </div>
+        <div class="kv">
+          <button id="md-show-json" class="json-dot" title="Показать исходные данные"></button>
 
+          <div><span>Тип:</span> <b id="md-type">—</b></div>
+          <div><span>UUID:</span> <b id="md-uuid">—</b></div>
+          <div><span>Символ:</span> <b id="md-symbol">—</b></div>
+          <div><span>Сторона:</span> <b id="md-side">—</b></div>
+          <div><span>Статус:</span> <b id="md-status">—</b></div>
+          <div><span>Кол-во:</span> <b id="md-qty">—</b></div>
+          <div><span>Цена:</span> <b id="md-price">—</b></div>
+          <div><span>PnL:</span> <b id="md-pnl">—</b></div>
+          <div><span>Курс закрытия:</span> <b id="md-close">—</b></div>
+          <div><span>Создано:</span> <b id="md-created">—</b></div>
+          <div><span>Живёт:</span> <b id="md-lifetime">—</b></div>
+        </div>
+      </div>
 
       <div class="modal-section modal-actions">
         <button class="btn btn-primary big" id="md-close-order-btn">
@@ -137,7 +147,9 @@
   </div>
 </div>
 
-<!-- JSON MODAL -->
+<!-- ===========================================
+     JSON MODAL
+=========================================== -->
 <div id="json-modal" class="modal">
   <div class="modal-dialog json-dialog">
     <div class="modal-head">

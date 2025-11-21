@@ -117,7 +117,8 @@ class Range(Schema):
     ms: Optional[List[int]] = None
     start_ms: Optional[int] = None
     end_ms: Optional[int] = None
-    symbol: Optional[str] = None  # например BTCUSDT
+    symbol: Optional[str] = None
+
 @router.get(
     path='/search',
 )
