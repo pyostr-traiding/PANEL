@@ -16,9 +16,12 @@ export function initOrdersModule(ctx) {
     const url = `/api/order/search?start_ms=${startMs}&end_ms=${endMs}`;
     try {
       const res = await fetch(url);
+
       if (!res.ok) {
         console.warn("Order API returned error:", res.status);
+
         return [];
+
       }
       const json = await res.json();
       return json.results || [];

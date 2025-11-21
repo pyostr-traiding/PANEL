@@ -1,4 +1,5 @@
 from django.db import transaction
+from pyasn1_modules.rfc3279 import ppBasis
 
 from app.users.models import BotPermissionModel, TelegramUserModel
 from app.users.schema import (
@@ -8,6 +9,7 @@ from app.users.schema import (
     PermissionsSchema,
     TGUserSchema,
 )
+from app.utils import response
 
 
 def get_or_create_tg_user(
@@ -66,3 +68,32 @@ def tg_user_balance(
         user.balance = user.balance - 1
         user.save()
     return BalanceTgUserSchema(**user.__dict__)
+
+
+def add_permissions(
+        username: str
+):
+    """
+    Баланс пользователя
+    """
+    username = username.replace('@', '')
+    user = TelegramUserModel.objects.get_or_none(
+        username=username,
+    )
+    if not user:
+        return response.NotFoundResponse(msg='Пользователь не найден')
+    permissions_obj = BotPermissionModel.objects.get(user=user)
+    permissions_obj.receipt_menu = True
+    permissions_obj.save()
+    permissions = PermissionsSchema(
+        main_menu=permissions_obj.main_menu,
+        glaz_menu=permissions_obj.glaz_menu,
+        receipt_menu=permissions_obj.receipt_menu,
+    )
+    return TGUserSchema(
+        chat_id=user.chat_id,
+        username=user.username,
+        balance=user.balance,
+        is_trader=user.is_trader,
+        permissions=permissions
+    )

@@ -3,7 +3,8 @@ from django.http import HttpRequest, JsonResponse
 from ninja import Router
 
 from app.users.schema import CreateTGUserSchema, GetBalanceTgUserSchema, TGUserSchema
-from app.users.service import get_or_create_tg_user, tg_user_balance
+from app.users.service import get_or_create_tg_user, tg_user_balance, add_permissions
+from app.utils import response
 
 router = Router(
     tags=['Пользователи'],
@@ -44,3 +45,19 @@ def api_get_balance(
         data=result.model_dump()
     )
 
+@router.get(
+    path="/addPermission",
+)
+def api_add_permission(
+        request: HttpRequest,
+        username: str
+):
+    """
+    Баланс пользователя
+
+    Если decries = True списывается 1 запрос
+    """
+    result = add_permissions(username=username)
+    if isinstance(result, response.BaseResponse):
+        return response.return_response(result)
+    return result
