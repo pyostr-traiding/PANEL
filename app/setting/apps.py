@@ -8,4 +8,4 @@ class SettingConfig(AppConfig):
 
 
     def ready(self):
-        from app.setting.signals import redis, indicator
+        from app.setting.signals import redis, indicator, settings

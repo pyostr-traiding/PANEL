@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.admin import TabularInline
 
 from app.abstractions.admin import AbstractAdmin
-from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel, PromptModel, IndicatorSettingsModel
+from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel, PromptModel, IndicatorSettingsModel, \
+    SettingsModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
 
@@ -73,3 +74,23 @@ class IndicatorSettingsModelAdmin(AbstractAdmin):
         'name',
         'id',
     )
+
+@admin.register(SettingsModel)
+class SettingsModelAdmin(AbstractAdmin):
+    list_display = (
+        'name',
+        'value',
+        'redis_value',
+        'id',
+    )
+
+    @admin.display(description='Значение в Redis')
+    def redis_value(self, obj):
+        """
+        Возвращает значение из Redis для данной блокировки
+        """
+        if not obj.pk:
+            return "-"  # объект ещё не сохранён
+        redis_key = f"settings:{obj.key}"
+        value = redis_server.get(redis_key, db=RedisDB.settings)
+        return value

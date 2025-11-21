@@ -119,3 +119,23 @@ class IndicatorSettingsModel(AbstractModel):
     )
     def __str__(self):
         return self.name
+
+
+class SettingsModel(AbstractModel):
+    class Meta:
+        verbose_name = 'Настройки'
+        verbose_name_plural = 'Настройки'
+
+    name = models.CharField(
+        verbose_name='Индикатор',
+        max_length=40,
+    )
+    key = models.CharField(
+        verbose_name='Ключ',
+        max_length=40,
+    )
+    value = models.IntegerField(
+        verbose_name='Значение',
+    )
+    def __str__(self):
+        return self.name
