@@ -34,7 +34,10 @@ def create_position(
     check_open_order = OrderModel.objects.filter(
         status__in=[OrderStatus.CREATED, OrderStatus.ACCEPT_MONITORING]
     )
-    if check_open_order.exists():
+    check_open_position = PositionModel.objects.filter(
+        status__in=[PositionStatus.CREATED, PositionStatus.ACCEPT_MONITORING]
+    )
+    if check_open_order.exists() or check_open_position.exists():
         return response.OtherErrorResponse(
             msg='Нельзя иметь более 1 ордера'
         )
