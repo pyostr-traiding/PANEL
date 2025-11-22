@@ -136,9 +136,9 @@ def close_order(data: CloseOrderSchema) -> Union[OrderSchema, response.BaseRespo
     order_model.status = OrderStatus.COMPLETED
     order_model.close_rate = data.rate
     order_model.close_kline_ms = data.kline_ms
-
     order_model.close_at = datetime.now()
     order_model.save(update_fields=['status', 'close_rate', 'close_at'])
+    print('ЗАКРЫТИЕ', data.kline_ms, order_model.close_kline_ms, order_model.__dict__)
 
     return OrderSchema.model_validate(order_model)
 

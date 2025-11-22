@@ -6,6 +6,7 @@ import django
 from django.db import transaction
 
 import pika
+from django.db.models import Case, When, Value, IntegerField
 
 from app.order.models import OrderModel, OrderStatus
 from app.position.models import PositionModel, PositionStatus
@@ -106,7 +107,6 @@ def filter_positions(
         offset: int = 0,
 ) -> Union[PositionFilterResponseSchema, response.BaseResponse]:
     """"""
-
     filters = {}
     if status is not None:
         filters["status"] = status
@@ -115,21 +115,31 @@ def filter_positions(
     if uuid is not None:
         filters["uuid"] = uuid
 
+    # Фильтруем базовый queryset
     result = PositionModel.objects.filter(**filters)
-    count_positions = PositionModel.objects.count()
 
-    result = result[offset:offset + limit]
-    if not result:
-        return response.NotFoundResponse(
-            msg='Нечего не найдено'
+    # Сортировка: сначала created/monitoring, потом остальные, внутри — по убыванию даты создания
+    result = result.annotate(
+        status_position=Case(
+            When(status__in=['create', 'monitoring'], then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField(),
         )
+    ).order_by('status_position', '-created_at')  # предполагается, что есть поле created_at
+
+    count_orders = PositionModel.objects.count()
+    result = result[offset:offset + limit]
+
+    if not result:
+        return response.NotFoundResponse(msg='Нечего не найдено')
 
     positions = []
     for i in result:
         schema = PositionSchema.model_validate(i)
         schema.status_title = i.get_status_display().upper()
         positions.append(schema)
+
     return PositionFilterResponseSchema(
         positions=positions,
-        count_db=count_positions,
+        count_db=count_orders,
     )
