@@ -49,6 +49,8 @@ def __create_order_test(position: PositionModel, data: ChangeStatusSchema) -> Un
                 qty_tokens=position.qty_tokens,
                 price=position.price,
                 status=OrderStatus.CREATED,
+                open_kline_ms=data.kline_ms,
+
             )
         return result_create
 
@@ -133,6 +135,8 @@ def close_order(data: CloseOrderSchema) -> Union[OrderSchema, response.BaseRespo
     # Обновляем статус и сохраняем
     order_model.status = OrderStatus.COMPLETED
     order_model.close_rate = data.rate
+    order_model.close_kline_ms = data.kline_ms
+
     order_model.close_at = datetime.now()
     order_model.save(update_fields=['status', 'close_rate', 'close_at'])
 

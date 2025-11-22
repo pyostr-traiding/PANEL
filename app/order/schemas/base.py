@@ -77,3 +77,4 @@ class OrderExtremumSchema(BaseModel):
 class CloseOrderSchema(BaseModel):
     uuid: str
     rate: Decimal
+    kline_ms: int
