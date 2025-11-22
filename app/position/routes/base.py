@@ -112,22 +112,15 @@ def api_get_list_open_position(
     return result
 
 
-class Range(Schema):
-    # Либо список точек client_ms (минутные), либо диапазон start/end
-    ms: Optional[List[int]] = None
-    start_ms: Optional[int] = None
-    end_ms: Optional[int] = None
-    symbol: Optional[str] = None
 
 @router.get(
     path='/search',
+
 )
 def api_get_positions(
         request: HttpRequest,
-        ms: Optional[List[int]] = None,
-        start_ms: Optional[List[int]] = None,
-        end_ms: Optional[List[int]] = None,
-        symbol: Optional[List[str]] = None,
+        start_ms: int = None,
+        end_ms: int = None,
 ):
     """
     Получить список в диапазоне
@@ -139,14 +132,6 @@ def api_get_positions(
     qs = PositionModel.objects.all().annotate(
         kline_ms_int=Cast('kline_ms', output_field=BigIntegerField())
     )
-
-    # фильтр по символу, если задан
-    if symbol:
-        qs = qs.filter(symbol__name=symbol)
-
-    # вариант 1: список точек ms
-    if ms:
-        qs = qs.filter(kline_ms_int__in=ms)
 
     # вариант 2: диапазон
     if start_ms is not None and end_ms is not None:
