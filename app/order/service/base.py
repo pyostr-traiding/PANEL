@@ -4,13 +4,15 @@ from typing import List, Union, Literal
 
 import django
 from django.db import transaction
+from django.db.models import Case, When, Value, IntegerField
 
 from app.order.models import OrderModel, OrderStatus
 from app.order.schemas.base import CloseOrderSchema, OrderSchema, OrderFilterResponseSchema
 from app.position.models import PositionModel, PositionStatus
 from app.position.schemas.status import ChangeStatusSchema
-from app.utils import response
 from app.utils.rabbit import send_to_rabbitmq
+from app.utils import response
+
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +143,6 @@ def close_order(data: CloseOrderSchema) -> Union[OrderSchema, response.BaseRespo
     return OrderSchema.model_validate(order_model)
 
 
-from django.db.models import Case, When, Value, IntegerField
 
 def filter_order(
         status: str = None,

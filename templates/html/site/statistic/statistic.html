@@ -1,0 +1,62 @@
+{% extends 'html/site/base_app.html' %}
+{% load static %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/site/statistic/statistic.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="stat-container">
+  <h2 class="stat-title">Статистика ордеров</h2>
+
+  <div class="filters">
+
+  <div class="quick-filters">
+    <button class="btn-accent" onclick="setQuickRange('today')">Сегодня</button>
+    <button class="btn-accent" onclick="setQuickRange('week')">Неделя</button>
+    <button class="btn-accent" onclick="setQuickRange('month')">Месяц</button>
+  </div>
+
+  <div class="filter-item">
+    <label>Дата от</label>
+    <input type="date" id="date_from" />
+  </div>
+
+  <div class="filter-item">
+    <label>Дата до</label>
+    <input type="date" id="date_to" />
+  </div>
+
+  <div class="filter-item">
+    <label>Статус</label>
+    <select id="status">
+      <option value="">Все</option>
+      <option value="created">created</option>
+      <option value="monitoring">monitoring</option>
+      <option value="completed">completed</option>
+      <option value="cancel">cancel</option>
+    </select>
+  </div>
+
+  <button id="apply_filters" class="btn-accent">Применить</button>
+
+</div>
+
+
+  <div class="stat-blocks">
+    <div class="stat-card" id="card-buy"></div>
+    <div class="stat-card" id="card-sell"></div>
+    <div class="stat-card" id="card-other"></div>
+  </div>
+
+  <div class="charts">
+    <canvas id="chart-pnl"></canvas>
+    <canvas id="chart-net"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/site/statistic/statistic.js' %}"></script>
+{% endblock %}

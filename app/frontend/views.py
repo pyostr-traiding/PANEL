@@ -53,3 +53,6 @@ class ServerView(IndicatorBaseView):
         ctx['path'] = self.request.path
         ctx["access_token"] = os.getenv('WS_DOCKER_TOKEN')
         return ctx
+
+class StatisticView(IndicatorBaseView):
+    template_name = 'html/site/statistic/statistic.html'

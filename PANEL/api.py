@@ -7,6 +7,10 @@ from app.order.routes.base import router as router_order_base
 from app.order.routes.crediting import router as router_order_crediting
 from app.order.routes.extremum import router as router_order_extremum
 from app.order.routes.status import router as router_order_status
+from app.order.routes.statistic import router as router_order_statistic
+
+#####
+# P2P
 from app.P2P.fake_check.api import router as router_fake_p2p
 
 #####
@@ -54,6 +58,7 @@ api_route.add_router('/order/', router_order_base)
 api_route.add_router('/order/', router_order_status)
 api_route.add_router('/order/', router_order_crediting)
 api_route.add_router('/order/', router_order_extremum)
+api_route.add_router('/order/', router_order_statistic)
 
 #####
 # Настройки

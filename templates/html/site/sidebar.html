@@ -30,9 +30,15 @@
     </a>
     <a href="{% url 'settings_indicator' %}"
        class="nav-item {% if '/settings_indicator/' in path %}active{% endif %}"
-       title="Анализ">
+       title="Настройки">
       <i data-lucide="settings-2" class="nav-icon"></i>
       <span class="nav-label">Настройки</span>
+    </a>
+      <a href="{% url 'statistic' %}"
+       class="nav-item {% if '/statistic/' in path %}active{% endif %}"
+       title="Статистика">
+      <i data-lucide="chart-network" class="nav-icon"></i>
+      <span class="nav-label">Статистика</span>
     </a>
   </nav>
 
