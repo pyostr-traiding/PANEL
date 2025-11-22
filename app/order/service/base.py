@@ -131,14 +131,12 @@ def close_order(data: CloseOrderSchema) -> Union[OrderSchema, response.BaseRespo
     # Разрешаем закрывать только ордера в статусе мониторинга
     if order_model.status not in [OrderStatus.ACCEPT_MONITORING]:
         return response.OtherErrorResponse(msg='Ордер должен быть в статусе MONITORING')
-
     # Обновляем статус и сохраняем
     order_model.status = OrderStatus.COMPLETED
     order_model.close_rate = data.rate
     order_model.close_kline_ms = data.kline_ms
     order_model.close_at = datetime.now()
-    order_model.save(update_fields=['status', 'close_rate', 'close_at'])
-    print('ЗАКРЫТИЕ', data.kline_ms, order_model.close_kline_ms, order_model.__dict__)
+    order_model.save(update_fields=['status', 'close_rate', 'close_at', 'close_kline_ms'])
 
     return OrderSchema.model_validate(order_model)
 
