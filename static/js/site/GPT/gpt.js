@@ -1,5 +1,6 @@
 // ============================================================
-// GPT — чаты: список, диалог, отправка, статусы, сокет с авто-реподключением
+// GPT — чаты: список, диалог, отправка, загрузка истории,
+// автообновление, выбор модели, сокет с переподключением
 // ============================================================
 
 (function () {
@@ -7,6 +8,8 @@
   const LIST_API = '/api/front/gpt/filter';
   const CHAT_API = '/api/front/gpt/?key=';
   const SEND_API = '/api/front/gpt/send';
+  const MODELS_API = '/api/settings/gpt/list';
+  const DELETE_API = '/api/front/gpt/delete';
 
   // --- WS URL ---
   const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -23,6 +26,8 @@
   const listErrorEl = document.getElementById('chat-list-error');
   const inputForm = document.getElementById('chat-input-form');
   const inputField = document.getElementById('chat-input');
+  const modelSelect = document.getElementById('gpt-model-select');
+  const newChatBtn = document.getElementById('chat-new-btn');
 
   // --- State ---
   let page = 1;
@@ -33,7 +38,11 @@
   const chatKeys = new Set();
   let chats = [];
   let activeKey = null;
-  const messagesCache = new Map();
+
+  let messagesCache = new Map();
+
+  let models = [];
+  let activeModel = null;
 
   // --- WS ---
   let ws = null;
@@ -55,8 +64,8 @@
   }
 
   function parseKey(key) {
-    const parts = key.split(':');
-    return { uuid: parts[1], action: parts[2] || '' };
+    const [_, uuid, action = ""] = key.split(':');
+    return { uuid, action };
   }
 
   function escapeHtml(str) {
@@ -74,10 +83,47 @@
   }
 
   // ============================================================
+  // Загрузка моделей
+  // ============================================================
+
+  async function loadModels() {
+    try {
+      const res = await fetch(MODELS_API);
+      const data = await res.json();
+      models = data;
+
+      modelSelect.innerHTML = '';
+
+      if (!data.length) {
+        modelSelect.innerHTML = `<option value="">Модели не найдены</option>`;
+        activeModel = null;
+        return;
+      }
+
+      data.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.code;
+        opt.textContent = m.name;
+        modelSelect.appendChild(opt);
+      });
+
+      activeModel = data[0].code;
+      modelSelect.value = activeModel;
+
+    } catch (err) {
+      console.error('Ошибка загрузки моделей:', err);
+      modelSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+      activeModel = null;
+    }
+  }
+
+  modelSelect?.addEventListener('change', () => {
+    activeModel = modelSelect.value;
+  });
+
+  // ============================================================
   // Список чатов
   // ============================================================
-  // --- Кнопка создания нового чата ---
-  const newChatBtn = document.getElementById('chat-new-btn');
 
   newChatBtn?.addEventListener('click', () => {
     const uuid = crypto.randomUUID();
@@ -90,85 +136,85 @@
       setActiveChat(key);
     }
   });
+
   function renderChatItem({ key }) {
-  const { action } = parseKey(key);
-  const el = document.createElement('div');
-  el.className = 'chat-item';
-  el.dataset.key = key;
+    const { action } = parseKey(key);
+    const el = document.createElement('div');
+    el.className = 'chat-item';
+    el.dataset.key = key;
 
-  el.innerHTML = `
-    <div class="chat-item-left">
-      <div class="chat-title">${action || 'Диалог'}</div>
-      <span class="chat-key">${key}</span>
-    </div>
-    <div class="chat-menu">
-      <button type="button" class="chat-menu-btn">⋯</button>
-      <div class="chat-menu-popup">
-        <button class="chat-delete-btn">Удалить</button>
+    el.innerHTML = `
+      <div class="chat-item-left">
+        <div class="chat-title">${action || 'Диалог'}</div>
+        <span class="chat-key">${key}</span>
       </div>
-    </div>
-  `;
+      <div class="chat-menu">
+        <button type="button" class="chat-menu-btn">⋯</button>
+        <div class="chat-menu-popup">
+          <button class="chat-delete-btn">Удалить</button>
+        </div>
+      </div>
+    `;
 
-  // открытие чата
-  el.querySelector('.chat-item-left').addEventListener('click', () => {
-    if (activeKey !== key) setActiveChat(key);
-  });
-
-  // обработка меню
-  const menu = el.querySelector('.chat-menu');
-  const menuBtn = menu.querySelector('.chat-menu-btn');
-  const deleteBtn = menu.querySelector('.chat-delete-btn');
-
-  menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = menu.classList.contains('open');
-    closeAllMenus();
-    if (!isOpen) menu.classList.add('open');
-  });
-
-  deleteBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    menu.classList.remove('open');
-    await deleteChat(key, el);
-  });
-
-  return el;
-}
-
-
-
-async function deleteChat(key, element) {
-  if (!confirm('Удалить этот чат?')) return;
-  try {
-    const res = await fetch('/api/front/gpt/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uuid: key })
+    el.querySelector('.chat-item-left').addEventListener('click', () => {
+      if (activeKey !== key) setActiveChat(key);
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    element.remove();
-    chatKeys.delete(key);
-    chats = chats.filter(c => c.key !== key);
-    if (activeKey === key) {
-      activeKey = null;
-      chatWindowEl.innerHTML = `<div class="empty-state">Чат удалён.</div>`;
-    }
-  } catch (err) {
-    console.error('Delete chat error:', err);
-    alert('Не удалось удалить чат');
-  }
-}
-function closeAllMenus() {
-  document.querySelectorAll('.chat-menu.open').forEach(m => m.classList.remove('open'));
-}
+    const menu = el.querySelector('.chat-menu');
+    const menuBtn = el.querySelector('.chat-menu-btn');
+    const deleteBtn = el.querySelector('.chat-delete-btn');
 
-document.addEventListener('click', (e) => {
-  // если клик вне меню
-  if (!e.target.closest('.chat-menu')) {
-    closeAllMenus();
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.contains('open');
+      closeAllMenus();
+      if (!isOpen) menu.classList.add('open');
+    });
+
+    deleteBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      menu.classList.remove('open');
+      await deleteChat(key, el);
+    });
+
+    return el;
   }
-});
+
+  function closeAllMenus() {
+    document.querySelectorAll('.chat-menu.open').forEach(m => m.classList.remove('open'));
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.chat-menu')) closeAllMenus();
+  });
+
+  async function deleteChat(key, element) {
+    if (!confirm('Удалить этот чат?')) return;
+
+    try {
+      const res = await fetch(DELETE_API, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uuid: key })
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      element.remove();
+      chatKeys.delete(key);
+      chats = chats.filter(c => c.key !== key);
+      messagesCache.delete(key);
+
+      if (activeKey === key) {
+        activeKey = null;
+        chatWindowEl.innerHTML = `<div class="empty-state">Чат удалён.</div>`;
+      }
+
+    } catch (err) {
+      console.error('Delete chat error:', err);
+      alert('Не удалось удалить чат');
+    }
+  }
 
   function mountChatList(items, { prepend = false } = {}) {
     const fragment = document.createDocumentFragment();
@@ -186,20 +232,22 @@ document.addEventListener('click', (e) => {
   async function loadPage() {
     if (isLoading || noMore) return;
     isLoading = true;
+
     listErrorEl.classList.add('hidden');
     listEndEl.classList.add('hidden');
     listLoaderEl.classList.remove('hidden');
 
-    const url = `${LIST_API}?page=${page}&per_page=${perPage}`;
     try {
-      const res = await fetch(url);
+      const res = await fetch(`${LIST_API}?page=${page}&per_page=${perPage}`);
       if (res.status === 404) {
         noMore = true;
         listEndEl.classList.remove('hidden');
         return;
       }
+
       const data = await res.json();
       const fresh = [];
+
       data.forEach(key => {
         if (!chatKeys.has(key)) {
           chatKeys.add(key);
@@ -207,9 +255,12 @@ document.addEventListener('click', (e) => {
           fresh.push({ key });
         }
       });
+
       if (fresh.length) mountChatList(fresh);
       if (!activeKey && chats.length) setActiveChat(chats[0].key);
+
       page++;
+
     } catch (e) {
       listErrorEl.classList.remove('hidden');
       console.error('loadPage error:', e);
@@ -225,39 +276,74 @@ document.addEventListener('click', (e) => {
   });
 
   // ============================================================
+  // Модель для чата
+  // ============================================================
+
+  function applyModelFromChat(modelCode) {
+    if (!modelSelect) return;
+
+    let found = false;
+    for (let i = 0; i < modelSelect.options.length; i++) {
+      if (modelSelect.options[i].value === modelCode) {
+        modelSelect.selectedIndex = i;
+        activeModel = modelCode;
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      console.warn("Модель из чата не найдена:", modelCode);
+    }
+  }
+
+  // ============================================================
   // Диалог
   // ============================================================
 
   async function setActiveChat(key) {
     activeKey = key;
     highlightActive();
+
     if (emptyStateEl) emptyStateEl.remove();
+
     chatWindowEl.innerHTML = '';
+
+    // 1. Моментально рендерим кэш если есть
     if (messagesCache.has(key)) {
       renderMessages(messagesCache.get(key));
-    } else {
-      await loadChat(key);
     }
+
+    // 2. ВСЕГДА грузим с сервера заново (и обновляем модель)
+    await loadChat(key);
   }
 
   async function loadChat(key) {
     const encodedKey = encodeURIComponent(key);
+
     try {
       const res = await fetch(`${CHAT_API}${encodedKey}`);
       const data = await res.json();
+
       const msgs = Array.isArray(data)
         ? data
         : (Array.isArray(data.results) ? data.results : [data]);
+
       messagesCache.set(key, msgs);
       renderMessages(msgs);
-    } catch (e) {
-      console.error('loadChat error:', e);
+
+      if (msgs.length > 0) {
+        const last = msgs[msgs.length - 1];
+        if (last.code) applyModelFromChat(last.code);
+      }
+
+    } catch (err) {
+      console.error('loadChat error:', err);
       chatWindowEl.innerHTML = `<div class="empty-state">Не удалось загрузить чат</div>`;
     }
   }
 
   function renderMessages(msgs) {
-    if (!Array.isArray(msgs)) return;
     chatWindowEl.innerHTML = '';
     msgs.forEach(appendMessage);
     scrollChatToBottom();
@@ -269,18 +355,14 @@ document.addEventListener('click', (e) => {
     bubble.className = `msg ${isAssistant ? 'assistant' : 'user'}`;
 
     const content = m.message_type === 'img_url'
-      ? `<img src="${m.message}" alt="image">`
+      ? `<img src="${m.message}" alt="">`
       : escapeHtml(m.message).replace(/\n/g, '<br>');
 
     let statusIcon = '';
     if (m.role === 'user') {
-      if (m.status === 'pending') {
-        statusIcon = `<span class="msg-status pending">⏳</span>`;
-      } else if (m.status === 'error') {
-        statusIcon = `<span class="msg-status error">❌</span>`;
-      } else {
-        statusIcon = `<span class="msg-status delivered">✅</span>`;
-      }
+      if (m.status === 'pending') statusIcon = `<span class="msg-status pending">⏳</span>`;
+      else if (m.status === 'error') statusIcon = `<span class="msg-status error">❌</span>`;
+      else statusIcon = `<span class="msg-status delivered">✅</span>`;
     }
 
     bubble.dataset.msgText = m.message;
@@ -300,19 +382,17 @@ document.addEventListener('click', (e) => {
   }
 
   // ============================================================
-  // Отправка сообщений
+  // Отправка
   // ============================================================
 
   inputForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!activeKey) return;
+    if (!activeModel) return;
 
     const text = inputField.value.trim();
     if (!text) return;
 
-    const body = JSON.stringify({ uuid: activeKey, text });
-
-    // добавляем локально как "ожидающее"
     appendMessage({
       message: text,
       message_type: 'text',
@@ -327,12 +407,18 @@ document.addEventListener('click', (e) => {
       const res = await fetch(SEND_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body
+        body: JSON.stringify({
+          uuid: activeKey,
+          text,
+          code: activeModel
+        })
       });
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     } catch (err) {
       console.error('Send error:', err);
-      // если ошибка — помечаем последнее как ❌
+
       const lastPending = chatWindowEl.querySelector('.msg.user .msg-status.pending');
       if (lastPending) {
         lastPending.textContent = '❌';
@@ -349,21 +435,25 @@ document.addEventListener('click', (e) => {
   function connectWS() {
     cleanupWS();
     setWsStatus('yellow', 'Подключение...');
+
     ws = new WebSocket(WS_URL);
 
     ws.onopen = () => setWsStatus('green', 'Подключено');
+
     ws.onmessage = (ev) => {
       try {
-        const data = JSON.parse(ev.data);
-        handleIncoming(data);
-      } catch (e) {
-        console.error('WS parse error', e);
+        const pkt = JSON.parse(ev.data);
+        handleIncoming(pkt);
+      } catch (err) {
+        console.error('WS parse error:', err);
       }
     };
+
     ws.onclose = () => {
       setWsStatus('red', 'Нет соединения');
       scheduleReconnect();
     };
+
     ws.onerror = () => {
       setWsStatus('red', 'Ошибка');
       try { ws.close(); } catch {}
@@ -392,7 +482,7 @@ document.addEventListener('click', (e) => {
   }
 
   function handleIncoming(pkt) {
-    const { uuid, action, role, message } = pkt;
+    const { uuid, action, role, message, code } = pkt;
     if (!uuid || !action) return;
 
     const key = keyFrom(uuid, action);
@@ -406,6 +496,8 @@ document.addEventListener('click', (e) => {
     const arr = messagesCache.get(key) || [];
     arr.push(pkt);
     messagesCache.set(key, arr);
+
+    if (role === "assistant" && code) applyModelFromChat(code);
 
     if (activeKey === key && role === 'user') {
       const pending = Array.from(chatWindowEl.querySelectorAll('.msg.user'))
@@ -430,10 +522,12 @@ document.addEventListener('click', (e) => {
   // Инициализация
   // ============================================================
 
-  window.addEventListener('load', () => {
-    loadPage();
+  window.addEventListener('load', async () => {
+    await loadModels();
+    await loadPage();
     connectWS();
   });
 
   window.addEventListener('beforeunload', cleanupWS);
+
 })();

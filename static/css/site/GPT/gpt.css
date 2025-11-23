@@ -376,3 +376,14 @@ html, body {
 .chat-menu.open .chat-menu-popup {
   display: block;
 }
+
+.gpt-model-select {
+  margin-left: 12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg);
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+}

@@ -11,12 +11,18 @@
 
   <!-- Верхняя панель -->
   <div class="gpt-header">
-    <div class="gpt-title">GPT чаты</div>
-    <div class="ws-status-container">
-      <div id="ws-dot" class="ws-dot red"></div>
-      <div id="ws-status-text" class="ws-status-text">Нет соединения</div>
-    </div>
+  <div class="gpt-title">GPT чаты</div>
+
+  <!-- Выбор модели -->
+  <select id="gpt-model-select" class="gpt-model-select">
+    <option value="">Загрузка моделей...</option>
+  </select>
+
+  <div class="ws-status-container">
+    <div id="ws-dot" class="ws-dot red"></div>
+    <div id="ws-status-text" class="ws-status-text">Нет соединения</div>
   </div>
+</div>
 
   <!-- Основной лейаут -->
   <div class="gpt-layout">

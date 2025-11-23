@@ -11,6 +11,7 @@ from pydantic_core.core_schema import JsonSchema
 class SendMessageSchema(BaseModel):
     uuid: str
     text: str
+    code: str
 
 class DeleteSchema(BaseModel):
     uuid: str

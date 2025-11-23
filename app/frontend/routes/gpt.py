@@ -88,6 +88,7 @@ def api_send_to_gpt_chat(
         "extra": {
             'uuid': data.uuid,
             'text': data.text,
+            'code': data.code,
         }
     }
     x = send_to_rabbitmq(

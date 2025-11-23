@@ -139,3 +139,20 @@ class SettingsModel(AbstractModel):
     )
     def __str__(self):
         return self.name
+
+
+class GPTModel(AbstractModel):
+    class Meta:
+        verbose_name = 'GPT'
+        verbose_name_plural = 'GPT'
+
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=40,
+    )
+    code = models.CharField(
+        verbose_name='Код',
+        max_length=100,
+    )
+    def __str__(self):
+        return self.name

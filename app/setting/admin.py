@@ -3,7 +3,7 @@ from django.contrib.admin import TabularInline
 
 from app.abstractions.admin import AbstractAdmin
 from app.setting.models import BanSymbolModel, ExchangeModel, SymbolModel, PromptModel, IndicatorSettingsModel, \
-    SettingsModel
+    SettingsModel, GPTModel
 from PANEL.redis_conf import RedisDB
 from PANEL.settings import redis_server
 
@@ -94,3 +94,12 @@ class SettingsModelAdmin(AbstractAdmin):
         redis_key = f"settings:{obj.key}"
         value = redis_server.get(redis_key, db=RedisDB.settings)
         return value
+
+
+@admin.register(GPTModel)
+class GPTModelAdmin(AbstractAdmin):
+    list_display = (
+        'name',
+        'code',
+        'id',
+    )
