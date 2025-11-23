@@ -5,6 +5,10 @@
 
 {% block head_extra %}
   <link rel="stylesheet" href="{% static 'css/site/GPT/gpt.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -50,13 +54,12 @@
 
       <!-- Панель ввода -->
       <form id="chat-input-form" class="chat-input-form">
-        <input
-          type="text"
+        <textarea
           id="chat-input"
           class="chat-input"
           placeholder="Введите сообщение..."
-          autocomplete="off"
-        />
+          rows="1"
+        ></textarea>
         <button type="submit" id="chat-send-btn" class="chat-send-btn">➤</button>
       </form>
     </main>

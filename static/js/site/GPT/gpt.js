@@ -76,6 +76,19 @@
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
+  // --- Markdown + highlight.js ---
+hljs.configure({ ignoreUnescapedHTML: true });
+
+function renderMarkdown(text) {
+  return marked.parse(text, {
+    highlight: (code, lang) => {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(code, { language: lang }).value;
+      }
+      return hljs.highlightAuto(code).value;
+    }
+  });
+}
 
   function formatDate(dt) {
     try { return new Date(dt).toLocaleString(); }
@@ -354,26 +367,29 @@
     const bubble = document.createElement('div');
     bubble.className = `msg ${isAssistant ? 'assistant' : 'user'}`;
 
-    const content = m.message_type === 'img_url'
-      ? `<img src="${m.message}" alt="">`
-      : escapeHtml(m.message).replace(/\n/g, '<br>');
+    let content;
 
-    let statusIcon = '';
-    if (m.role === 'user') {
-      if (m.status === 'pending') statusIcon = `<span class="msg-status pending">⏳</span>`;
-      else if (m.status === 'error') statusIcon = `<span class="msg-status error">❌</span>`;
-      else statusIcon = `<span class="msg-status delivered">✅</span>`;
+    if (m.message_type === 'img_url') {
+        content = `<img src="${m.message}" alt="">`;
+    } else {
+        // ВСЕ сообщения → через Markdown
+        content = renderMarkdown(m.message || "");
     }
 
-    bubble.dataset.msgText = m.message;
     bubble.innerHTML = `
-      <div class="msg-content">${content}</div>
-      <small>${formatDate(m.dt)} • ${isAssistant ? 'Ассистент' : 'Вы'} ${statusIcon}</small>
+        <div class="bubble">
+            ${content}
+        </div>
     `;
 
     chatWindowEl.appendChild(bubble);
     scrollChatToBottom();
-  }
+
+    // подсветка
+    bubble.querySelectorAll("pre code").forEach(block => {
+        hljs.highlightElement(block);
+    });
+}
 
   function scrollChatToBottom() {
     requestAnimationFrame(() => {
@@ -410,7 +426,8 @@
         body: JSON.stringify({
           uuid: activeKey,
           text,
-          code: activeModel
+          code: activeModel,
+          context: (models.find(m => m.code === activeModel)?.context) || null
         })
       });
 

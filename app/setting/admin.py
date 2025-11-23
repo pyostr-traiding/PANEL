@@ -101,5 +101,6 @@ class GPTModelAdmin(AbstractAdmin):
     list_display = (
         'name',
         'code',
+        'context',
         'id',
     )

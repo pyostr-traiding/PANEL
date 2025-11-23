@@ -12,6 +12,7 @@ class SendMessageSchema(BaseModel):
     uuid: str
     text: str
     code: str
+    context: int
 
 class DeleteSchema(BaseModel):
     uuid: str

@@ -154,5 +154,8 @@ class GPTModel(AbstractModel):
         verbose_name='Код',
         max_length=100,
     )
+    context = models.BigIntegerField(
+        verbose_name='Контекст',
+    )
     def __str__(self):
         return self.name

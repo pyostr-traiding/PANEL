@@ -6,3 +6,4 @@ class GPTSchema(BaseModel):
         from_attributes = True
     name: str
     code: str
+    context: int

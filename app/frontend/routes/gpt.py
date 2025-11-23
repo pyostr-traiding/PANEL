@@ -89,6 +89,7 @@ def api_send_to_gpt_chat(
             'uuid': data.uuid,
             'text': data.text,
             'code': data.code,
+            'context': data.context,
         }
     }
     x = send_to_rabbitmq(

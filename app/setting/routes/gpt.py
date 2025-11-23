@@ -18,7 +18,7 @@ router = Router(
 )
 
 
-@router.get(path='/gpt/list')
+@router.get(path='/gpt/list/')
 def api_get_gpt_list(
         request: HttpRequest,
 ) -> Union[List[GPTSchema], response.BaseResponse]:
@@ -27,6 +27,25 @@ def api_get_gpt_list(
 
     """
     result = get_gpt_list()
+    if isinstance(result, response.BaseResponse):
+        return response.return_response(result)
+    return result
+
+
+
+@router.get(path='/gpt/prompt/')
+def api_get_prompt(
+        request: HttpRequest,
+        code: str,
+) -> Union[PromptSchema, response.BaseResponse]:
+    """
+    Получить промпт.
+
+    Статусы:
+    * 200 — Успешно
+    * 404 — Ордер не найден
+    """
+    result = get_prompt(code=code)
     if isinstance(result, response.BaseResponse):
         return response.return_response(result)
     return result
