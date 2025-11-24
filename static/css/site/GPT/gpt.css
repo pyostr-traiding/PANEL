@@ -390,3 +390,68 @@ html, body {
     min-width: 100px;
   }
 }
+/* ============================================================
+   📝 Футер сообщения: Автор, время, статус
+   ============================================================ */
+
+.msg .bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.msg-content {
+  width: 100%;
+}
+
+/* Контейнер футера */
+.msg-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  opacity: 0.65;
+  font-size: 11px;
+  color: var(--muted-color);
+  user-select: none;
+}
+
+/* Автор */
+.msg-author {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Время */
+.msg-time {
+  color: var(--muted-color);
+  font-size: 11px;
+}
+
+/* Статусы */
+.msg-status {
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.msg-status.pending {
+  color: var(--muted-color);
+}
+
+.msg-status.delivered {
+  color: #36c36c;
+}
+
+.msg-status.error {
+  color: #ff4a4a;
+}
+
+/* Немного разные выравнивания для ассистента и юзера */
+.msg.user .msg-footer {
+  justify-content: flex-end;
+}
+
+.msg.assistant .msg-footer {
+  justify-content: flex-start;
+}

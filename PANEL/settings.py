@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_json_widget',
 
     # --- Local apps ---
+    'app.tasks',
     'app.abstractions',
     'app.users',
     'app.frontend',

@@ -362,34 +362,61 @@ function renderMarkdown(text) {
     scrollChatToBottom();
   }
 
-  function appendMessage(m) {
+function appendMessage(m) {
     const isAssistant = m.role === 'assistant';
+    const isUser = m.role === 'user';
+
     const bubble = document.createElement('div');
     bubble.className = `msg ${isAssistant ? 'assistant' : 'user'}`;
 
-    let content;
+    const time = formatDate(m.dt || new Date().toISOString());
+    const author = isAssistant ? "GPT" : "Вы";
 
+    // обработка контента (markdown)
+    let content;
     if (m.message_type === 'img_url') {
         content = `<img src="${m.message}" alt="">`;
     } else {
-        // ВСЕ сообщения → через Markdown
         content = renderMarkdown(m.message || "");
+    }
+
+    // статус
+    let statusIcon = "";
+    if (isUser) {
+        if (m.status === "pending") {
+            statusIcon = `<span class="msg-status pending">⏳</span>`;
+        } else if (m.status === "error") {
+            statusIcon = `<span class="msg-status error">❌</span>`;
+        } else {
+            statusIcon = `<span class="msg-status delivered">✅</span>`;
+        }
     }
 
     bubble.innerHTML = `
         <div class="bubble">
-            ${content}
+            <div class="msg-content">${content}</div>
+
+            <div class="msg-footer">
+                <span class="msg-author">${author}</span>
+                <span class="msg-time">${time}</span>
+                ${statusIcon}
+            </div>
         </div>
     `;
 
     chatWindowEl.appendChild(bubble);
     scrollChatToBottom();
 
-    // подсветка
     bubble.querySelectorAll("pre code").forEach(block => {
         hljs.highlightElement(block);
     });
+
+    // нужно для поиска pending → delivered
+    if (isUser && m.message) {
+        bubble.dataset.msgText = m.message;
+    }
 }
+
 
   function scrollChatToBottom() {
     requestAnimationFrame(() => {
