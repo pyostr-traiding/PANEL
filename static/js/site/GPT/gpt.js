@@ -11,6 +11,9 @@
   const MODELS_API = '/api/settings/gpt/list';
   const DELETE_API = '/api/front/gpt/delete';
 
+  const chatFilterSelect = document.getElementById('chat-filter-select');
+  let chatFilter = 'all';  // <-- выбранный серверный фильтр
+
   // --- WS URL ---
   const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const WS_URL = `${wsScheme}://${window.location.host}/ws/gpt/`;
@@ -68,27 +71,18 @@
     return { uuid, action };
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-  // --- Markdown + highlight.js ---
-hljs.configure({ ignoreUnescapedHTML: true });
+  hljs.configure({ ignoreUnescapedHTML: true });
 
-function renderMarkdown(text) {
-  return marked.parse(text, {
-    highlight: (code, lang) => {
-      if (lang && hljs.getLanguage(lang)) {
-        return hljs.highlight(code, { language: lang }).value;
+  function renderMarkdown(text) {
+    return marked.parse(text, {
+      highlight: (code, lang) => {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
       }
-      return hljs.highlightAuto(code).value;
-    }
-  });
-}
+    });
+  }
 
   function formatDate(dt) {
     try { return new Date(dt).toLocaleString(); }
@@ -229,10 +223,44 @@ function renderMarkdown(text) {
     }
   }
 
+  // ============================================================
+  // <--- НОВОЕ: серверная фильтрация --->
+  // ============================================================
+
+  chatFilterSelect?.addEventListener('change', () => {
+    chatFilter = chatFilterSelect.value;
+
+    // полный ресет
+    page = 1;
+    noMore = false;
+    isLoading = false;
+
+    chatKeys.clear();
+    chats = [];
+    messagesCache.clear();
+
+    chatListEl.innerHTML = '';
+    chatWindowEl.innerHTML = `<div class="empty-state">Выберите чат слева, чтобы посмотреть диалог.</div>`;
+    activeKey = null;
+
+    loadPage();
+  });
+
+  // ============================================================
+
   function mountChatList(items, { prepend = false } = {}) {
     const fragment = document.createDocumentFragment();
-    items.forEach(it => fragment.appendChild(renderChatItem(it)));
-    prepend ? chatListEl.prepend(fragment) : chatListEl.appendChild(fragment);
+
+    items.forEach(it => {
+      fragment.appendChild(renderChatItem(it));
+    });
+
+    if (!fragment.children.length) return;
+
+    prepend
+      ? chatListEl.prepend(fragment)
+      : chatListEl.appendChild(fragment);
+
     highlightActive();
   }
 
@@ -251,7 +279,10 @@ function renderMarkdown(text) {
     listLoaderEl.classList.remove('hidden');
 
     try {
-      const res = await fetch(`${LIST_API}?page=${page}&per_page=${perPage}`);
+      const res = await fetch(
+        `${LIST_API}?page=${page}&per_page=${perPage}&type=${chatFilter}`
+      );
+
       if (res.status === 404) {
         noMore = true;
         listEndEl.classList.remove('hidden');
@@ -270,6 +301,7 @@ function renderMarkdown(text) {
       });
 
       if (fresh.length) mountChatList(fresh);
+
       if (!activeKey && chats.length) setActiveChat(chats[0].key);
 
       page++;
@@ -322,12 +354,10 @@ function renderMarkdown(text) {
 
     chatWindowEl.innerHTML = '';
 
-    // 1. Моментально рендерим кэш если есть
     if (messagesCache.has(key)) {
       renderMessages(messagesCache.get(key));
     }
 
-    // 2. ВСЕГДА грузим с сервера заново (и обновляем модель)
     await loadChat(key);
   }
 
@@ -362,7 +392,7 @@ function renderMarkdown(text) {
     scrollChatToBottom();
   }
 
-function appendMessage(m) {
+  function appendMessage(m) {
     const isAssistant = m.role === 'assistant';
     const isUser = m.role === 'user';
 
@@ -372,30 +402,27 @@ function appendMessage(m) {
     const time = formatDate(m.dt || new Date().toISOString());
     const author = isAssistant ? "GPT" : "Вы";
 
-    // обработка контента (markdown)
     let content;
     if (m.message_type === 'img_url') {
-        content = `<img src="${m.message}" alt="">`;
+      content = `<img src="${m.message}" alt="">`;
     } else {
-        content = renderMarkdown(m.message || "");
+      content = renderMarkdown(m.message || "");
     }
 
-    // статус
     let statusIcon = "";
     if (isUser) {
-        if (m.status === "pending") {
-            statusIcon = `<span class="msg-status pending">⏳</span>`;
-        } else if (m.status === "error") {
-            statusIcon = `<span class="msg-status error">❌</span>`;
-        } else {
-            statusIcon = `<span class="msg-status delivered">✅</span>`;
-        }
+      if (m.status === "pending") {
+        statusIcon = `<span class="msg-status pending">⏳</span>`;
+      } else if (m.status === "error") {
+        statusIcon = `<span class="msg-status error">❌</span>`;
+      } else {
+        statusIcon = `<span class="msg-status delivered">✅</span>`;
+      }
     }
 
     bubble.innerHTML = `
         <div class="bubble">
             <div class="msg-content">${content}</div>
-
             <div class="msg-footer">
                 <span class="msg-author">${author}</span>
                 <span class="msg-time">${time}</span>
@@ -408,15 +435,13 @@ function appendMessage(m) {
     scrollChatToBottom();
 
     bubble.querySelectorAll("pre code").forEach(block => {
-        hljs.highlightElement(block);
+      hljs.highlightElement(block);
     });
 
-    // нужно для поиска pending → delivered
     if (isUser && m.message) {
-        bubble.dataset.msgText = m.message;
+      bubble.dataset.msgText = m.message;
     }
-}
-
+  }
 
   function scrollChatToBottom() {
     requestAnimationFrame(() => {

@@ -22,30 +22,46 @@ router = Router(
 def api_filter_gpt_chats(
         request: HttpRequest,
         page: int,
-        per_page: int = 10
+        per_page: int = 10,
+        type: str = "all"
 ):
-
     """
-    Возвращает список ключей чатов по страницам
+    Возвращает список ключей чатов по страницам, с фильтрацией по типу
     """
     all_keys = []
     cursor = 0
-    pattern = "chat:*"
+
+    # фильтр по action
+    # type == "all" --> chat:*:* (все)
+    # иначе         --> chat:*:trend_analysis
+    if type == "all":
+        pattern = "chat:*:*"
+    else:
+        pattern = f"chat:*:{type}"
+
     while True:
-        cursor, keys = redis_server.scan(cursor=cursor, match=pattern, count=100, db=RedisDB.gpt)
+        cursor, keys = redis_server.scan(
+            cursor=cursor,
+            match=pattern,
+            count=100,
+            db=RedisDB.gpt
+        )
         all_keys.extend(keys)
         if cursor == 0:
             break
 
-    # Считаем срез по страницам
+    # пагинация
     start = (page - 1) * per_page
     end = start + per_page
     result = all_keys[start:end]
+
     if not result:
-        return response.return_response(response.NotFoundResponse(
-            msg='Пуфто'
-        ))
+        return response.return_response(
+            response.NotFoundResponse(msg='Пусто')
+        )
+
     return result
+
 
 
 @router.get(

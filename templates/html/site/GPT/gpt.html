@@ -34,9 +34,19 @@
     <aside class="chat-sidebar">
 
         <div class="chat-sidebar-header">
-  <div class="chat-sidebar-title">Чаты</div>
+      <div class="chat-sidebar-title">Чаты</div>
+            <div class="chat-filter">
+              <select id="chat-filter-select">
+                  <option value="all">Все</option>
+                  <option value="user_chat">user_chat</option>
+                  <option value="trend_analysis">trend_analysis</option>
+                  <option value="global_analysis">global_analysis</option>
+              </select>
+            </div>
   <button id="chat-new-btn" class="chat-new-btn">+ Новый чат</button>
 </div>
+
+
       <div id="chat-list" class="chat-list"></div>
 
       <div id="chat-list-footer" class="chat-list-footer">
