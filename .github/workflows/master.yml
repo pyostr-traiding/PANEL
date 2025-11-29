@@ -35,6 +35,12 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
+            
+            # Временные переменные окружения для деплоя
+            export INFISICAL_TOKEN="${{ secrets.INFISICAL_TOKEN }}"
+            export INFISICAL_HOST="${{ secrets.INFISICAL_HOST }}"
+            export ENVIRONMENT_SLUG="${{ secrets.ENVIRONMENT_SLUG }}"
+            
             echo "===== Проверка папки apps ====="
             if [ ! -d "apps" ]; then
               sudo mkdir apps
