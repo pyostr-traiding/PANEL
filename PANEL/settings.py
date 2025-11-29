@@ -6,21 +6,52 @@ import boto3
 import pika
 import redis
 from dotenv import load_dotenv
+from infisical_sdk import InfisicalSDKClient
 from telebot import TeleBot
 from PANEL.redis_conf import RedisServer
 
 
 # =========================
+# === LOAD ENVIROMENT ==
+# =========================
+load_dotenv()
+
+client = InfisicalSDKClient(
+    host=os.getenv('INFISICAL_HOST'),
+    token=os.getenv('INFISICAL_TOKEN'),
+    cache_ttl=300
+)
+
+
+def load_project_secrets(project_slug: str):
+    resp = client.secrets.list_secrets(
+        project_slug=project_slug,
+        environment_slug=os.getenv('ENVIRONMENT_SLUG'),
+        secret_path="/"
+    )
+    return {s['secretKey']: s['secretValue'] for s in resp.to_dict()['secrets']}
+
+# Загружаем общие секреты
+shared_secrets = load_project_secrets("shared-all")
+
+# Загружаем проектные секреты
+project_secrets = load_project_secrets("panel")
+
+# Объединяем: проектные перезаписывают общие при совпадении ключей
+all_secrets = {**shared_secrets, **project_secrets}
+
+# Добавляем в окружение
+os.environ.update(all_secrets)
+
+# =========================
 # === BASE CONFIGURATION ==
 # =========================
 
-load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False'))
+DEBUG = False
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-ALLOWED_HOSTS.append('admin-panel')
 
 # ======================
 # === DJANGO APPS ======
@@ -52,22 +83,7 @@ INSTALLED_APPS = [
     'app.order',
 ]
 
-# =======================
-# === CHANNELS CONFIG ===
-# =======================
 
-ASGI_APPLICATION = 'PANEL.asgi.application'
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [
-                f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}"
-            ],
-        },
-    },
-}
 
 # ======================
 # === MIDDLEWARE =======
@@ -111,14 +127,20 @@ WSGI_APPLICATION = 'PANEL.wsgi.application'
 # === DATABASE =========
 # ======================
 
+MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
+MYSQL_USER = os.getenv('MYSQL_USER')
+MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+MYSQL_DATABASE_HOST = os.getenv('MYSQL_DATABASE_HOST')
+MYSQL_DATABASE_PORT = os.getenv('MYSQL_DATABASE_PORT')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE'),
-        'USER': os.getenv('MYSQL_USER'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-        'HOST': os.getenv('MYSQL_DATABASE_HOST'),
-        'PORT': os.getenv('MYSQL_DATABASE_PORT'),
+        'NAME': MYSQL_DATABASE,
+        'USER': MYSQL_USER,
+        'PASSWORD': MYSQL_PASSWORD,
+        'HOST': MYSQL_DATABASE_HOST,
+        'PORT': MYSQL_DATABASE_PORT,
         'OPTIONS': {
             'charset': 'utf8mb4',
             'use_unicode': True,
@@ -172,10 +194,16 @@ SESSION_COOKIE_SECURE = False
 # === S3 STORAGE =======
 # ======================
 
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
+
+
 s3_client = boto3.resource(
     service_name='s3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     endpoint_url='https://s3.timeweb.com',
 )
 
@@ -189,10 +217,10 @@ else:
         'default': {
             'BACKEND': 'storages.backends.s3.S3Storage',
             'OPTIONS': {
-                'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
-                'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
-                'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
-                'endpoint_url': os.getenv('AWS_S3_ENDPOINT_URL'),
+                'access_key': AWS_ACCESS_KEY_ID,
+                'secret_key': AWS_SECRET_ACCESS_KEY,
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'endpoint_url': AWS_S3_ENDPOINT_URL,
                 'signature_version': 's3',
                 'location': 'TRADE',
             },
@@ -200,26 +228,28 @@ else:
         'staticfiles': {
             'BACKEND': 'storages.backends.s3.S3Storage',
             'OPTIONS': {
-                'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
-                'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
-                'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
-                'endpoint_url': os.getenv('AWS_S3_ENDPOINT_URL'),
+                'access_key': AWS_ACCESS_KEY_ID,
+                'secret_key': AWS_SECRET_ACCESS_KEY,
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'endpoint_url': AWS_S3_ENDPOINT_URL,
                 'signature_version': 's3',
                 'location': 'TRADE',
             },
         },
     }
 
-    MEDIA_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/media/"
-    STATIC_URL = f"{os.getenv('AWS_S3_ENDPOINT_URL')}/{os.getenv('AWS_STORAGE_BUCKET_NAME')}/TRADE/static/"
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/TRADE/media/"
+    STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/TRADE/static/"
     STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # ======================
 # === TELEGRAM =========
 # ======================
 
+TG_BOT_TOKEN = os.getenv('BOT_TOKEN')
+
 tg_client = TeleBot(
-    token=os.getenv('BOT_TOKEN'),
+    token=TG_BOT_TOKEN,
     parse_mode='HTML',
 )
 
@@ -227,34 +257,68 @@ tg_client = TeleBot(
 # === RABBITMQ =========
 # ======================
 
+RABBITMQ_USERNAME = os.getenv('RABBITMQ_USERNAME')
+RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
+RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
+RABBITMQ_VIRTUAL_HOST = os.getenv('RABBITMQ_VIRTUAL_HOST')
+
 credentials = pika.PlainCredentials(
-    username=os.getenv('RABBITMQ_USERNAME'),
-    password=os.getenv('RABBITMQ_PASSWORD'),
+    username=RABBITMQ_USERNAME,
+    password=RABBITMQ_PASSWORD,
 )
 
 connection_params = pika.ConnectionParameters(
-    host=os.getenv('RABBITMQ_HOST'),
-    port=int(os.getenv('RABBITMQ_PORT')),
-    virtual_host=os.getenv('RABBITMQ_VIRTUAL_HOST'),
+    host=RABBITMQ_HOST,
+    port=RABBITMQ_PORT,
+    virtual_host=RABBITMQ_VIRTUAL_HOST,
     credentials=credentials,
 )
+
+# ======================
+# === REDIS ============
+# ======================
+
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = int(os.getenv('REDIS_PORT'))
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
+
+redis_server = RedisServer(
+    host=REDIS_HOST,
+    port=REDIS_PORT,
+    password=REDIS_PASSWORD,
+)
+
+
+# =======================
+# === CHANNELS CONFIG ===
+# =======================
+
+ASGI_APPLICATION = 'PANEL.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}"
+            ],
+        },
+    },
+}
 
 # ======================
 # === CELERY ===========
 # ======================
 
 CELERY_BROKER_URL = (
-    f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}/44"
+    f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/44"
 )
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_RESULT_EXTENDED = True
 CELERY_BEAT_MAX_LOOP_INTERVAL = 1  # сек
 
-# ======================
-# === REDIS ============
-# ======================
 
-redis_server = RedisServer()
 
 # ======================
 # === LOGGING ==========

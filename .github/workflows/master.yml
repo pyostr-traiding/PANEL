@@ -1,6 +1,5 @@
 name: Deploy to PRODUCTION Server
 
-
 on:
   push:
     branches:
@@ -10,11 +9,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
 
-      #----------------------------------------------
-      # Определяем хосты
-      #----------------------------------------------
+    steps:
+      # ----------------------------------------------
+      # Установка SSH ключей
+      # ----------------------------------------------
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -24,11 +23,10 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      #----------------------------------------------
-      # Подключение к серверу и пересборка проекта
-      #----------------------------------------------
-      - name: Connect to server> .env
-
+      # ----------------------------------------------
+      # Основной деплой
+      # ----------------------------------------------
+      - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -37,32 +35,28 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            # Проверяем, существует ли папка apps
+            echo "===== Проверка папки apps ====="
             if [ ! -d "apps" ]; then
-                sudo mkdir apps
+              sudo mkdir apps
             fi
-            # Проверяем, существует ли папка apps/PANEL
+
+            echo "===== Пересоздание папки проекта ====="
             if [ -d "apps/TRADING_PANEL" ]; then
-                sudo rm -rf apps/TRADING_PANEL
+              sudo rm -rf apps/TRADING_PANEL
             fi
             sudo mkdir apps/TRADING_PANEL
             cd apps/TRADING_PANEL
-            
-            script: |
-            # Попытка клонирования репозитория
+
+            echo "===== Клонирование репозитория ====="
             if ! sudo git clone https://username:${{ secrets.ACCESS_TOKEN }}@github.com/pyostr-traiding/PANEL.git .; then
               echo "Ошибка при клонировании репозитория"
               exit 1
             fi
 
-            # Установка .env файла
-            if ! echo "${{ secrets.ENV_FILE }}" > .env; then
-              echo "Ошибка при установке .env файла"
-              exit 1
-            fi
-
-            # Попытка запуска docker-compose
+            echo "===== Запуск Docker ====="
             if ! docker compose up --build -d; then
               echo "Ошибка при запуске docker-compose"
               exit 1
             fi
+
+            echo "===== Развёртывание завершено успешно ====="

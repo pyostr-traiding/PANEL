@@ -13,15 +13,23 @@ class RedisDB:
     monitoring: int = 8
 
 class RedisServer:
-    def __init__(self):
+    def __init__(
+            self,
+            host: str,
+            port: int,
+            password: str,
+    ):
         self._connections = {}
+        self.host = host
+        self.port = port
+        self.password = password
 
     def _get_connection(self, db: int) -> redis.Redis:
         if db not in self._connections:
             self._connections[db] = redis.Redis(
-                host=os.getenv('REDIS_HOST'),
-                port=int(os.getenv('REDIS_PORT')),
-                password=os.getenv('REDIS_PASSWORD'),
+                host=self.host,
+                port=self.port,
+                password=self.password,
                 db=db,
                 decode_responses=True
             )
