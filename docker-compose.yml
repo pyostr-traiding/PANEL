@@ -4,21 +4,13 @@ networks:
   GLOBAL_NETWORK:
     external: true
 
-#-------------------------------------------
-# Единый блок environment (якорь)
-#-------------------------------------------
-x-common-env: &common_env
-  INFISICAL_HOST: ${INFISICAL_HOST}
-  INFISICAL_TOKEN: ${INFISICAL_TOKEN}
-  ENVIRONMENT_SLUG: ${ENVIRONMENT_SLUG}
-
 services:
 
   panel:
     build: ./
     container_name: admin-panel
     command: poetry run daphne -b 0.0.0.0 -p 8000 PANEL.asgi:application --verbosity 0
-    environment: *common_env
+    env_file: .env
     restart: always
     ports:
       - '8091:8000'
@@ -31,7 +23,7 @@ services:
     build: ./
     container_name: panel-celery-tasks
     command: poetry run celery -A PANEL worker --beat -l INFO
-    environment: *common_env
+    env_file: .env
     restart: always
     depends_on:
       - panel
@@ -44,7 +36,7 @@ services:
     build: ./
     container_name: panel-beat
     command: poetry run celery -A PANEL beat -S django_celery_beat.schedulers:DatabaseScheduler --loglevel=info
-    environment: *common_env
+    env_file: .env
     restart: always
     depends_on:
       - panel
